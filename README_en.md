@@ -8,7 +8,7 @@
 ![GitHub Stars](https://img.shields.io/github/stars/ChangooLee/mcp-kr-legislation)
 ![GitHub Issues](https://img.shields.io/github/issues/ChangooLee/mcp-kr-legislation)
 
-Model Context Protocol (MCP) server integrating Korean Ministry of Legislation OPEN APIs. **125 comprehensive tools** provide complete access to all Korean legal information including laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, mobile services, custom services, knowledge base, miscellaneous, and ministry interpretations.
+Model Context Protocol (MCP) server integrating Korean Ministry of Legislation OPEN APIs. **121 comprehensive tools** provide complete access to all Korean legal information including laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, mobile services, custom services, knowledge base, miscellaneous, and ministry interpretations.
 
 **🔗 GitHub Repository**: https://github.com/ChangooLee/mcp-kr-legislation
 
@@ -42,7 +42,7 @@ Ask your AI assistant to:
 | **International Treaties** | ✅ Fully supported | 2 tools | International treaties and agreements concluded by Korea |
 | **Analysis Tools** | 🔧 Under Development | 2 tools | Legislation data analysis and statistics (planned) |
 
-**Access all Korean legislation information with 125 comprehensive tools**
+**Access all Korean legislation information with 121 comprehensive tools**
 
 ---
 

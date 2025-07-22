@@ -1,5 +1,5 @@
 """
-한국 법제처 OPEN API 125개 완전 통합 MCP 서버
+한국 법제처 OPEN API 121개 완전 통합 MCP 서버
 
 지원하는 API 카테고리:
 - 법령 (16개)
@@ -75,7 +75,7 @@ async def legislation_lifespan(app: FastMCP):
         client = LegislationClient(config=legislation_config)
         ctx = LegislationContext(client=client)
         logger.info("Legislation client initialized successfully.")
-        logger.info("🚀 125개 법제처 OPEN API 지원 완료! (법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 모바일, 맞춤형, 지식베이스, 기타, 중앙부처해석 등 전체 카테고리 완벽 지원)")
+        logger.info("🚀 121개 법제처 OPEN API 지원 완료! (법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 모바일, 맞춤형, 지식베이스, 기타, 중앙부처해석 등 전체 카테고리 완벽 지원)")
         
         await asyncio.sleep(0)  # async generator로 인식되도록 보장
         yield ctx
@@ -91,7 +91,7 @@ tool_registry = initialize_registry()
 # FastMCP 인스턴스 생성
 mcp = FastMCP(
     "KR Legislation MCP",
-    instructions="Korean legislation information MCP server with 125 comprehensive tools covering all categories: laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, mobile services, custom services, knowledge base, miscellaneous, and ministry interpretations.",
+    instructions="Korean legislation information MCP server with 121 comprehensive tools covering all categories: laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, mobile services, custom services, knowledge base, miscellaneous, and ministry interpretations.",
     lifespan=legislation_lifespan,
 )
 

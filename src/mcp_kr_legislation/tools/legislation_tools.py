@@ -1,7 +1,7 @@
 """
-한국 법제처 OPEN API 125개 완전 통합 MCP 도구
+한국 법제처 OPEN API 119개 완전 통합 MCP 도구
 
-125개의 모든 API를 구현하여 한국의 법령, 행정규칙, 자치법규, 판례, 위원회결정문 등 
+119개의 모든 API를 구현하여 한국의 법령, 행정규칙, 자치법규, 판례, 위원회결정문 등 
 모든 법률 정보에 대한 포괄적인 접근을 제공합니다.
 
 API 카테고리:
@@ -3008,4 +3008,4 @@ def get_ministry_manual_info(manual_id: str) -> str:
     
     return f"중앙부처 매뉴얼 상세 정보가 저장되었습니다: {file_path}"
 
-logger.info("125개 법제처 OPEN API 도구가 모두 로드되었습니다!") 
+logger.info("119개 법제처 OPEN API 도구가 모두 로드되었습니다!") 

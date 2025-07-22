@@ -1,5 +1,5 @@
 """
-한국 법제처 OPEN API 125개 완전 통합 도구 레지스트리 초기화
+한국 법제처 OPEN API 121개 완전 통합 도구 레지스트리 초기화
 """
 
 from mcp_kr_legislation.registry.tool_registry import ToolRegistry

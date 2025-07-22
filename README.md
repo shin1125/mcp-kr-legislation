@@ -8,7 +8,7 @@
 ![GitHub Stars](https://img.shields.io/github/stars/ChangooLee/mcp-kr-legislation)
 ![GitHub Issues](https://img.shields.io/github/issues/ChangooLee/mcp-kr-legislation)
 
-한국 법제처 OPEN API를 통합한 Model Context Protocol(MCP) 서버입니다. **125개의 포괄적인 도구**를 통해 법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 모바일, 맞춤형, 지식베이스, 기타, 중앙부처해석 등 모든 법률 정보에 대한 완전한 접근을 제공합니다.
+한국 법제처 OPEN API를 통합한 Model Context Protocol(MCP) 서버입니다. **121개의 포괄적인 도구**를 통해 법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 모바일, 맞춤형, 지식베이스, 기타, 중앙부처해석 등 모든 법률 정보에 대한 완전한 접근을 제공합니다.
 
 **🔗 GitHub Repository**: https://github.com/ChangooLee/mcp-kr-legislation
 
@@ -42,7 +42,7 @@ AI 어시스턴트에게 다음과 같은 요청을 할 수 있습니다:
 | **국제조약** | ✅ 완전 지원 | 2개 | 한국이 체결한 국제조약 및 협정 |
 | **분석 도구** | 🔧 개발 중 | 2개 | 법령 데이터 분석 및 통계 (개발 예정) |
 
-**총 125개 포괄적 도구로 한국의 모든 법령 정보에 완전한 접근 가능**
+**총 121개 포괄적 도구로 한국의 모든 법령 정보에 완전한 접근 가능**
 
 ---
 

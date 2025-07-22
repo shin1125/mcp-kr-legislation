@@ -1,5 +1,5 @@
 """
-한국 법제처 OPEN API 125개 완전 통합 클라이언트
+한국 법제처 OPEN API 121개 완전 통합 클라이언트
 
 지원하는 API 카테고리:
 - 법령 (16개): 목록/본문/영문/시행일/변경이력/연혁/체계도/신구법비교/3단비교/약칭/삭제데이터/한눈보기/조문별/별표
@@ -32,7 +32,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 class LegislationClient:
-    """법제처 OPEN API 125개 완전 통합 클라이언트"""
+    """법제처 OPEN API 121개 완전 통합 클라이언트"""
     
     def __init__(self, config: Optional[LegislationConfig] = None):
         self.config = config or legislation_config
@@ -378,5 +378,5 @@ class LegislationClient:
         return self.service(ministry, params)
 
 """
-법제처 OPEN API 125개 완전 통합 HTTP 클라이언트
+법제처 OPEN API 121개 완전 통합 HTTP 클라이언트
 """ 
