@@ -1,0 +1,103 @@
+{
+  "StatisticItemList": {
+    "list_total_count": 6,
+    "row": [
+      {
+        "STAT_CODE": "901Y062",
+        "STAT_NAME": "4.4.1.1. 주택매매가격지수(KB)",
+        "GRP_CODE": "Group1",
+        "GRP_NAME": "계정항목",
+        "ITEM_CODE": "P63ACA",
+        "ITEM_NAME": "아파트(서울)",
+        "P_ITEM_CODE": "P63AC",
+        "P_ITEM_NAME": "아파트",
+        "CYCLE": "M",
+        "START_TIME": "198601",
+        "END_TIME": "202505",
+        "DATA_CNT": 473,
+        "UNIT_NAME": "2022.01=100",
+        "WEIGHT": null
+      },
+      {
+        "STAT_CODE": "901Y062",
+        "STAT_NAME": "4.4.1.1. 주택매매가격지수(KB)",
+        "GRP_CODE": "Group1",
+        "GRP_NAME": "계정항목",
+        "ITEM_CODE": "P63A",
+        "ITEM_NAME": "총지수",
+        "P_ITEM_CODE": null,
+        "P_ITEM_NAME": null,
+        "CYCLE": "M",
+        "START_TIME": "198601",
+        "END_TIME": "202505",
+        "DATA_CNT": 473,
+        "UNIT_NAME": "2022.01=100",
+        "WEIGHT": null
+      },
+      {
+        "STAT_CODE": "901Y062",
+        "STAT_NAME": "4.4.1.1. 주택매매가격지수(KB)",
+        "GRP_CODE": "Group1",
+        "GRP_NAME": "계정항목",
+        "ITEM_CODE": "P63AA",
+        "ITEM_NAME": "단독주택",
+        "P_ITEM_CODE": "P63A",
+        "P_ITEM_NAME": "총지수",
+        "CYCLE": "M",
+        "START_TIME": "198601",
+        "END_TIME": "202505",
+        "DATA_CNT": 473,
+        "UNIT_NAME": "2022.01=100",
+        "WEIGHT": null
+      },
+      {
+        "STAT_CODE": "901Y062",
+        "STAT_NAME": "4.4.1.1. 주택매매가격지수(KB)",
+        "GRP_CODE": "Group1",
+        "GRP_NAME": "계정항목",
+        "ITEM_CODE": "P63AB",
+        "ITEM_NAME": "연립주택",
+        "P_ITEM_CODE": "P63A",
+        "P_ITEM_NAME": "총지수",
+        "CYCLE": "M",
+        "START_TIME": "198601",
+        "END_TIME": "202505",
+        "DATA_CNT": 473,
+        "UNIT_NAME": "2022.01=100",
+        "WEIGHT": null
+      },
+      {
+        "STAT_CODE": "901Y062",
+        "STAT_NAME": "4.4.1.1. 주택매매가격지수(KB)",
+        "GRP_CODE": "Group1",
+        "GRP_NAME": "계정항목",
+        "ITEM_CODE": "P63AC",
+        "ITEM_NAME": "아파트",
+        "P_ITEM_CODE": "P63A",
+        "P_ITEM_NAME": "총지수",
+        "CYCLE": "M",
+        "START_TIME": "198601",
+        "END_TIME": "202505",
+        "DATA_CNT": 473,
+        "UNIT_NAME": "2022.01=100",
+        "WEIGHT": null
+      },
+      {
+        "STAT_CODE": "901Y062",
+        "STAT_NAME": "4.4.1.1. 주택매매가격지수(KB)",
+        "GRP_CODE": "Group1",
+        "GRP_NAME": "계정항목",
+        "ITEM_CODE": "P63AD",
+        "ITEM_NAME": "총지수(서울)",
+        "P_ITEM_CODE": "P63A",
+        "P_ITEM_NAME": "총지수",
+        "CYCLE": "M",
+        "START_TIME": "198601",
+        "END_TIME": "202505",
+        "DATA_CNT": 473,
+        "UNIT_NAME": "2022.01=100",
+        "WEIGHT": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,406 @@
+{
+    "overallStatistics": {
+        "totalTransactionCount": 314,
+        "totalTransactionValue": {
+            "value": 363436500000.0,
+            "unit": "원"
+        }
+    },
+    "priceLevelStatistics": {
+        "overallAveragePrice": {
+            "value": 1157441082.8025477,
+            "unit": "원"
+        },
+        "overallMedianPrice": {
+            "value": 1175000000.0,
+            "unit": "원"
+        },
+        "overallHighestPrice": {
+            "value": 2330000000.0,
+            "unit": "원"
+        },
+        "overallLowestPrice": {
+            "value": 102000000.0,
+            "unit": "원"
+        },
+        "representativeDeals": {
+            "highestPriceDeal": {
+                "aptDong": " ",
+                "aptNm": "고덕 아이파크",
+                "buildYear": {
+                    "value": 2011,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "233,000",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 강동구",
+                "excluUseAr": {
+                    "value": 178,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 7,
+                    "unit": "층"
+                },
+                "jibun": "499",
+                "landLeaseholdGbn": "N",
+                "rgstDate": " ",
+                "sggCd": 11740,
+                "slerGbn": "개인",
+                "umdNm": "고덕동",
+                "dealAmountNum": {
+                    "value": 2330000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 178,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2011,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 7,
+                    "unit": "층"
+                },
+                "dealDayNum": 4,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2025-04-04"
+            },
+            "lowestPriceDeal": {
+                "aptDong": " ",
+                "aptNm": "청광플러스원(큐브1차)",
+                "buildYear": {
+                    "value": 2012,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "10,200",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 강동구",
+                "excluUseAr": {
+                    "value": 17,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 10,
+                    "unit": "층"
+                },
+                "jibun": "387-5",
+                "landLeaseholdGbn": "N",
+                "rgstDate": "25.04.25",
+                "sggCd": 11740,
+                "slerGbn": "개인",
+                "umdNm": "길동",
+                "dealAmountNum": {
+                    "value": 102000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 17,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2012,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 10,
+                    "unit": "층"
+                },
+                "dealDayNum": 25,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2025-04-25"
+            },
+            "dealClosestToAverage": {
+                "aptDong": " ",
+                "aptNm": "프라이어팰리스",
+                "buildYear": {
+                    "value": 2007,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "116,000",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 강동구",
+                "excluUseAr": {
+                    "value": 60,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 19,
+                    "unit": "층"
+                },
+                "jibun": "413",
+                "landLeaseholdGbn": "N",
+                "rgstDate": " ",
+                "sggCd": 11740,
+                "slerGbn": "개인",
+                "umdNm": "암사동",
+                "dealAmountNum": {
+                    "value": 1160000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 60,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2007,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 19,
+                    "unit": "층"
+                },
+                "dealDayNum": 26,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2025-04-26"
+            },
+            "dealClosestToMedian": {
+                "aptDong": "102",
+                "aptNm": "고덕센트럴푸르지오",
+                "buildYear": {
+                    "value": 2020,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "118,000",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 강동구",
+                "excluUseAr": {
+                    "value": 59,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 21,
+                    "unit": "층"
+                },
+                "jibun": "210-1",
+                "landLeaseholdGbn": "N",
+                "rgstDate": "25.06.11",
+                "sggCd": 11740,
+                "slerGbn": "개인",
+                "umdNm": "고덕동",
+                "dealAmountNum": {
+                    "value": 1180000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 59,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2020,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 21,
+                    "unit": "층"
+                },
+                "dealDayNum": 8,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2025-04-08"
+            }
+        }
+    },
+    "pricePerAreaStatistics": {
+        "overallAveragePricePerPyeong": {
+            "value": 52571003.6859147,
+            "unit": "원/평"
+        },
+        "overallMedianPricePerPyeong": {
+            "value": 50132549.015613295,
+            "unit": "원/평"
+        }
+    },
+    "statisticsByApartmentComplex": {},
+    "statisticsByDong": {
+        "강일동": {
+            "transactionCount": 14,
+            "averagePrice": {
+                "value": 910392857.1428571,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 954000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 41841339.633301675,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 38969527.28987387,
+                "unit": "원/평"
+            }
+        },
+        "고덕동": {
+            "transactionCount": 45,
+            "averagePrice": {
+                "value": 1525555555.5555556,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1545000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 69436136.61499088,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 72064460.56650932,
+                "unit": "원/평"
+            }
+        },
+        "길동": {
+            "transactionCount": 33,
+            "averagePrice": {
+                "value": 771984848.4848485,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 750000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 37801240.642602965,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 37055997.050147496,
+                "unit": "원/평"
+            }
+        },
+        "둔촌동": {
+            "transactionCount": 22,
+            "averagePrice": {
+                "value": 1041090909.0909091,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 922500000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 45253913.54643291,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 46826370.00513421,
+                "unit": "원/평"
+            }
+        },
+        "명일동": {
+            "transactionCount": 55,
+            "averagePrice": {
+                "value": 1267809090.909091,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1260000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 59593754.86019982,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 56851394.496784806,
+                "unit": "원/평"
+            }
+        },
+        "상일동": {
+            "transactionCount": 37,
+            "averagePrice": {
+                "value": 1431513513.5135136,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1400000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 66591469.14902694,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 68489483.22542673,
+                "unit": "원/평"
+            }
+        },
+        "성내동": {
+            "transactionCount": 31,
+            "averagePrice": {
+                "value": 860532258.0645161,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 870000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 39581557.14344342,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 40677497.3793925,
+                "unit": "원/평"
+            }
+        },
+        "암사동": {
+            "transactionCount": 49,
+            "averagePrice": {
+                "value": 1235275510.2040818,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1250000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 52286720.99665865,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 51640128.07137956,
+                "unit": "원/평"
+            }
+        },
+        "천호동": {
+            "transactionCount": 28,
+            "averagePrice": {
+                "value": 848607142.8571429,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 772500000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 36544454.98217767,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 32419247.24708685,
+                "unit": "원/평"
+            }
+        }
+    },
+    "notes": "PPA (Price Per Pyeong) is calculated based on the 'exclusive use area'."
+}

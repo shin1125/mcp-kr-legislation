@@ -1,0 +1,60 @@
+{
+    "overallStatistics": {
+        "totalTransactionCount": 12,
+        "totalTransactionValue": "16,252,000 만원",
+        "transactionDistributionByPropertyType": {}
+    },
+    "priceLevelStatistics": {
+        "overallAveragePrice": "1,354,333 만원",
+        "overallMedianPrice": "103,250 만원",
+        "overallHighestPrice": "8,370,000 만원",
+        "overallLowestPrice": "14,000 만원"
+    },
+    "pricePerAreaStatistics": {
+        "overallAveragePricePerPyeong": "7,113 만원/평",
+        "overallMedianPricePerPyeong": "6,049 만원/평"
+    },
+    "locationStatistics_byDong": {},
+    "buildingCharacteristicsStatistics": {
+        "statisticsByBuildingAge": {
+            "5 years or newer": {
+                "transactionCount": 1,
+                "averagePrice": "8,370,000 만원",
+                "averagePricePerPyeong": null
+            },
+            "6-10 years": {
+                "transactionCount": 1,
+                "averagePrice": "50,000 만원",
+                "averagePricePerPyeong": null
+            },
+            "11-20 years": {
+                "transactionCount": 3,
+                "averagePrice": "83,000 만원",
+                "averagePricePerPyeong": null
+            },
+            "over 20 years": {
+                "transactionCount": 7,
+                "averagePrice": "1,083,286 만원",
+                "averagePricePerPyeong": null
+            }
+        },
+        "statisticsByBuildingScale_exclusiveArea": {
+            "small (<100m²)": {
+                "transactionCount": 8,
+                "averagePrice": "63,375 만원",
+                "averagePricePerPyeong": null
+            },
+            "large (300-1000m²)": {
+                "transactionCount": 1,
+                "averagePrice": "1,375,000 만원",
+                "averagePricePerPyeong": null
+            },
+            "extra_large (>1000m²)": {
+                "transactionCount": 3,
+                "averagePrice": "4,790,000 만원",
+                "averagePricePerPyeong": null
+            }
+        }
+    },
+    "notes": "Price per pyeong and building scale are calculated based on the 'exclusive use area'. Data for 'land share' or 'road access conditions' is not provided by the API and is not included in this analysis."
+}

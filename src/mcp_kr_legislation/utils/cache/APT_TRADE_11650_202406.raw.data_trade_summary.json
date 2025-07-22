@@ -1,0 +1,387 @@
+{
+    "overallStatistics": {
+        "totalTransactionCount": 495,
+        "totalTransactionValue": {
+            "value": 1309771000000.0,
+            "unit": "원"
+        }
+    },
+    "priceLevelStatistics": {
+        "overallAveragePrice": {
+            "value": 2646002020.20202,
+            "unit": "원"
+        },
+        "overallMedianPrice": {
+            "value": 2500000000.0,
+            "unit": "원"
+        },
+        "overallHighestPrice": {
+            "value": 7100000000.0,
+            "unit": "원"
+        },
+        "overallLowestPrice": {
+            "value": 195000000.0,
+            "unit": "원"
+        },
+        "representativeDeals": {
+            "highestPriceDeal": {
+                "aptDong": "103동",
+                "aptNm": "아크로리버파크",
+                "buildYear": {
+                    "value": 2016,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "710,000",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 서초구",
+                "excluUseAr": {
+                    "value": 130,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 21,
+                    "unit": "층"
+                },
+                "jibun": "2-12",
+                "landLeaseholdGbn": "N",
+                "rgstDate": "24.11.29",
+                "sggCd": 11650,
+                "slerGbn": "개인",
+                "umdNm": "반포동",
+                "dealAmountNum": {
+                    "value": 7100000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 130,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2016,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 21,
+                    "unit": "층"
+                },
+                "dealDayNum": 27,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2024-06-27"
+            },
+            "lowestPriceDeal": {
+                "aptDong": "1",
+                "aptNm": "서초중흥S-클래스(도시형생활주택)",
+                "buildYear": {
+                    "value": 2013,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "19,500",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 서초구",
+                "excluUseAr": {
+                    "value": 19,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 3,
+                    "unit": "층"
+                },
+                "jibun": "1451-89",
+                "landLeaseholdGbn": "N",
+                "rgstDate": "24.08.28",
+                "sggCd": 11650,
+                "slerGbn": "개인",
+                "umdNm": "서초동",
+                "dealAmountNum": {
+                    "value": 195000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 19,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2013,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 3,
+                    "unit": "층"
+                },
+                "dealDayNum": 7,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2024-06-07"
+            },
+            "dealClosestToAverage": {
+                "aptDong": "101동",
+                "aptNm": "래미안서초에스티지",
+                "buildYear": {
+                    "value": 2016,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "265,000",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 강남구, 서울 서초구",
+                "excluUseAr": {
+                    "value": 84,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 14,
+                    "unit": "층"
+                },
+                "jibun": "1332-13",
+                "landLeaseholdGbn": "N",
+                "rgstDate": "24.09.30",
+                "sggCd": 11650,
+                "slerGbn": "개인",
+                "umdNm": "서초동",
+                "dealAmountNum": {
+                    "value": 2650000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 84,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 2016,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 14,
+                    "unit": "층"
+                },
+                "dealDayNum": 29,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2024-06-29"
+            },
+            "dealClosestToMedian": {
+                "aptDong": "309",
+                "aptNm": "반포미도",
+                "buildYear": {
+                    "value": 1987,
+                    "unit": "년"
+                },
+                "buyerGbn": "개인",
+                "cdealDay": " ",
+                "cdealType": " ",
+                "dealAmount": "250,000",
+                "dealingGbn": "중개거래",
+                "estateAgentSggNm": "서울 서초구",
+                "excluUseAr": {
+                    "value": 85,
+                    "unit": "㎡"
+                },
+                "floor": {
+                    "value": 3,
+                    "unit": "층"
+                },
+                "jibun": "60-4",
+                "landLeaseholdGbn": "N",
+                "rgstDate": "24.09.27",
+                "sggCd": 11650,
+                "slerGbn": "개인",
+                "umdNm": "반포동",
+                "dealAmountNum": {
+                    "value": 2500000000.0,
+                    "unit": "원"
+                },
+                "areaNum": {
+                    "value": 85,
+                    "unit": "㎡"
+                },
+                "buildYearNum": {
+                    "value": 1987,
+                    "unit": "년"
+                },
+                "floorNum": {
+                    "value": 3,
+                    "unit": "층"
+                },
+                "dealDayNum": 29,
+                "계약년월_num": null,
+                "계약일_num": null,
+                "dealDate": "2024-06-29"
+            }
+        }
+    },
+    "pricePerAreaStatistics": {
+        "overallAveragePricePerPyeong": {
+            "value": 98785716.6158695,
+            "unit": "원/평"
+        },
+        "overallMedianPricePerPyeong": {
+            "value": 97274746.93973637,
+            "unit": "원/평"
+        }
+    },
+    "statisticsByApartmentComplex": {},
+    "statisticsByDong": {
+        "내곡동": {
+            "transactionCount": 7,
+            "averagePrice": {
+                "value": 1492857142.857143,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1460000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 54419966.75308476,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 56003702.76033646,
+                "unit": "원/평"
+            }
+        },
+        "반포동": {
+            "transactionCount": 127,
+            "averagePrice": {
+                "value": 3739645669.2913384,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 3650000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 137579896.31880996,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 141890299.752637,
+                "unit": "원/평"
+            }
+        },
+        "방배동": {
+            "transactionCount": 64,
+            "averagePrice": {
+                "value": 1914375000.0,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1867500000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 65173734.10213947,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 62270078.66821843,
+                "unit": "원/평"
+            }
+        },
+        "서초동": {
+            "transactionCount": 119,
+            "averagePrice": {
+                "value": 2249084033.6134453,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 2350000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 85237431.74208105,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 84079668.97422169,
+                "unit": "원/평"
+            }
+        },
+        "신원동": {
+            "transactionCount": 7,
+            "averagePrice": {
+                "value": 1396285714.2857141,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1380000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 66324749.624423064,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 65884140.677118085,
+                "unit": "원/평"
+            }
+        },
+        "양재동": {
+            "transactionCount": 6,
+            "averagePrice": {
+                "value": 904500000.0,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 810000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 53413259.868021324,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 51663728.292865835,
+                "unit": "원/평"
+            }
+        },
+        "우면동": {
+            "transactionCount": 25,
+            "averagePrice": {
+                "value": 1291120000.0,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 1350000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 55574635.31119679,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 56499154.29042904,
+                "unit": "원/평"
+            }
+        },
+        "잠원동": {
+            "transactionCount": 140,
+            "averagePrice": {
+                "value": 2762471428.5714283,
+                "unit": "원"
+            },
+            "medianPrice": {
+                "value": 2780000000.0,
+                "unit": "원"
+            },
+            "averagePricePerPyeong": {
+                "value": 103977507.68493839,
+                "unit": "원/평"
+            },
+            "medianPricePerPyeong": {
+                "value": 103378203.93089634,
+                "unit": "원/평"
+            }
+        }
+    },
+    "notes": "PPA (Price Per Pyeong) is calculated based on the 'exclusive use area'."
+}
