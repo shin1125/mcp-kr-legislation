@@ -1,6 +1,7 @@
 """
-데이터 전처리
-""" 
+데이터 처리 및 캐시 관리 유틸리티
+"""
+
 import os
 import sys
 import tempfile
@@ -19,17 +20,20 @@ def get_cache_dir():
     if cache_dir:
         Path(cache_dir).mkdir(parents=True, exist_ok=True)
         return cache_dir
+    
     # 2. OS별 표준 사용자 캐시 디렉토리
     if sys.platform == "win32":
         local_appdata = os.environ.get("LOCALAPPDATA") or os.path.expanduser("~\\AppData\\Local")
         cache_dir = os.path.join(local_appdata, "mcp-kr-legislation-cache")
     else:
         cache_dir = os.path.expanduser("~/.cache/mcp-kr-legislation")
+    
     try:
         Path(cache_dir).mkdir(parents=True, exist_ok=True)
         return cache_dir
     except Exception:
         pass
+    
     # 3. /tmp (공유 불가, 임시)
     tmp_cache = os.path.join(tempfile.gettempdir(), "mcp-kr-legislation-cache")
     Path(tmp_cache).mkdir(parents=True, exist_ok=True)

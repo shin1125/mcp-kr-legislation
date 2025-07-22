@@ -1,8 +1,7 @@
-# 환경변수 및 설정 파일
+# 환경변수 파일 (민감한 정보 포함)
 .env
 .env.local
 .env.*.local
-config.local.py
 
 # Python
 __pycache__/
@@ -22,27 +21,43 @@ parts/
 sdist/
 var/
 wheels/
-share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
 MANIFEST
 
-# 가상환경
-.venv/
-venv/
-.venv310/
-env/
-ENV/
+# PyInstaller
+*.manifest
+*.spec
 
-# IDE
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+.venv310/
+venv/
+ENV/
+env/
+
+# IDEs
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# 시스템 파일
+# OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -51,24 +66,21 @@ ENV/
 ehthumbs.db
 Thumbs.db
 
-# 로그 파일
+# Logs
 *.log
-logs/
-src/mcp_kr_legislation/utils/logs/
+legislation.log
 
-# 캐시 및 임시 파일
-src/mcp_kr_legislation/utils/cache/
-src/mcp_kr_legislation/utils/data/
-*.tmp
-*.temp
+# Cache directories
 .cache/
-
-# 테스트 파일
-.coverage
+.mypy_cache/
 .pytest_cache/
-.tox/
-.nox/
-htmlcov/
+__pycache__/
+
+# Data files
+*.csv
+*.json
+data/
+cache/
 
 # Jupyter Notebook
 .ipynb_checkpoints
@@ -76,30 +88,7 @@ htmlcov/
 # pyenv
 .python-version
 
-# pipenv
-Pipfile.lock
-
-# poetry
-poetry.lock
-
-# Celery
-celerybeat-schedule
-celerybeat.pid
-
-# SageMath parsed files
-*.sage.py
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
-.mypy_cache/
-.dmypy.json
-dmypy.json 
+# Backup files
+*.bak
+*.backup
+*.orig 
