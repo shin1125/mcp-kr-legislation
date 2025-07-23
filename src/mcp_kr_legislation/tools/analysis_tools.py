@@ -38,7 +38,10 @@ def _save_analysis_data(data: dict, filename: str, target_dir: Optional[str] = N
     
     return str(file_path)
 
-@mcp.tool()
+@mcp.tool(
+    name="analyze_legislation",
+    description="법령 데이터를 체계적으로 분석하여 트렌드, 패턴, 주요 변화를 도출합니다. 검색 결과의 법령 유형 분포, 최근 개정 동향, 연관 분야 분석 등을 통해 법령 환경의 전체적인 이해와 전략적 인사이트를 제공합니다."
+)
 def analyze_legislation(file_path: str) -> TextContent:
     """
     법령 데이터 파일을 분석하여 요약 정보를 제공합니다.
@@ -93,7 +96,10 @@ def analyze_legislation(file_path: str) -> TextContent:
             text=f"법령 분석 중 오류가 발생했습니다: {str(e)}"
         )
 
-@mcp.tool()
+@mcp.tool(
+    name="get_legislation_history",
+    description="특정 법령의 상세한 제·개정 연혁과 변화 과정을 시계열로 분석합니다. 개정 사유, 주요 변경사항, 시행일 등 포괄적인 연혁 정보로 법령의 발전 과정과 정책 의도를 파악하여 미래 변화 방향을 예측할 수 있습니다."
+)
 def get_legislation_history(law_name: str) -> TextContent:
     """
     법령의 개정 이력을 조회합니다.

@@ -1,7 +1,7 @@
 """
-한국 법제처 OPEN API 119개 완전 통합 MCP 도구
+한국 법제처 OPEN API 146개 완전 통합 MCP 도구
 
-119개의 모든 API를 구현하여 한국의 법령, 행정규칙, 자치법규, 판례, 위원회결정문 등 
+146개의 모든 API를 구현하여 한국의 법령, 행정규칙, 자치법규, 판례, 위원회결정문 등 
 모든 법률 정보에 대한 포괄적인 접근을 제공합니다.
 
 API 카테고리:
@@ -16,10 +16,10 @@ API 카테고리:
 - 학칙공단 (2개)
 - 법령용어 (2개)
 - 모바일 (15개)
-- 맞춤형 (6개)
-- 지식베이스 (6개)
+- 맞춤형 (12개)  
+- 지식베이스 (13개)
 - 기타 (1개)
-- 중앙부처해석 (14개)
+- 중앙부처해석 (27개)
 """
 
 import logging
@@ -103,7 +103,7 @@ def _make_api_request(target: str, service_type: str = "search", **params) -> Di
 
 @mcp.tool(
     name="search_law",
-    description="한국의 현행 법령을 검색합니다. 근로기준법, 민법, 형법 등 모든 법령을 검색할 수 있습니다."
+    description="한국의 모든 현행 법령을 검색합니다. 법령명, 법령번호, 소관부처별 검색이 가능하며, 약 2만여 개의 법률, 대통령령, 부령이 포함됩니다. 법무/법제 연구, 컴플라이언스 검토, 정책 분석에 활용됩니다."
 )
 def search_law(
     query: Optional[str] = None,
@@ -145,7 +145,7 @@ def search_law(
 
 @mcp.tool(
     name="get_law_info",
-    description="특정 법령의 상세 본문을 조회합니다."
+    description="특정 법령의 전체 조문과 부칙, 별표를 포함한 상세 본문을 조회합니다. 조항별 내용, 시행일, 제·개정 이력 등 완전한 법령 정보를 제공하여 정확한 법령 해석과 적용을 지원합니다."
 )
 def get_law_info(
     law_id: Optional[str] = None,
@@ -178,7 +178,7 @@ def get_law_info(
 
 @mcp.tool(
     name="search_englaw",
-    description="영문 법령을 검색합니다."
+    description="한국 법령의 공식 영문 번역본을 검색합니다. 국제 계약, 외국인 투자, 글로벌 컴플라이언스 검토 시 필수적이며, 약 400여 개의 주요 법령이 영어로 제공됩니다."
 )
 def search_englaw(
     query: Optional[str] = None,
@@ -224,7 +224,7 @@ def get_englaw_info(
 
 @mcp.tool(
     name="search_eflaw",
-    description="시행일 법령을 검색합니다."
+    description="특정 시점에 시행되는 법령을 검색합니다. 과거 또는 미래의 특정 날짜에 효력이 있는 법령을 확인할 수 있어, 시간적 적용 범위 분석과 과도기적 법령 적용에 중요합니다."
 )
 def search_eflaw(
     query: Optional[str] = None,
@@ -388,7 +388,7 @@ def search_eflaw_article_detail(
 
 @mcp.tool(
     name="search_law_changes",
-    description="법령 변경이력 목록을 조회합니다."
+    description="특정 날짜의 법령 제·개정 현황을 조회합니다. 일자별 법령 변화 추적으로 법무팀의 법령 모니터링과 컴플라이언스 업데이트에 필수적이며, 규제 변화에 대한 선제적 대응을 가능하게 합니다."
 )
 def search_law_changes(
     reg_dt: str,
@@ -533,7 +533,7 @@ def search_delegated_laws(
 
 @mcp.tool(
     name="search_admrul",
-    description="행정규칙(훈령, 예규, 고시 등)을 검색합니다."
+    description="행정기관의 내부 규정인 훈령, 예규, 고시, 지침 등을 검색합니다. 약 8만여 건의 행정규칙으로 실무 운영 기준과 세부 해석 기준을 제공하여 행정업무와 민원 처리의 구체적 기준을 확인할 수 있습니다."
 )
 def search_admrul(
     query: Optional[str] = None,
@@ -569,7 +569,7 @@ def search_admrul(
 
 @mcp.tool(
     name="get_admrul_info",
-    description="특정 행정규칙의 상세 정보를 조회합니다."
+    description="특정 행정규칙의 상세 정보를 조회합니다. 훈령, 예규, 고시 등의 전체 조문과 부칙, 제·개정 이력을 포함하여 행정업무의 구체적 운영 기준과 세부 해석 지침을 확인할 수 있습니다."
 )
 def get_admrul_info(
     admrul_id: str,
@@ -661,7 +661,7 @@ def search_admrul_forms(
 
 @mcp.tool(
     name="search_ordin",
-    description="자치법규(조례, 규칙 등)를 검색합니다."
+    description="지방자치단체의 조례와 규칙을 검색합니다. 전국 243개 지자체의 약 40만여 건 자치법규로 지역별 특성을 반영한 법규를 확인할 수 있어, 지역 사업과 투자 시 필수적인 정보를 제공합니다."
 )
 def search_ordin(
     query: Optional[str] = None,
@@ -698,7 +698,7 @@ def search_ordin(
 
 @mcp.tool(
     name="get_ordin_info",
-    description="특정 자치법규의 상세 정보를 조회합니다."
+    description="특정 자치법규의 상세 정보를 조회합니다. 지방자치단체별 조례와 규칙의 전체 조문, 부칙, 제·개정 이력을 포함하여 지역별 특성과 정책을 반영한 상세 규정을 확인할 수 있습니다."
 )
 def get_ordin_info(
     ordin_id: Optional[str] = None,
@@ -719,7 +719,7 @@ def get_ordin_info(
 
 @mcp.tool(
     name="search_ordin_law_connection",
-    description="자치법규 법령 연계 목록을 조회합니다."
+    description="자치법규와 상위 법령 간의 연계 관계를 조회합니다. 지방자치단체의 조례와 규칙이 어떤 법률이나 시행령을 근거로 제정되었는지 확인하여 법령 체계상의 위치와 권한 범위를 파악할 수 있습니다."
 )
 def search_ordin_law_connection(
     query: Optional[str] = None,
@@ -769,7 +769,7 @@ def search_ordin_forms(
 
 @mcp.tool(
     name="search_prec",
-    description="판례를 검색합니다."
+    description="대법원과 각급 법원의 판례를 검색합니다. 약 160만여 건의 판례로 법령 해석의 실제 적용례와 법원의 판단 기준을 확인할 수 있어, 법리 연구와 소송 전략 수립에 핵심적인 자료를 제공합니다."
 )
 def search_prec(
     query: Optional[str] = None,
@@ -823,7 +823,7 @@ def get_prec_info(prec_id: str) -> str:
 
 @mcp.tool(
     name="search_detc",
-    description="헌재결정례를 검색합니다."
+    description="헌법재판소의 결정례를 검색합니다. 위헌심판, 헌법소원, 권한쟁의 등 약 3만여 건의 헌재 결정으로 헌법적 쟁점과 기본권 해석의 권위있는 기준을 제공합니다."
 )
 def search_detc(
     query: Optional[str] = None,
@@ -865,7 +865,7 @@ def get_detc_info(detc_id: str) -> str:
 
 @mcp.tool(
     name="search_expc",
-    description="법령해석례를 검색합니다."
+    description="법제처의 공식 법령해석례를 검색합니다. 약 12만여 건의 해석례로 법령 조문의 구체적 의미와 적용 범위에 대한 정부의 공식 견해를 제공하여 법령 적용의 불확실성을 해소합니다."
 )
 def search_expc(
     query: Optional[str] = None,
@@ -907,7 +907,7 @@ def get_expc_info(expc_id: str) -> str:
 
 @mcp.tool(
     name="search_decc",
-    description="행정심판례를 검색합니다."
+    description="행정심판례를 검색합니다. 행정청의 위법·부당한 처분에 대한 구제 사례로 행정처분의 적법성 판단 기준과 권리구제 절차를 확인할 수 있어, 행정쟁송과 민원 해결에 실무적 지침을 제공합니다."
 )
 def search_decc(
     query: Optional[str] = None,
@@ -953,7 +953,7 @@ def get_decc_info(decc_id: str) -> str:
 
 @mcp.tool(
     name="search_trty",
-    description="조약을 검색합니다."
+    description="한국이 체결한 양자·다자 조약과 국제협정을 검색합니다. 약 2천여 건의 조약으로 국제거래, 투자협정, 통상협정의 법적 근거를 확인할 수 있어 국제업무와 해외진출에 필수적인 정보를 제공합니다."
 )
 def search_trty(
     query: Optional[str] = None,
@@ -999,7 +999,7 @@ def get_trty_info(trty_id: str) -> str:
 
 @mcp.tool(
     name="search_lstrm",
-    description="법령용어를 검색합니다."
+    description="법령에서 사용되는 전문용어의 정의와 해석을 검색합니다. 약 4천여 개의 법령용어 사전으로 법률 문서 작성, 계약서 검토, 법령 해석 시 정확한 용어 이해를 지원합니다."
 )
 def search_lstrm(
     query: Optional[str] = None,
@@ -1043,7 +1043,7 @@ def get_lstrm_info(lstrm_id: str) -> str:
 
 @mcp.tool(
     name="search_ppc",
-    description="개인정보보호위원회 결정문을 검색합니다."
+    description="개인정보보호위원회의 결정문과 가이드라인을 검색합니다. 개인정보 처리 기준, 위반 사례, 과징금 부과 기준 등을 통해 개인정보보호법 준수와 프라이버시 컴플라이언스 구축에 필수적인 정보를 제공합니다."
 )
 def search_ppc(
     query: Optional[str] = None,
@@ -1085,7 +1085,7 @@ def get_ppc_info(ppc_id: str) -> str:
 
 @mcp.tool(
     name="search_ftc",
-    description="공정거래위원회 결정문을 검색합니다."
+    description="공정거래위원회 결정문을 검색합니다. 독점금지, 불공정거래행위, 기업결합 제재 사례와 심결 기준을 통해 공정거래법 위반 리스크 파악과 기업 컴플라이언스 체계 구축에 필수적인 정보를 제공합니다."
 )
 def search_ftc(
     query: Optional[str] = None,
@@ -1211,7 +1211,7 @@ def get_acr_info(acr_id: str) -> str:
 
 @mcp.tool(
     name="search_fsc",
-    description="금융위원회 결정문을 검색합니다."
+    description="금융위원회 결정문을 검색합니다. 금융업 인허가, 금융소비자 보호, 자본시장 제재 사례와 심결 기준을 통해 금융 규제 준수와 금융업계 컴플라이언스 체계 구축에 필수적인 정보를 제공합니다."
 )
 def search_fsc(
     query: Optional[str] = None,
@@ -1253,7 +1253,7 @@ def get_fsc_info(fsc_id: str) -> str:
 
 @mcp.tool(
     name="search_nlrc",
-    description="노동위원회 결정문을 검색합니다."
+    description="중앙노동위원회와 지방노동위원회의 결정문을 검색합니다. 부당해고 구제, 부당노동행위 판정, 노동쟁의 조정 사례 등을 통해 노사관계와 근로자 권익 보호의 실무 기준을 제공합니다."
 )
 def search_nlrc(
     query: Optional[str] = None,
@@ -1295,7 +1295,7 @@ def get_nlrc_info(nlrc_id: str) -> str:
 
 @mcp.tool(
     name="search_kcc",
-    description="방송통신위원회 결정문을 검색합니다."
+    description="방송통신위원회 결정문을 검색합니다. 방송 심의, 통신 규제, 온라인 플랫폼 제재 사례와 심결 기준을 통해 방송통신 관련 법규 준수와 미디어 컴플라이언스 구축에 필요한 실무 기준을 제공합니다."
 )
 def search_kcc(
     query: Optional[str] = None,
@@ -1341,7 +1341,7 @@ def get_kcc_info(kcc_id: str) -> str:
 
 @mcp.tool(
     name="search_law_system",
-    description="법령 체계도를 검색합니다."
+    description="법령 간의 위계질서와 상호관계를 보여주는 체계도를 검색합니다. 법률-시행령-시행규칙의 구조적 관계와 근거법령을 시각적으로 파악하여 법령 적용의 우선순위와 적용범위를 명확히 이해할 수 있습니다."
 )
 def search_law_system(
     query: Optional[str] = None,
@@ -1385,7 +1385,7 @@ def get_law_system_info(
 
 @mcp.tool(
     name="search_old_new_law",
-    description="신구법 대조표를 검색합니다."
+    description="법령 개정 시 변경된 조문의 신구법 대조표를 검색합니다. 개정 전후 조문을 나란히 비교하여 정확한 변경사항을 파악할 수 있어, 법령 개정이 기존 업무와 계약에 미치는 영향을 정밀하게 분석할 수 있습니다."
 )
 def search_old_new_law(
     query: Optional[str] = None,
@@ -1429,7 +1429,7 @@ def get_old_new_law_info(
 
 @mcp.tool(
     name="search_three_way_comparison",
-    description="3단 비교(법률-시행령-시행규칙)를 검색합니다."
+    description="법률-시행령-시행규칙의 3단계 법령 구조를 통합 비교합니다. 상위법과 하위법간의 위임관계와 구체적 시행 기준을 체계적으로 파악하여 법령 적용의 전체적인 맥락과 실무 적용 방법을 명확히 이해할 수 있습니다."
 )
 def search_three_way_comparison(
     query: Optional[str] = None,
@@ -1579,7 +1579,7 @@ def search_one_view(
 
 @mcp.tool(
     name="search_all_legislation",
-    description="모든 법령 관련 정보를 통합 검색합니다."
+    description="법령, 행정규칙, 자치법규, 판례를 한번에 통합 검색합니다. 키워드로 모든 법령 정보를 횡단검색하여 포괄적인 법적 근거와 관련 정보를 빠르게 파악할 수 있는 원스톱 검색 도구입니다."
 )
 def search_all_legislation(
     query: str,
@@ -1649,7 +1649,7 @@ def search_all_legislation(
 
 @mcp.tool(
     name="analyze_law_changes",
-    description="특정 법령의 변경 이력을 분석합니다."
+    description="특정 법령의 제·개정 이력을 시계열로 분석합니다. 법령의 변화 추이, 주요 개정 사항, 정책 방향성을 파악하여 향후 규제 변화 예측과 장기적 컴플라이언스 전략 수립을 지원합니다."
 )
 def analyze_law_changes(
     law_name: str,
@@ -1710,7 +1710,7 @@ def analyze_law_changes(
 
 @mcp.tool(
     name="get_legislation_statistics",
-    description="법령 통계 정보를 조회합니다."
+    description="전체 법령 현황의 통계적 분석 정보를 제공합니다. 법령 유형별 분포, 제·개정 추이, 소관부처별 현황 등 거시적 관점의 법령 데이터로 정책 연구와 입법 동향 분석에 기초 자료를 제공합니다."
 )
 def get_legislation_statistics(
     target_date: Optional[str] = None
@@ -2115,7 +2115,7 @@ def get_school_regulations_info(regulation_id: str) -> str:
 
 @mcp.tool(
     name="search_mobile_law_list",
-    description="모바일 법령 목록을 검색합니다."
+    description="모바일 최적화된 간편 법령 정보를 검색합니다. 핵심 법령을 간결하고 직관적인 형태로 제공하여 현장 업무나 이동 중에도 신속한 법령 확인과 즉시 적용이 가능합니다."
 )
 def search_mobile_law_list(
     query: Optional[str] = None,
@@ -2691,16 +2691,14 @@ def search_law_case_study(
 )
 def search_miscellaneous_law_service(
     query: Optional[str] = None,
-    service_type: Optional[str] = None,
     display: int = 20,
     page: int = 1
 ) -> str:
     """기타 법령 서비스를 검색합니다."""
     data = _make_api_request(
-        target="miscLaw",
+        target="miscellaneousLaw",
         service_type="search",
         query=query,
-        serviceType=service_type,
         display=display,
         page=page
     )
@@ -3008,4 +3006,856 @@ def get_ministry_manual_info(manual_id: str) -> str:
     
     return f"중앙부처 매뉴얼 상세 정보가 저장되었습니다: {file_path}"
 
-logger.info("119개 법제처 OPEN API 도구가 모두 로드되었습니다!") 
+# ===========================================
+# 중앙부처별 법령해석 관련 도구 (14개)
+# ===========================================
+
+@mcp.tool(
+    name="search_customs_interpretation",
+    description="관세청 법령해석을 검색합니다. 관세 및 무역 관련 법령의 구체적 해석과 적용 기준을 제공하여 수출입 업무와 관세 정책에 대한 정확한 이해를 지원합니다."
+)
+def search_customs_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """관세청 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="kcsCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"customs_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"관세청 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="get_customs_interpretation_info",
+    description="관세청 법령해석 상세 정보를 조회합니다."
+)
+def get_customs_interpretation_info(interpretation_id: str) -> str:
+    """관세청 법령해석 상세 정보를 조회합니다."""
+    data = _make_api_request(
+        target="kcsCgmExpc",
+        service_type="service",
+        ID=interpretation_id
+    )
+    
+    filename = f"customs_interpretation_info_{interpretation_id}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"관세청 법령해석 상세 정보가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_environment_interpretation",
+    description="환경부 법령해석을 검색합니다. 환경 규제와 오염 방지 관련 법령의 해석을 통해 환경법 준수와 환경영향평가에 필요한 기준을 제공합니다."
+)
+def search_environment_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """환경부 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="meCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"environment_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"환경부 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="get_environment_interpretation_info",
+    description="환경부 법령해석 상세 정보를 조회합니다."
+)
+def get_environment_interpretation_info(interpretation_id: str) -> str:
+    """환경부 법령해석 상세 정보를 조회합니다."""
+    data = _make_api_request(
+        target="meCgmExpc",
+        service_type="service",
+        ID=interpretation_id
+    )
+    
+    filename = f"environment_interpretation_info_{interpretation_id}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"환경부 법령해석 상세 정보가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_finance_interpretation",
+    description="기획재정부 법령해석을 검색합니다. 경제정책, 재정관리, 예산 관련 법령의 해석을 통해 경제 활동과 재정 정책에 대한 명확한 기준을 제공합니다."
+)
+def search_finance_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """기획재정부 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="moefCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"finance_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"기획재정부 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_labor_interpretation",
+    description="고용노동부 법령해석을 검색합니다. 근로기준법, 산업안전보건법 등 노동 관련 법령의 해석을 통해 근로자 권익과 기업의 노무 관리에 필요한 기준을 제공합니다."
+)
+def search_labor_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """고용노동부 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="moelCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"labor_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"고용노동부 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="get_labor_interpretation_info",
+    description="고용노동부 법령해석 상세 정보를 조회합니다."
+)
+def get_labor_interpretation_info(interpretation_id: str) -> str:
+    """고용노동부 법령해석 상세 정보를 조회합니다."""
+    data = _make_api_request(
+        target="moelCgmExpc",
+        service_type="service",
+        ID=interpretation_id
+    )
+    
+    filename = f"labor_interpretation_info_{interpretation_id}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"고용노동부 법령해석 상세 정보가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_maritime_interpretation",
+    description="해양수산부 법령해석을 검색합니다. 항만, 어업, 해운 관련 법령의 해석을 통해 해양 산업과 수산업 정책에 대한 정확한 기준을 제공합니다."
+)
+def search_maritime_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """해양수산부 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="mofCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"maritime_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"해양수산부 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="get_maritime_interpretation_info",
+    description="해양수산부 법령해석 상세 정보를 조회합니다."
+)
+def get_maritime_interpretation_info(interpretation_id: str) -> str:
+    """해양수산부 법령해석 상세 정보를 조회합니다."""
+    data = _make_api_request(
+        target="mofCgmExpc",
+        service_type="service",
+        ID=interpretation_id
+    )
+    
+    filename = f"maritime_interpretation_info_{interpretation_id}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"해양수산부 법령해석 상세 정보가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_public_safety_interpretation",
+    description="행정안전부 법령해석을 검색합니다. 행정절차, 지방자치, 재해안전 관련 법령의 해석을 통해 공공행정과 안전관리에 필요한 기준을 제공합니다."
+)
+def search_public_safety_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """행정안전부 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="moisCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"public_safety_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"행정안전부 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="get_public_safety_interpretation_info",
+    description="행정안전부 법령해석 상세 정보를 조회합니다."
+)
+def get_public_safety_interpretation_info(interpretation_id: str) -> str:
+    """행정안전부 법령해석 상세 정보를 조회합니다."""
+    data = _make_api_request(
+        target="moisCgmExpc",
+        service_type="service",
+        ID=interpretation_id
+    )
+    
+    filename = f"public_safety_interpretation_info_{interpretation_id}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"행정안전부 법령해석 상세 정보가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_transport_interpretation",
+    description="국토교통부 법령해석을 검색합니다. 건설, 교통, 도시계획 관련 법령의 해석을 통해 건설업계와 교통정책에 필요한 구체적 기준을 제공합니다."
+)
+def search_transport_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """국토교통부 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="molitCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"transport_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"국토교통부 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="get_transport_interpretation_info",
+    description="국토교통부 법령해석 상세 정보를 조회합니다."
+)
+def get_transport_interpretation_info(interpretation_id: str) -> str:
+    """국토교통부 법령해석 상세 정보를 조회합니다."""
+    data = _make_api_request(
+        target="molitCgmExpc",
+        service_type="service",
+        ID=interpretation_id
+    )
+    
+    filename = f"transport_interpretation_info_{interpretation_id}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"국토교통부 법령해석 상세 정보가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_tax_interpretation",
+    description="국세청 법령해석을 검색합니다. 세법의 구체적 해석과 적용 기준을 통해 세무 신고, 과세 처분, 조세 정책에 대한 정확한 이해를 지원합니다."
+)
+def search_tax_interpretation(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """국세청 법령해석을 검색합니다."""
+    data = _make_api_request(
+        target="ntsCgmExpc",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"tax_interpretation_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"국세청 법령해석 검색 결과가 저장되었습니다: {file_path}"
+
+# ===========================================
+# 법령정보지식베이스 관련 도구 (7개)
+# ===========================================
+
+@mcp.tool(
+    name="search_legal_term_ai",
+    description="AI 기반 법령용어를 검색합니다. 법령에서 사용되는 전문용어의 정의와 동음이의어를 구분하여 정확한 법령 해석과 문서 작성을 지원합니다."
+)
+def search_legal_term_ai(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1,
+    homonym: Optional[str] = None
+) -> str:
+    """AI 기반 법령용어를 검색합니다."""
+    data = _make_api_request(
+        target="lstrmAI",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page,
+        homonymYn=homonym
+    )
+    
+    filename = f"legal_term_ai_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"AI 기반 법령용어 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_daily_term",
+    description="일상용어를 검색합니다. 법령용어와 연계된 일반적인 용어를 찾아 법령의 내용을 쉽게 이해할 수 있도록 지원합니다."
+)
+def search_daily_term(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """일상용어를 검색합니다."""
+    data = _make_api_request(
+        target="dlytrm",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"daily_term_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"일상용어 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_legal_term_relation",
+    description="법령용어와 일상용어 간의 연계 관계를 검색합니다. 동의어, 반의어, 상하위어 등의 관계를 통해 용어의 정확한 의미를 파악할 수 있습니다."
+)
+def search_legal_term_relation(
+    query: Optional[str] = None,
+    mst: Optional[str] = None,
+    relation_code: Optional[int] = None
+) -> str:
+    """법령용어-일상용어 연계를 검색합니다."""
+    data = _make_api_request(
+        target="lstrmRlt",
+        service_type="service",
+        query=query,
+        MST=mst,
+        trmRltCd=relation_code
+    )
+    
+    filename = f"legal_term_relation_{query or mst or 'all'}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"법령용어 연계 관계 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_daily_term_relation",
+    description="일상용어와 법령용어 간의 연계 관계를 검색합니다. 일반적인 용어에서 시작하여 관련된 법령용어를 찾을 수 있습니다."
+)
+def search_daily_term_relation(
+    query: Optional[str] = None,
+    mst: Optional[str] = None,
+    relation_code: Optional[int] = None
+) -> str:
+    """일상용어-법령용어 연계를 검색합니다."""
+    data = _make_api_request(
+        target="dlytrmRlt",
+        service_type="service",
+        query=query,
+        MST=mst,
+        trmRltCd=relation_code
+    )
+    
+    filename = f"daily_term_relation_{query or mst or 'all'}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"일상용어 연계 관계 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_legal_term_article_relation",
+    description="법령용어와 조문 간의 연계 관계를 검색합니다. 특정 용어가 어떤 법령의 어떤 조문에서 사용되는지 확인할 수 있습니다."
+)
+def search_legal_term_article_relation(
+    query: str
+) -> str:
+    """법령용어-조문 연계를 검색합니다."""
+    data = _make_api_request(
+        target="lstrmRltJo",
+        service_type="service",
+        query=query
+    )
+    
+    filename = f"legal_term_article_relation_{query}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"법령용어-조문 연계 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_article_legal_term_relation",
+    description="조문과 법령용어 간의 연계 관계를 검색합니다. 특정 조문에서 사용되는 법령용어들을 확인할 수 있습니다."
+)
+def search_article_legal_term_relation(
+    query: str
+) -> str:
+    """조문-법령용어 연계를 검색합니다."""
+    data = _make_api_request(
+        target="joRltLstrm",
+        service_type="service",
+        query=query
+    )
+    
+    filename = f"article_legal_term_relation_{query}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"조문-법령용어 연계 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_related_legislation",
+    description="관련 법령 간의 연계 관계를 검색합니다. 특정 법령과 관련된 다른 법령들을 찾아 법령 체계의 전체적인 구조를 파악할 수 있습니다."
+)
+def search_related_legislation(
+    query: Optional[str] = None,
+    law_id: Optional[int] = None,
+    relation_code: Optional[int] = None
+) -> str:
+    """관련 법령을 검색합니다."""
+    data = _make_api_request(
+        target="lsRlt",
+        service_type="search",
+        query=query,
+        ID=law_id,
+        lsRltCd=relation_code
+    )
+    
+    filename = f"related_legislation_{query or law_id or 'all'}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"관련 법령 검색 결과가 저장되었습니다: {file_path}"
+
+# ===========================================
+# 맞춤형 법령서비스 관련 도구 (6개)
+# ===========================================
+
+@mcp.tool(
+    name="search_custom_law_list",
+    description="맞춤형 법령 목록을 검색합니다. 특정 분야나 주제별로 분류된 법령을 효율적으로 찾을 수 있어 업무 영역별 전문적인 법령 검토를 지원합니다."
+)
+def search_custom_law_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 법령 목록을 검색합니다."""
+    data = _make_api_request(
+        target="couseLs",
+        service_type="search",
+        vcode=classification_code,
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_law_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 법령 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_law_article_list",
+    description="맞춤형 법령 조문 목록을 검색합니다. 특정 분야의 법령에서 중요한 조문들만 선별하여 제공함으로써 핵심 규정을 빠르게 파악할 수 있습니다."
+)
+def search_custom_law_article_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 법령 조문 목록을 검색합니다."""
+    data = _make_api_request(
+        target="couseLs",
+        service_type="search",
+        vcode=classification_code,
+        lj="jo",
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_law_article_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 법령 조문 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_admrul_list",
+    description="맞춤형 행정규칙 목록을 검색합니다. 특정 분야의 행정규칙을 분류별로 체계화하여 제공함으로써 실무에 필요한 세부 기준을 효율적으로 확인할 수 있습니다."
+)
+def search_custom_admrul_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 행정규칙 목록을 검색합니다."""
+    data = _make_api_request(
+        target="couseAdmrul",
+        service_type="search",
+        vcode=classification_code,
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_admrul_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 행정규칙 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_admrul_article_list",
+    description="맞춤형 행정규칙 조문 목록을 검색합니다. 특정 분야의 행정규칙에서 핵심적인 조문들을 선별하여 실무 적용에 필요한 구체적 기준을 제공합니다."
+)
+def search_custom_admrul_article_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 행정규칙 조문 목록을 검색합니다."""
+    data = _make_api_request(
+        target="couseAdmrul",
+        service_type="search",
+        vcode=classification_code,
+        lj="jo",
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_admrul_article_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 행정규칙 조문 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_ordinance_list",
+    description="맞춤형 자치법규 목록을 검색합니다. 지역별·분야별로 분류된 자치법규를 체계적으로 제공하여 지방자치단체별 특화된 규정을 효과적으로 파악할 수 있습니다."
+)
+def search_custom_ordinance_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 자치법규 목록을 검색합니다."""
+    data = _make_api_request(
+        target="couseOrdin",
+        service_type="search",
+        vcode=classification_code,
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_ordinance_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 자치법규 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_ordinance_article_list",
+    description="맞춤형 자치법규 조문 목록을 검색합니다. 특정 분야의 자치법규에서 중요한 조문들을 선별하여 지역 특성에 맞는 핵심 규정을 빠르게 확인할 수 있습니다."
+)
+def search_custom_ordinance_article_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 자치법규 조문 목록을 검색합니다."""
+    data = _make_api_request(
+        target="couseOrdin",
+        service_type="search",
+        vcode=classification_code,
+        lj="jo",
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_ordinance_article_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 자치법규 조문 목록 검색 결과가 저장되었습니다: {file_path}"
+
+# ===========================================
+# 추가 누락된 API들 구현 (새롭게 추가된 API만)
+# ===========================================
+
+@mcp.tool(
+    name="search_customs_interpretation_list",
+    description="관세청 법령해석 목록을 검색합니다."
+)
+def search_customs_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """관세청 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcKcs",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"customs_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"관세청 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_environment_interpretation_list",
+    description="환경부 법령해석 목록을 검색합니다."
+)
+def search_environment_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """환경부 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcMe",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"environment_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"환경부 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_finance_interpretation_list",
+    description="기획재정부 법령해석 목록을 검색합니다."
+)
+def search_finance_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """기획재정부 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcMoef",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"finance_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"기획재정부 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_labor_interpretation_list",
+    description="고용노동부 법령해석 목록을 검색합니다."
+)
+def search_labor_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """고용노동부 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcMoel",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"labor_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"고용노동부 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_maritime_interpretation_list",
+    description="해양수산부 법령해석 목록을 검색합니다."
+)
+def search_maritime_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """해양수산부 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcMof",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"maritime_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"해양수산부 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_interior_interpretation_list",
+    description="행정안전부 법령해석 목록을 검색합니다."
+)
+def search_interior_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """행정안전부 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcMois",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"interior_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"행정안전부 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_transport_interpretation_list",
+    description="국토교통부 법령해석 목록을 검색합니다."
+)
+def search_transport_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """국토교통부 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcMolit",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"transport_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"국토교통부 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_tax_interpretation_list",
+    description="국세청 법령해석 목록을 검색합니다."
+)
+def search_tax_interpretation_list(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """국세청 법령해석 목록을 검색합니다."""
+    data = _make_api_request(
+        target="cgmExpcNts",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"tax_interpretation_list_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"국세청 법령해석 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_administrative_rule_article_list",
+    description="맞춤형 행정규칙 조문 목록을 검색합니다."
+)
+def search_custom_administrative_rule_article_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 행정규칙 조문 목록을 검색합니다."""
+    data = _make_api_request(
+        target="custAdmrul",
+        service_type="search",
+        vcode=classification_code,
+        lj="jo",
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_admin_rule_article_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 행정규칙 조문 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_custom_administrative_rule_list",
+    description="맞춤형 행정규칙 목록을 검색합니다."
+)
+def search_custom_administrative_rule_list(
+    classification_code: str,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """맞춤형 행정규칙 목록을 검색합니다."""
+    data = _make_api_request(
+        target="custAdmrul",
+        service_type="search",
+        vcode=classification_code,
+        display=display,
+        page=page
+    )
+    
+    filename = f"custom_admin_rule_list_{classification_code}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"맞춤형 행정규칙 목록 검색 결과가 저장되었습니다: {file_path}"
+
+@mcp.tool(
+    name="search_legal_term_relation_article",
+    description="법령용어 연계 조문을 검색합니다."
+)
+def search_legal_term_relation_article(
+    query: Optional[str] = None,
+    display: int = 20,
+    page: int = 1
+) -> str:
+    """법령용어 연계 조문을 검색합니다."""
+    data = _make_api_request(
+        target="lstrmRltJo",
+        service_type="search",
+        query=query,
+        display=display,
+        page=page
+    )
+    
+    filename = f"legal_term_relation_article_{query or 'all'}_{page}"
+    file_path = _save_legislation_data(data, filename)
+    
+    return f"법령용어 연계 조문 검색 결과가 저장되었습니다: {file_path}"
+
+logger.info("146개 법제처 OPEN API 도구가 모두 로드되었습니다!") 
