@@ -48,7 +48,7 @@ def _normalize_search_query(query: str) -> str:
     return normalized
 
 def _create_search_variants(query: str) -> list[str]:
-    """검색어 변형 생성 - 금융/개인정보 특화 확장"""
+    """검색어 변형 생성 - 범용적 법률 검색 최적화"""
     variants = []
     
     # 원본
@@ -64,36 +64,22 @@ def _create_search_variants(query: str) -> list[str]:
         variants.append(query.replace(" ", ""))
     
     # "법" 추가/제거 변형
-    if not query.endswith("법"):
+    if not query.endswith("법") and len(query) > 2:
         variants.append(query + "법")
-    if query.endswith("법") and len(query) > 1:
+    if query.endswith("법") and len(query) > 2:
         variants.append(query[:-1])
     
-    # 금융/개인정보 특화 키워드 확장
-    finance_expansions = {
-        "개인정보": ["개인정보보호", "개인정보처리", "개인정보활용", "개인정보수집"],
-        "금융": ["금융회사", "금융기관", "금융업", "은행", "보험회사"],
-        "신용정보": ["신용정보처리", "신용정보보호", "신용정보활용"],
-        "핀테크": ["금융서비스", "전자금융", "인터넷금융"],
-        "데이터": ["데이터처리", "데이터보호", "데이터활용"],
-        "암호화": ["정보보안", "개인정보암호화"],
-        "동의": ["사전동의", "명시적동의", "별도동의"]
-    }
-    
-    # 키워드 확장 적용
-    for keyword, expansions in finance_expansions.items():
-        if keyword in query.lower():
-            for expansion in expansions[:3]:  # 상위 3개만
-                variants.append(expansion)
-                # 원본 쿼리에서 키워드를 확장어로 치환
-                expanded_query = query.lower().replace(keyword, expansion)
-                if expanded_query != query.lower():
-                    variants.append(expanded_query)
-    
-    # 조합형 검색어 생성 (금융 + 개인정보)
-    if any(k in query.lower() for k in ["금융", "은행", "보험", "카드"]):
-        if "개인정보" not in query.lower():
-            variants.extend([f"{query} 개인정보", f"개인정보 {query}"])
+    # 키워드 분리 검색 (긴 검색어의 경우)
+    if len(query) > 6:
+        keywords = query.split()
+        if len(keywords) > 1:
+            # 첫 번째 키워드만
+            variants.append(keywords[0])
+            # 마지막 키워드만
+            variants.append(keywords[-1])
+            # 상위 2개 키워드
+            if len(keywords) >= 2:
+                variants.append(" ".join(keywords[:2]))
     
     # 중복 제거하면서 순서 유지
     unique_variants = []
@@ -101,7 +87,7 @@ def _create_search_variants(query: str) -> list[str]:
         if variant and variant not in unique_variants:
             unique_variants.append(variant)
             
-    return unique_variants[:10]  # 최대 10개로 제한
+    return unique_variants[:8]  # 적절한 개수로 제한
 
 def _smart_search(target: str, query: str, display: int = 20, page: int = 1) -> dict:
     """지능형 다단계 검색 - 정확도 우선에서 점진적 확장"""
@@ -901,7 +887,7 @@ def search_law(
     except Exception as e:
         return TextContent(type="text", text=f"법령 검색 중 오류: {str(e)}")
 
-@mcp.tool(name="get_law_detail", description="특정 법령의 상세 내용을 조회합니다. 법령ID나 법령명으로 조회 가능합니다. 법령명으로 검색 시 자동으로 정확한 법령을 찾아 상세 내용을 제공합니다.")
+@mcp.tool(name="get_law_detail", description="특정 법령의 상세 내용과 전체 조문을 조회합니다. 법령ID나 법령명으로 조회 가능하며, 모든 분야(민법, 상법, 행정법, 형법, 노동법, 환경법, 보건법 등)의 법령에 대응합니다. 법령명으로 검색 시 자동으로 가장 관련성 높은 법령을 찾아 조문, 부칙, 개정문까지 완전한 내용을 제공합니다.")
 def get_law_detail(law_id: Optional[Union[str, int]] = None, law_name: Optional[str] = None) -> TextContent:
     """법령 본문 조회 - 개선된 검색 로직"""
     if not law_id and not law_name:
@@ -2436,10 +2422,10 @@ def search_custom_precedent(query: Optional[str] = None, display: int = 20, page
 # 13. 지식베이스 API (6개)
 # ===========================================
 
-@mcp.tool(name="search_legal_ai", description="법령 AI 지식베이스를 검색합니다. 스마트 다중 검색으로 최적화된 법령 정보와 분석을 제공합니다.")
+@mcp.tool(name="search_legal_ai", description="AI 기반 종합 법률 검색을 수행합니다. 단일 검색어로 관련 법령, 해석례, 위원회 결정문을 동시에 검색하여 종합적인 법적 분석을 제공합니다. 모든 법률 분야(민사, 상사, 행정, 형사, 노동, 환경, 보건 등)에 대응하며, 스마트 매칭 알고리즘으로 정확도가 높은 검색 결과를 제공합니다.")
 def search_legal_ai(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
     """스마트 AI 기반 다중 검색 - 기존 API가 작동하지 않아 대안 구현"""
-    search_query = query or "개인정보보호"
+    search_query = query or "법률"
     
     results = []
     results.append(f"🤖 **AI 기반 스마트 검색 결과: '{search_query}'**\n")
@@ -2473,9 +2459,9 @@ def search_legal_ai(query: Optional[str] = None, display: int = 20, page: int = 
         
         # 4. AI 분석 요약
         results.append("🔍 **AI 분석 요약:**\n")
-        results.append(f"• 검색어 '{search_query}'에 대한 다각도 법령 분석을 완료했습니다.\n")
-        results.append("• 관련 법령, 해석례, 위원회 결정례를 종합적으로 제공합니다.\n")
-        results.append("• 상세한 내용은 각 문서의 상세조회 도구를 활용하세요.\n\n")
+        results.append(f"• 검색어 '{search_query}'에 대한 종합적인 법률 자료 검색을 완료했습니다.\n")
+        results.append("• 관련 법령, 해석례, 위원회 결정례를 다각도로 분석하여 제공합니다.\n")
+        results.append("• 각 문서의 상세조회 도구로 심화 분석이 가능합니다.\n\n")
         
         return TextContent(type="text", text="".join(results))
         
@@ -2734,7 +2720,7 @@ def search_korail_interpretation(query: Optional[str] = None, display: int = 20,
 # 16. 종합 검색 도구
 # ===========================================
 
-@mcp.tool(name="search_all_legal_documents", description="법령, 판례, 해석례, 위원회 결정문을 통합 검색합니다. 한 번에 모든 법적 문서를 검색할 수 있습니다.")
+@mcp.tool(name="search_all_legal_documents", description="모든 종류의 법적 문서를 한 번에 통합 검색합니다. 법령, 판례, 해석례, 위원회 결정문을 포괄적으로 검색하여 특정 주제에 대한 완전한 법적 분석 자료를 제공합니다. 모든 법률 분야와 업계에 적용 가능하며, 검색 범위를 선택적으로 조정할 수 있습니다.")
 def search_all_legal_documents(
     query: Optional[str] = None,
     include_law: bool = True,
@@ -2743,7 +2729,7 @@ def search_all_legal_documents(
     include_committee: bool = True
 ) -> TextContent:
     """통합 법률 문서 검색 - 안전한 패턴으로 수정"""
-    search_query = query or "개인정보보호"
+    search_query = query or "법률"
     
     results = []
     results.append(f"🔍 **'{search_query}' 통합 검색 결과**\n")
