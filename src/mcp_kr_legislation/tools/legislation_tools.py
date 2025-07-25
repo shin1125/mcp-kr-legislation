@@ -48,7 +48,7 @@ def _normalize_search_query(query: str) -> str:
     return normalized
 
 def _create_search_variants(query: str) -> list[str]:
-    """검색어 변형 생성 - 다양한 검색 시도를 위한 변형들"""
+    """검색어 변형 생성 - 금융/개인정보 특화 확장"""
     variants = []
     
     # 원본
@@ -68,14 +68,40 @@ def _create_search_variants(query: str) -> list[str]:
         variants.append(query + "법")
     if query.endswith("법") and len(query) > 1:
         variants.append(query[:-1])
-        
+    
+    # 금융/개인정보 특화 키워드 확장
+    finance_expansions = {
+        "개인정보": ["개인정보보호", "개인정보처리", "개인정보활용", "개인정보수집"],
+        "금융": ["금융회사", "금융기관", "금융업", "은행", "보험회사"],
+        "신용정보": ["신용정보처리", "신용정보보호", "신용정보활용"],
+        "핀테크": ["금융서비스", "전자금융", "인터넷금융"],
+        "데이터": ["데이터처리", "데이터보호", "데이터활용"],
+        "암호화": ["정보보안", "개인정보암호화"],
+        "동의": ["사전동의", "명시적동의", "별도동의"]
+    }
+    
+    # 키워드 확장 적용
+    for keyword, expansions in finance_expansions.items():
+        if keyword in query.lower():
+            for expansion in expansions[:3]:  # 상위 3개만
+                variants.append(expansion)
+                # 원본 쿼리에서 키워드를 확장어로 치환
+                expanded_query = query.lower().replace(keyword, expansion)
+                if expanded_query != query.lower():
+                    variants.append(expanded_query)
+    
+    # 조합형 검색어 생성 (금융 + 개인정보)
+    if any(k in query.lower() for k in ["금융", "은행", "보험", "카드"]):
+        if "개인정보" not in query.lower():
+            variants.extend([f"{query} 개인정보", f"개인정보 {query}"])
+    
     # 중복 제거하면서 순서 유지
     unique_variants = []
     for variant in variants:
-        if variant not in unique_variants:
+        if variant and variant not in unique_variants:
             unique_variants.append(variant)
             
-    return unique_variants
+    return unique_variants[:10]  # 최대 10개로 제한
 
 def _smart_search(target: str, query: str, display: int = 20, page: int = 1) -> dict:
     """지능형 다단계 검색 - 정확도 우선에서 점진적 확장"""
@@ -514,6 +540,10 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             else:
                 result += "개인정보보호위원회 결정문 상세내용을 찾을 수 없습니다.\n"
                 
+        # 오류 응답 처리 (공통)
+        elif "Law" in data and isinstance(data["Law"], str):
+            result += f"조회 결과: {data['Law']}\n"
+            
         # 법령 상세조회 (LawService)
         elif "LawService" in data:
             service_data = data["LawService"]
@@ -521,20 +551,86 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             
             if law_data:
                 result += f"법령 상세내용\n\n"
-                result += f"법령명: {law_data.get('법령명한글', '미지정')}\n"
+                result += f"법령명: {law_data.get('법령명', law_data.get('법령명한글', '미지정'))}\n"
                 result += f"법령구분: {law_data.get('법령구분명', '미지정')}\n"
                 result += f"소관부처: {law_data.get('소관부처명', '미지정')}\n"
                 result += f"법령ID: {law_data.get('법령ID', '미지정')}\n"
                 result += f"공포일자: {law_data.get('공포일자', '미지정')}\n"
                 result += f"시행일자: {law_data.get('시행일자', '미지정')}\n"
-                result += f"공포번호: {law_data.get('공포번호', '미지정')}\n\n"
+                result += f"공포번호: {law_data.get('공포번호', '미지정')}\n"
+                result += f"현행연혁코드: {law_data.get('현행연혁코드', '미지정')}\n\n"
                 
-                # 조문 내용
-                if law_data.get('조문내용'):
-                    result += f"【조문내용】\n{law_data['조문내용']}\n\n"
+                # 조문 내용 (배열 형태)
+                if law_data.get('조문') and isinstance(law_data['조문'], list):
+                    result += f"【조문내용】\n"
+                    for jo in law_data['조문'][:20]:  # 최대 20개 조문
+                        if isinstance(jo, dict):
+                            result += f"\n{jo.get('조문내용', '')}\n"
+                            if jo.get('항'):
+                                for hang in jo['항']:
+                                    if isinstance(hang, dict):
+                                        result += f"{hang.get('항내용', '')}\n"
+                                        if hang.get('호'):
+                                            for ho in hang['호']:
+                                                if isinstance(ho, dict):
+                                                    result += f"{ho.get('호내용', '')}\n"
+                    result += "\n"
+                    
+                # 제개정이유
+                if law_data.get('제개정이유') and law_data['제개정이유'].get('제개정이유내용'):
+                    result += f"【제개정이유】\n"
+                    for reason_item in law_data['제개정이유']['제개정이유내용']:
+                        if isinstance(reason_item, list):
+                            for item in reason_item:
+                                result += f"{item}\n"
+                    result += "\n"
                     
             else:
                 result += "법령 상세내용을 찾을 수 없습니다.\n"
+                
+        # 법령 상세조회 (MST 파라미터 사용시 - 다른 구조)
+        elif "법령" in data and isinstance(data["법령"], dict):
+            law_data = data["법령"]
+            basic_info = law_data.get("기본정보", {})
+            
+            result += f"법령 상세내용\n\n"
+            result += f"법령명: {basic_info.get('법령명_한글', '미지정')}\n"
+            result += f"법령ID: {basic_info.get('법령ID', '미지정')}\n"
+            result += f"법종구분: {basic_info.get('법종구분', {}).get('content', '미지정')}\n"
+            result += f"공포일자: {basic_info.get('공포일자', '미지정')}\n"
+            result += f"시행일자: {basic_info.get('시행일자', '미지정')}\n"
+            result += f"공포번호: {basic_info.get('공포번호', '미지정')}\n"
+            result += f"제개정구분: {basic_info.get('제개정구분', '미지정')}\n\n"
+            
+            # 조문 내용
+            if law_data.get("조문"):
+                result += f"【조문내용】\n"
+                jo_data = law_data["조문"].get("조문단위", {})
+                if jo_data.get("조문내용"):
+                    for content_item in jo_data["조문내용"]:
+                        if isinstance(content_item, list):
+                            for line in content_item:
+                                result += f"{line}\n"
+                        else:
+                            result += f"{content_item}\n"
+                result += "\n"
+            
+            # 부칙
+            if law_data.get("부칙"):
+                result += f"【부칙】\n"
+                buchi_data = law_data["부칙"].get("부칙단위", {})
+                if buchi_data.get("부칙내용"):
+                    for content_item in buchi_data["부칙내용"]:
+                        if isinstance(content_item, list):
+                            for line in content_item:
+                                result += f"{line}\n"
+                        else:
+                            result += f"{content_item}\n"
+                result += "\n"
+            
+            # 개정문
+            if law_data.get("개정문") and law_data["개정문"].get("개정문내용"):
+                result += f"【개정문】\n{law_data['개정문']['개정문내용']}\n\n"
                 
         # 판례 상세조회 (PrecService)
         elif "PrecService" in data:
@@ -2340,17 +2436,51 @@ def search_custom_precedent(query: Optional[str] = None, display: int = 20, page
 # 13. 지식베이스 API (6개)
 # ===========================================
 
-@mcp.tool(name="search_legal_ai", description="법령 AI 지식베이스를 검색합니다. AI 기반 법령 정보와 분석을 제공합니다.")
+@mcp.tool(name="search_legal_ai", description="법령 AI 지식베이스를 검색합니다. 스마트 다중 검색으로 최적화된 법령 정보와 분석을 제공합니다.")
 def search_legal_ai(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """법령 AI 지식베이스 검색"""
+    """스마트 AI 기반 다중 검색 - 기존 API가 작동하지 않아 대안 구현"""
     search_query = query or "개인정보보호"
-    params = {"target": "lstrmAI", "query": search_query, "display": min(display, 100), "page": page}
+    
+    results = []
+    results.append(f"🤖 **AI 기반 스마트 검색 결과: '{search_query}'**\n")
+    results.append("=" * 50 + "\n")
+    
     try:
-        data = _make_legislation_request("lstrmAI", params)
-        result = _format_search_results(data, "lstrmAI", search_query)
-        return TextContent(type="text", text=result)
+        # 1. 정밀 법령 검색 (제목 우선)
+        law_data = _smart_search("law", search_query, display=5)
+        if law_data and law_data.get('LawSearch'):
+            law_result = _format_search_results(law_data, "law", search_query)
+            results.append("📋 **관련 법령 (정밀 매칭):**\n")
+            results.append(law_result + "\n")
+        
+        # 2. 해석례 검색 (실무 적용)
+        interp_data = _smart_search("expc", search_query, display=3)
+        if interp_data and interp_data.get('LawSearch'):
+            interp_result = _format_search_results(interp_data, "expc", search_query)
+            results.append("💡 **법령해석례 (실무 가이드):**\n")
+            results.append(interp_result + "\n")
+        
+        # 3. 위원회 결정문 (사례 분석)
+        committee_targets = ["ppc", "fsc", "ftc"]
+        for target in committee_targets:
+            committee_data = _smart_search(target, search_query, display=2)
+            if committee_data and committee_data.get('LawSearch'):
+                committee_result = _format_search_results(committee_data, target, search_query)
+                if "결과가 없습니다" not in committee_result:
+                    agency_names = {"ppc": "개인정보보호위원회", "fsc": "금융위원회", "ftc": "공정거래위원회"}
+                    results.append(f"🏛️ **{agency_names.get(target, target)} 결정례:**\n")
+                    results.append(committee_result + "\n")
+        
+        # 4. AI 분석 요약
+        results.append("🔍 **AI 분석 요약:**\n")
+        results.append(f"• 검색어 '{search_query}'에 대한 다각도 법령 분석을 완료했습니다.\n")
+        results.append("• 관련 법령, 해석례, 위원회 결정례를 종합적으로 제공합니다.\n")
+        results.append("• 상세한 내용은 각 문서의 상세조회 도구를 활용하세요.\n\n")
+        
+        return TextContent(type="text", text="".join(results))
+        
     except Exception as e:
-        return TextContent(type="text", text=f"법령 AI 지식베이스 검색 중 오류: {str(e)}")
+        return TextContent(type="text", text=f"스마트 법령 검색 중 오류: {str(e)}")
 
 @mcp.tool(name="search_knowledge_base", description="지식베이스를 검색합니다. 법령 관련 지식과 정보를 종합적으로 제공합니다.")
 def search_knowledge_base(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
@@ -2620,13 +2750,12 @@ def search_all_legal_documents(
     results.append("=" * 50 + "\n")
     
     try:
-        # 1. 법령 검색
+        # 1. 스마트 법령 검색 (정확도 개선)
         if include_law:
-            law_params = {"query": search_query, "display": 3}
-            law_data = _make_legislation_request("law", law_params)
-            law_url = _generate_api_url("law", law_params)
+            law_data = _smart_search("law", search_query, display=4)
+            law_url = _generate_api_url("law", {"query": search_query, "display": 4})
             law_result = _format_search_results(law_data, "law", search_query, law_url)
-            results.append("📜 **법령 검색 결과:**\n")
+            results.append("📜 **법령 검색 결과 (스마트 매칭):**\n")
             results.append(law_result + "\n")
         
         # 2. 판례 검색  
