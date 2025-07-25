@@ -150,8 +150,14 @@ def _smart_search(target: str, query: str, display: int = 20, page: int = 1) -> 
     
     return best_result or {"LawSearch": {target: []}}
 
-def _generate_api_url(target: str, params: dict) -> str:
-    """API URL 생성 함수"""
+def _generate_api_url(target: str, params: dict, is_detail: bool = False) -> str:
+    """API URL 생성 함수
+    
+    Args:
+        target: API 대상 (law, prec, ppc, expc 등)
+        params: 요청 파라미터
+        is_detail: True면 상세조회(lawService.do), False면 검색(lawSearch.do)
+    """
     try:
         from urllib.parse import urlencode
         
@@ -166,49 +172,13 @@ def _generate_api_url(target: str, params: dict) -> str:
         base_params.update(params)
         base_params["target"] = target
         
-        # URL 결정 (검색 vs 서비스)
-        search_targets = [
-            # 법령 관련 검색
-            "law", "elaw", "eflaw", "lsHistory", "lsStmd",
-            # 행정규칙 검색
-            "admrul", "admbyl", "admrulOldAndNew",
-            # 자치법규 검색
-            "ordin", "ordinfd", "ordinbyl", "lnkLs", "lnkLsOrd", "lnkOrg", "lnkOrd",
-            # 판례 관련 검색  
-            "prec", "detc", "expc", "decc", "mobprec",
-            # 위원회 결정문 검색
-            "ppc", "eiac", "fsc", "ftc", "acr", "nlrc", "ecc", "sfc", "nhrck", "kcc", "iaciac", "oclt",
-            # 조약 검색
-            "trty",
-            # 별표서식 검색
-            "licbyl",
-            # 부가서비스 검색
-            "oldAndNew", "thdCmp", "delHst", "oneview", "lsAbrv", "datDel",
-            # 학칙공단공공기관 검색
-            "school", "public", "pi",
-            # 특별행정심판 검색
-            "ttSpecialDecc", "kmstSpecialDecc",
-            # 법령용어 검색
-            "lstrm", "lstrmAI",
-            # 모바일 검색
-            "moblaw", "molegm", "moleg_eng", "moleg_chn",
-            # 맞춤형 검색
-            "custlaw", "custprec", "couseLs", "couseOrdin",
-            # 지식베이스 검색
-            "knowledge", "faq", "qna", "counsel", "precCounsel", "minwon",
-            # 중앙부처 해석 검색
-            "moelCgmExpc", "molitCgmExpc", "moefCgmExpc", "mofCgmExpc", "mohwCgmExpc", 
-            "moeCgmExpc", "koreaExpc", "msspCgmExpc", "moteCgmExpc", "mafCgmExpc", 
-            "momsCgmExpc", "smeexpcCgmExpc", "nfaCgmExpc", "korailCgmExpc", "kcgCgmExpc", "kicoCgmExpc",
-            # 새로 추가된 API들 (125개 완성)
-            "lsDayJoRvs", "lsJoChg", "lsOrdinCon", "ordinLsCon", "dlytrm", "lstrmRlt", "dlytrmRlt", 
-            "lstrmRltJo", "joRltLstrm", "lsRlt", "ntsCgmExpc", "kcsCgmExpc"
-        ]
-        
-        if target in search_targets:
-            url = legislation_config.search_base_url
-        else:
+        # URL 결정: 상세조회 vs 검색
+        if is_detail and ("ID" in params or "MST" in params):
+            # 상세조회: lawService.do 사용
             url = legislation_config.service_base_url
+        else:
+            # 검색: lawSearch.do 사용
+            url = legislation_config.search_base_url
         
         return f"{url}?{urlencode(base_params)}"
         
@@ -216,8 +186,14 @@ def _generate_api_url(target: str, params: dict) -> str:
         logger.error(f"URL 생성 실패: {e}")
         return ""
 
-def _make_legislation_request(target: str, params: dict) -> dict:
-    """법제처 API 공통 요청 함수"""
+def _make_legislation_request(target: str, params: dict, is_detail: bool = False) -> dict:
+    """법제처 API 공통 요청 함수
+    
+    Args:
+        target: API 대상 (law, prec, ppc, expc 등)
+        params: 요청 파라미터
+        is_detail: True면 상세조회(lawService.do), False면 검색(lawSearch.do)
+    """
     try:
         import requests
         
@@ -231,50 +207,13 @@ def _make_legislation_request(target: str, params: dict) -> dict:
         }
         base_params.update(params)  # params에 type이 있으면 기본값 덮어씀
         
-        # URL 결정 (검색 vs 서비스)
-        # lawSearch.do를 사용하는 검색 API들  
-        search_targets = [
-            # 법령 관련 검색
-            "law", "elaw", "eflaw", "lsHistory", "lsStmd",
-            # 행정규칙 검색
-            "admrul", "admbyl", "admrulOldAndNew",
-            # 자치법규 검색
-            "ordin", "ordinfd", "ordinbyl", "lnkLs", "lnkLsOrd", "lnkOrg", "lnkOrd",
-            # 판례 관련 검색  
-            "prec", "detc", "expc", "decc", "mobprec",
-            # 위원회 결정문 검색
-            "ppc", "eiac", "fsc", "ftc", "acr", "nlrc", "ecc", "sfc", "nhrck", "kcc", "iaciac", "oclt",
-            # 조약 검색
-            "trty",
-            # 별표서식 검색
-            "licbyl",
-            # 부가서비스 검색
-            "oldAndNew", "thdCmp", "delHst", "oneview", "lsAbrv", "datDel",
-            # 학칙공단공공기관 검색
-            "school", "public", "pi",
-            # 특별행정심판 검색
-            "ttSpecialDecc", "kmstSpecialDecc",
-            # 법령용어 검색
-            "lstrm", "lstrmAI",
-            # 모바일 검색
-            "moblaw", "molegm", "moleg_eng", "moleg_chn",
-            # 맞춤형 검색
-            "custlaw", "custprec", "couseLs", "couseOrdin",
-            # 지식베이스 검색
-            "knowledge", "faq", "qna", "counsel", "precCounsel", "minwon",
-            # 중앙부처 해석 검색
-            "moelCgmExpc", "molitCgmExpc", "moefCgmExpc", "mofCgmExpc", "mohwCgmExpc", 
-            "moeCgmExpc", "koreaExpc", "msspCgmExpc", "moteCgmExpc", "mafCgmExpc", 
-            "momsCgmExpc", "smeexpcCgmExpc", "nfaCgmExpc", "korailCgmExpc", "kcgCgmExpc", "kicoCgmExpc",
-            # 새로 추가된 API들 (125개 완성)
-            "lsDayJoRvs", "lsJoChg", "lsOrdinCon", "ordinLsCon", "dlytrm", "lstrmRlt", "dlytrmRlt", 
-            "lstrmRltJo", "joRltLstrm", "lsRlt", "ntsCgmExpc", "kcsCgmExpc"
-        ]
-        
-        if target in search_targets:
-            url = legislation_config.search_base_url
-        else:
+        # URL 결정: 상세조회 vs 검색
+        if is_detail and ("ID" in params or "MST" in params):
+            # 상세조회: lawService.do 사용
             url = legislation_config.service_base_url
+        else:
+            # 검색: lawSearch.do 사용
+            url = legislation_config.search_base_url
         
         base_params["target"] = target
         
@@ -475,6 +414,41 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             else:
                 result += "검색된 금융위원회 결정문이 없습니다.\n"
                 
+        # 금융위원회 결정문 상세조회 (FscService)
+        elif "FscService" in data:
+            service_data = data["FscService"]
+            decision_data = service_data.get("의결서", {})
+            
+            if decision_data:
+                result += f"금융위원회 결정문 상세내용\n\n"
+                result += f"기관명: {decision_data.get('기관명', '금융위원회')}\n"
+                result += f"결정문일련번호: {decision_data.get('결정문일련번호', '미지정')}\n"
+                result += f"안건명: {decision_data.get('안건명', '미지정')}\n"
+                result += f"의결일자: {decision_data.get('의결일자', '미지정')}\n"
+                result += f"회의종류: {decision_data.get('회의종류', '미지정')}\n"
+                result += f"결정구분: {decision_data.get('결정', '미지정')}\n\n"
+                
+                # 주문
+                if decision_data.get('주문'):
+                    result += f"【주문】\n{decision_data['주문']}\n\n"
+                
+                # 이유
+                if decision_data.get('이유'):
+                    result += f"【이유】\n{decision_data['이유']}\n\n"
+                
+                # 별지 (상세 내용)
+                if decision_data.get('별지'):
+                    result += f"【별지】\n{decision_data['별지']}\n\n"
+                
+                # 기타 정보
+                other_fields = ['결정요지', '배경', '주요내용', '신청인', '위원서명']
+                for field in other_fields:
+                    if decision_data.get(field) and decision_data[field].strip():
+                        result += f"【{field}】\n{decision_data[field]}\n\n"
+                        
+            else:
+                result += "금융위원회 결정문 상세내용을 찾을 수 없습니다.\n"
+                
         # 개인정보보호위원회 결정문 (Ppc)  
         elif "Ppc" in data:
             search_data = data["Ppc"]
@@ -503,6 +477,125 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
                         result += "\n"
             else:
                 result += "검색된 개인정보보호위원회 결정문이 없습니다.\n"
+                
+        # 개인정보보호위원회 결정문 상세조회 (PpcService)
+        elif "PpcService" in data:
+            service_data = data["PpcService"]
+            decision_data = service_data.get("의결서", {})
+            
+            if decision_data:
+                result += f"개인정보보호위원회 결정문 상세내용\n\n"
+                result += f"기관명: {decision_data.get('기관명', '개인정보보호위원회')}\n"
+                result += f"결정문일련번호: {decision_data.get('결정문일련번호', '미지정')}\n"
+                result += f"안건명: {decision_data.get('안건명', '미지정')}\n"
+                result += f"의결일자: {decision_data.get('의결일자', '미지정')}\n"
+                result += f"회의종류: {decision_data.get('회의종류', '미지정')}\n"
+                result += f"결정구분: {decision_data.get('결정', '미지정')}\n"
+                result += f"위원서명: {decision_data.get('위원서명', '미지정')}\n\n"
+                
+                # 주문
+                if decision_data.get('주문'):
+                    result += f"【주문】\n{decision_data['주문']}\n\n"
+                
+                # 이유
+                if decision_data.get('이유'):
+                    result += f"【이유】\n{decision_data['이유']}\n\n"
+                
+                # 별지 (상세 내용)
+                if decision_data.get('별지'):
+                    result += f"【별지】\n{decision_data['별지']}\n\n"
+                
+                # 기타 정보
+                other_fields = ['결정요지', '배경', '주요내용', '신청인', '이의제기방법및기간']
+                for field in other_fields:
+                    if decision_data.get(field) and decision_data[field].strip():
+                        result += f"【{field}】\n{decision_data[field]}\n\n"
+                        
+            else:
+                result += "개인정보보호위원회 결정문 상세내용을 찾을 수 없습니다.\n"
+                
+        # 법령 상세조회 (LawService)
+        elif "LawService" in data:
+            service_data = data["LawService"]
+            law_data = service_data.get("법령", {})
+            
+            if law_data:
+                result += f"법령 상세내용\n\n"
+                result += f"법령명: {law_data.get('법령명한글', '미지정')}\n"
+                result += f"법령구분: {law_data.get('법령구분명', '미지정')}\n"
+                result += f"소관부처: {law_data.get('소관부처명', '미지정')}\n"
+                result += f"법령ID: {law_data.get('법령ID', '미지정')}\n"
+                result += f"공포일자: {law_data.get('공포일자', '미지정')}\n"
+                result += f"시행일자: {law_data.get('시행일자', '미지정')}\n"
+                result += f"공포번호: {law_data.get('공포번호', '미지정')}\n\n"
+                
+                # 조문 내용
+                if law_data.get('조문내용'):
+                    result += f"【조문내용】\n{law_data['조문내용']}\n\n"
+                    
+            else:
+                result += "법령 상세내용을 찾을 수 없습니다.\n"
+                
+        # 판례 상세조회 (PrecService)
+        elif "PrecService" in data:
+            service_data = data["PrecService"]
+            prec_data = service_data.get("판례", {})
+            
+            if prec_data:
+                result += f"판례 상세내용\n\n"
+                result += f"사건명: {prec_data.get('사건명', '미지정')}\n"
+                result += f"사건번호: {prec_data.get('사건번호', '미지정')}\n"
+                result += f"선고일자: {prec_data.get('선고일자', '미지정')}\n"
+                result += f"법원명: {prec_data.get('법원명', '미지정')}\n"
+                result += f"사건종류: {prec_data.get('사건종류명', '미지정')}\n"
+                result += f"판례일련번호: {prec_data.get('판례일련번호', '미지정')}\n\n"
+                
+                # 판시사항
+                if prec_data.get('판시사항'):
+                    result += f"【판시사항】\n{prec_data['판시사항']}\n\n"
+                
+                # 판결요지
+                if prec_data.get('판결요지'):
+                    result += f"【판결요지】\n{prec_data['판결요지']}\n\n"
+                
+                # 참조조문
+                if prec_data.get('참조조문'):
+                    result += f"【참조조문】\n{prec_data['참조조문']}\n\n"
+                
+                # 전문
+                if prec_data.get('전문'):
+                    result += f"【전문】\n{prec_data['전문']}\n\n"
+                    
+            else:
+                result += "판례 상세내용을 찾을 수 없습니다.\n"
+                
+        # 법령해석례 상세조회 (ExpcService)
+        elif "ExpcService" in data:
+            service_data = data["ExpcService"]
+            expc_data = service_data.get("해석례", {})
+            
+            if expc_data:
+                result += f"법령해석례 상세내용\n\n"
+                result += f"해석례명: {expc_data.get('해석례명', '미지정')}\n"
+                result += f"조회수: {expc_data.get('조회수', '미지정')}\n"
+                result += f"해석일자: {expc_data.get('해석일자', '미지정')}\n"
+                result += f"해석기관: {expc_data.get('해석기관', '미지정')}\n"
+                result += f"해석례일련번호: {expc_data.get('해석례일련번호', '미지정')}\n\n"
+                
+                # 질의요지
+                if expc_data.get('질의요지'):
+                    result += f"【질의요지】\n{expc_data['질의요지']}\n\n"
+                
+                # 회답
+                if expc_data.get('회답'):
+                    result += f"【회답】\n{expc_data['회답']}\n\n"
+                
+                # 관련법령
+                if expc_data.get('관련법령'):
+                    result += f"【관련법령】\n{expc_data['관련법령']}\n\n"
+                    
+            else:
+                result += "법령해석례 상세내용을 찾을 수 없습니다.\n"
                 
         # 공정거래위원회 결정문 (Ftc)
         elif "Ftc" in data:
@@ -721,9 +814,9 @@ def get_law_detail(law_id: Optional[Union[str, int]] = None, law_name: Optional[
     try:
         if law_id:
             # ID가 있으면 직접 조회
-            params = {"ID": str(law_id)}
-            data = _make_legislation_request("law", params)
-            url = _generate_api_url("law", params)
+            params = {"MST": str(law_id)}
+            data = _make_legislation_request("law", params, is_detail=True)
+            url = _generate_api_url("law", params, is_detail=True)
             search_term = f"ID:{law_id}"
         else:
             # 법령명으로 검색 - 먼저 검색해서 정확한 ID 찾기
@@ -752,12 +845,12 @@ def get_law_detail(law_id: Optional[Union[str, int]] = None, law_name: Optional[
                         best_match = law
                         break
                 
-                if best_match and best_match.get('법령ID'):
+                if best_match and best_match.get('법령일련번호'):
                     # 찾은 법령의 상세 정보 조회
-                    law_id = best_match['법령ID']
-                    params = {"ID": str(law_id)}
-                    data = _make_legislation_request("law", params)
-                    url = _generate_api_url("law", params)
+                    mst_id = best_match['법령일련번호']
+                    params = {"MST": str(mst_id)}
+                    data = _make_legislation_request("law", params, is_detail=True)
+                    url = _generate_api_url("law", params, is_detail=True)
                     search_term = f"{law_name} (자동 발견: {best_match.get('법령명한글', '')})"
                 else:
                     return TextContent(type="text", text=f"'{law_name}'과 일치하는 법령을 찾을 수 없습니다. search_law 도구로 먼저 검색해보세요.")
@@ -3019,8 +3112,8 @@ def get_precedent_detail(case_id: Union[str, int], data_source: Optional[str] = 
         params["type"] = output_type
     
     try:
-        data = _make_legislation_request("prec", params)
-        url = _generate_api_url("prec", params)
+        data = _make_legislation_request("prec", params, is_detail=True)
+        url = _generate_api_url("prec", params, is_detail=True)
         
         # 국세청 판례 HTML 응답 처리
         if params.get("type") == "HTML":
@@ -3043,8 +3136,8 @@ def get_constitutional_court_detail(case_id: Union[str, int]) -> TextContent:
     """헌재결정례 본문 조회 (detc)"""
     params = {"ID": str(case_id)}
     try:
-        data = _make_legislation_request("detc", params)
-        url = _generate_api_url("detc", params)
+        data = _make_legislation_request("detc", params, is_detail=True)
+        url = _generate_api_url("detc", params, is_detail=True)
         result = _format_search_results(data, "detc", str(case_id), url)
         return TextContent(type="text", text=result)
     except Exception as e:
@@ -3055,8 +3148,8 @@ def get_legal_interpretation_detail(interpretation_id: Union[str, int]) -> TextC
     """법령해석례 본문 조회 (expc)"""
     params = {"ID": str(interpretation_id)}
     try:
-        data = _make_legislation_request("expc", params)
-        url = _generate_api_url("expc", params)
+        data = _make_legislation_request("expc", params, is_detail=True)
+        url = _generate_api_url("expc", params, is_detail=True)
         result = _format_search_results(data, "expc", str(interpretation_id), url)
         return TextContent(type="text", text=result)
     except Exception as e:
@@ -3246,8 +3339,8 @@ def get_privacy_committee_detail(decision_id: Union[str, int]) -> TextContent:
     """개인정보보호위원회 결정문 본문 조회 (ppc)"""
     params = {"ID": str(decision_id)}
     try:
-        data = _make_legislation_request("ppc", params)
-        url = _generate_api_url("ppc", params)
+        data = _make_legislation_request("ppc", params, is_detail=True)
+        url = _generate_api_url("ppc", params, is_detail=True)
         result = _format_search_results(data, "ppc", str(decision_id), url)
         return TextContent(type="text", text=result)
     except Exception as e:
@@ -3258,8 +3351,8 @@ def get_financial_committee_detail(decision_id: Union[str, int]) -> TextContent:
     """금융위원회 결정문 본문 조회 (fsc)"""
     params = {"ID": str(decision_id)}
     try:
-        data = _make_legislation_request("fsc", params)
-        url = _generate_api_url("fsc", params)
+        data = _make_legislation_request("fsc", params, is_detail=True)
+        url = _generate_api_url("fsc", params, is_detail=True)
         result = _format_search_results(data, "fsc", str(decision_id), url)
         return TextContent(type="text", text=result)
     except Exception as e:
@@ -3270,7 +3363,7 @@ def get_monopoly_committee_detail(decision_id: Union[str, int]) -> TextContent:
     """공정거래위원회 결정문 본문 조회 (ftc)"""
     params = {"ID": str(decision_id)}
     try:
-        data = _make_legislation_request("ftc", params)
+        data = _make_legislation_request("ftc", params, is_detail=True)
         url = _generate_api_url("ftc", params)
         result = _format_search_results(data, "ftc", str(decision_id), url)
         return TextContent(type="text", text=result)
