@@ -1509,17 +1509,7 @@ def search_legal_interpretation(query: Optional[str] = None, display: int = 20, 
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 검색 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_precedent", description="모바일 판례를 검색합니다. 모바일 최적화된 판례 정보를 제공합니다.")
-def search_mobile_precedent(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 판례 검색"""
-    search_query = query or "개인정보보호"
-    params = {"target": "mobprec", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("mobprec", params)
-        result = _format_search_results(data, "mobprec", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 판례 검색 중 오류: {str(e)}")
+
 
 @mcp.tool(name="search_administrative_trial", description="행정심판례를 검색합니다. 행정심판 관련 사건과 결정을 제공합니다.")
 def search_administrative_trial(query: Optional[str] = None, search: int = 1, display: int = 20, page: int = 1) -> TextContent:
@@ -1546,17 +1536,7 @@ def get_administrative_trial_detail(trial_id: Union[str, int], trial_name: Optio
     except Exception as e:
         return TextContent(type="text", text=f"행정심판례 상세 조회 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_administrative_trial", description="모바일 행정심판례를 검색합니다. 모바일 최적화된 행정심판례 정보를 제공합니다.")
-def search_mobile_administrative_trial(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 행정심판례 검색"""
-    search_query = query or "개인정보보호"
-    params = {"target": "decc", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("decc", params)
-        result = _format_search_results(data, "decc", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 행정심판례 검색 중 오류: {str(e)}")
+
 
 # ===========================================
 # 6. 위원회결정문 API (30개 주요 위원회)
@@ -2096,17 +2076,7 @@ def search_treaty(
     except Exception as e:
         return TextContent(type="text", text=f"조약 검색 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_treaty", description="모바일 조약을 검색합니다. 모바일 최적화된 조약 정보를 제공합니다.")
-def search_mobile_treaty(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 조약 검색"""
-    search_query = query or "개인정보보호"
-    params = {"target": "trty", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("trty", params)
-        result = _format_search_results(data, "trty", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 조약 검색 중 오류: {str(e)}")
+
 
 # ===========================================
 # 8. 별표서식 API (4개)
@@ -2160,17 +2130,7 @@ def search_law_appendix(
     except Exception as e:
         return TextContent(type="text", text=f"법령 별표서식 검색 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_law_appendix", description="모바일 법령 별표서식을 검색합니다. 모바일 최적화된 별표서식을 제공합니다.")
-def search_mobile_law_appendix(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 법령 별표서식 검색"""
-    search_query = query or "개인정보보호"
-    params = {"target": "licbyl", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("licbyl", params)
-        result = _format_search_results(data, "licbyl", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 법령 별표서식 검색 중 오류: {str(e)}")
+
 
 # ===========================================
 # 9. 학칙공단 API (2개)
@@ -2319,69 +2279,7 @@ def search_legal_term(query: Optional[str] = None, display: int = 20, page: int 
     except Exception as e:
         return TextContent(type="text", text=f"법령용어 검색 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_legal_term", description="모바일 법령용어를 검색합니다. 모바일 최적화된 법령용어 정보를 제공합니다.")
-def search_mobile_legal_term(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 법령용어 검색"""
-    search_query = query or "개인정보"
-    params = {"target": "lstrm", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("lstrm", params)
-        result = _format_search_results(data, "lstrm", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 법령용어 검색 중 오류: {str(e)}")
 
-# ===========================================
-# 11. 모바일 API (15개)
-# ===========================================
-
-@mcp.tool(name="search_mobile_law", description="모바일 법령을 검색합니다. 모바일 기기에 최적화된 법령 정보를 제공합니다.")
-def search_mobile_law(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 법령 검색"""
-    search_query = query or "개인정보보호법"
-    params = {"target": "law", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("law", params)
-        result = _format_search_results(data, "law", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 법령 검색 중 오류: {str(e)}")
-
-@mcp.tool(name="search_mobile_english_law", description="모바일 영문법령을 검색합니다. 모바일 최적화된 영문법령을 제공합니다.")
-def search_mobile_english_law(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 영문법령 검색"""
-    search_query = query or "Personal Information Protection Act"
-    params = {"target": "englaw", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("englaw", params)
-        result = _format_search_results(data, "englaw", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 영문법령 검색 중 오류: {str(e)}")
-
-@mcp.tool(name="search_mobile_administrative_rule", description="모바일 행정규칙을 검색합니다. 모바일 최적화된 행정규칙을 제공합니다.")
-def search_mobile_administrative_rule(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 행정규칙 검색"""
-    search_query = query or "개인정보보호"
-    params = {"target": "admrul", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("admrul", params)
-        result = _format_search_results(data, "admrul", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 행정규칙 검색 중 오류: {str(e)}")
-
-@mcp.tool(name="search_mobile_local_ordinance", description="모바일 자치법규를 검색합니다. 모바일 최적화된 자치법규를 제공합니다.")
-def search_mobile_local_ordinance(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 자치법규 검색"""
-    search_query = query or "개인정보보호"
-    params = {"target": "ordin", "query": search_query, "display": min(display, 100), "page": page, "mobileYn": "Y"}
-    try:
-        data = _make_legislation_request("ordin", params)
-        result = _format_search_results(data, "ordin", search_query)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 자치법규 검색 중 오류: {str(e)}")
 
 # ===========================================
 # 12. 맞춤형 API (6개)
@@ -3102,31 +3000,7 @@ def get_kcg_interpretation_detail(interpretation_id: Union[str, int]) -> TextCon
     except Exception as e:
         return TextContent(type="text", text=f"해양경찰청 법령해석 상세조회 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_ordinance_appendix", description="모바일 자치법규 별표서식을 검색합니다. 모바일 최적화된 자치법규 별표서식을 제공합니다.")
-def search_mobile_ordinance_appendix(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 자치법규 별표서식 목록 조회 (mobOrdinByl)"""
-    search_query = query or "서식"
-    params = {"query": search_query, "display": min(display, 100), "page": page}
-    try:
-        data = _make_legislation_request("mobOrdinByl", params)
-        url = _generate_api_url("mobOrdinByl", params)
-        result = _format_search_results(data, "mobOrdinByl", search_query, url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 자치법규 별표서식 검색 중 오류: {str(e)}")
 
-@mcp.tool(name="search_mobile_administrative_rule_appendix", description="모바일 행정규칙 별표서식을 검색합니다. 모바일 최적화된 행정규칙 별표서식을 제공합니다.")
-def search_mobile_administrative_rule_appendix(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """모바일 행정규칙 별표서식 목록 조회 (mobAdmrulByl)"""
-    search_query = query or "서식"
-    params = {"query": search_query, "display": min(display, 100), "page": page}
-    try:
-        data = _make_legislation_request("mobAdmrulByl", params)
-        url = _generate_api_url("mobAdmrulByl", params)
-        result = _format_search_results(data, "mobAdmrulByl", search_query, url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 행정규칙 별표서식 검색 중 오류: {str(e)}")
 
 logger.info("✅ 완벽한 125개 API 전체 완성! 🎉") 
 
@@ -3295,77 +3169,6 @@ def get_legal_interpretation_detail(interpretation_id: Union[str, int]) -> TextC
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 상세조회 중 오류: {str(e)}")
 
-@mcp.tool(name="get_mobile_precedent_detail", description="모바일 판례 상세내용을 조회합니다. 모바일 최적화된 판례 본문을 제공합니다. 목록 검색은 search_mobile_precedent 도구를 사용하세요.")
-def get_mobile_precedent_detail(case_id: Union[str, int]) -> TextContent:
-    """모바일 판례 본문 조회 (mobprec)"""
-    params = {"ID": str(case_id)}
-    try:
-        data = _make_legislation_request("mobprec", params)
-        url = _generate_api_url("mobprec", params)
-        result = _format_search_results(data, "mobprec", str(case_id), url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 판례 상세조회 중 오류: {str(e)}")
-
-@mcp.tool(name="get_mobile_constitutional_court_detail", description="모바일 헌재결정례 상세내용을 조회합니다. 모바일 최적화된 헌재결정례 본문을 제공합니다. 목록 검색은 search_constitutional_court 도구를 사용하세요.")
-def get_mobile_constitutional_court_detail(case_id: Union[str, int]) -> TextContent:
-    """모바일 헌재결정례 본문 조회 (mobdetc)"""
-    params = {"ID": str(case_id)}
-    try:
-        data = _make_legislation_request("mobdetc", params)
-        url = _generate_api_url("mobdetc", params)
-        result = _format_search_results(data, "mobdetc", str(case_id), url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 헌재결정례 상세조회 중 오류: {str(e)}")
-
-@mcp.tool(name="get_mobile_legal_interpretation_detail", description="모바일 법령해석례 상세내용을 조회합니다. 모바일 최적화된 해석례 본문을 제공합니다. 목록 검색은 search_legal_interpretation 도구를 사용하세요.")
-def get_mobile_legal_interpretation_detail(interpretation_id: Union[str, int]) -> TextContent:
-    """모바일 법령해석례 본문 조회 (mobexpc)"""
-    params = {"ID": str(interpretation_id)}
-    try:
-        data = _make_legislation_request("mobexpc", params)
-        url = _generate_api_url("mobexpc", params)
-        result = _format_search_results(data, "mobexpc", str(interpretation_id), url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 법령해석례 상세조회 중 오류: {str(e)}")
-
-@mcp.tool(name="get_mobile_administrative_trial_detail", description="모바일 행정심판례 상세내용을 조회합니다. 모바일 최적화된 심판례 본문을 제공합니다. 목록 검색은 search_mobile_administrative_trial 도구를 사용하세요.")
-def get_mobile_administrative_trial_detail(trial_id: Union[str, int]) -> TextContent:
-    """모바일 행정심판례 본문 조회 (mobdecc)"""
-    params = {"ID": str(trial_id)}
-    try:
-        data = _make_legislation_request("mobdecc", params)
-        url = _generate_api_url("mobdecc", params)
-        result = _format_search_results(data, "mobdecc", str(trial_id), url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 행정심판례 상세조회 중 오류: {str(e)}")
-
-@mcp.tool(name="get_mobile_treaty_detail", description="모바일 조약 상세내용을 조회합니다. 모바일 최적화된 조약 본문을 제공합니다. 목록 검색은 search_mobile_treaty 도구를 사용하세요.")
-def get_mobile_treaty_detail(treaty_id: Union[str, int]) -> TextContent:
-    """모바일 조약 본문 조회 (mobtrty)"""
-    params = {"ID": str(treaty_id)}
-    try:
-        data = _make_legislation_request("mobtrty", params)
-        url = _generate_api_url("mobtrty", params)
-        result = _format_search_results(data, "mobtrty", str(treaty_id), url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 조약 상세조회 중 오류: {str(e)}")
-
-@mcp.tool(name="get_mobile_legal_term_detail", description="모바일 법령용어 상세내용을 조회합니다. 모바일 최적화된 용어 해설을 제공합니다. 목록 검색은 search_mobile_legal_term 도구를 사용하세요.")
-def get_mobile_legal_term_detail(term_id: Union[str, int]) -> TextContent:
-    """모바일 법령용어 본문 조회 (moblstrm)"""
-    params = {"ID": str(term_id)}
-    try:
-        data = _make_legislation_request("moblstrm", params)
-        url = _generate_api_url("moblstrm", params)
-        result = _format_search_results(data, "moblstrm", str(term_id), url)
-        return TextContent(type="text", text=result)
-    except Exception as e:
-        return TextContent(type="text", text=f"모바일 법령용어 상세조회 중 오류: {str(e)}")
 
 @mcp.tool(name="get_legal_term_detail", description="법령용어 상세내용을 조회합니다. 특정 법령용어의 정의와 설명을 제공합니다. 목록 검색은 search_legal_term 도구를 사용하세요.")
 def get_legal_term_detail(term_id: Union[str, int]) -> TextContent:
