@@ -587,19 +587,44 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             result += f"시행일자: {basic_info.get('시행일자', '미지정')}\n"
             result += f"공포번호: {basic_info.get('공포번호', '미지정')}\n"
             result += f"제개정구분: {basic_info.get('제개정구분', '미지정')}\n\n"
-            
-            # 조문 내용
+             
+            # 조문 내용 (개선된 구조 처리)
             if law_data.get("조문"):
-                result += f"【조문내용】\n"
-                jo_data = law_data["조문"].get("조문단위", {})
-                if jo_data.get("조문내용"):
-                    for content_item in jo_data["조문내용"]:
-                        if isinstance(content_item, list):
-                            for line in content_item:
-                                result += f"{line}\n"
-                        else:
-                            result += f"{content_item}\n"
-                result += "\n"
+                 result += f"【조문내용】\n"
+                 jo_units = law_data["조문"].get("조문단위", [])
+                 
+                 # 단일 조문과 여러 조문 모두 처리
+                 if isinstance(jo_units, dict):
+                     jo_units = [jo_units]
+                 elif not isinstance(jo_units, list):
+                     jo_units = []
+                 
+                 for jo_unit in jo_units[:30]:  # 최대 30개 조문
+                     if isinstance(jo_unit, dict):
+                         # 조문 제목과 번호
+                         jo_num = jo_unit.get('조문번호', '')
+                         jo_title = jo_unit.get('조문제목', '')
+                         if jo_num and jo_title:
+                             result += f"\n제{jo_num}조({jo_title})\n"
+                         elif jo_unit.get('조문내용'):
+                             result += f"\n{jo_unit['조문내용']}\n"
+                         
+                         # 항별 내용
+                         if jo_unit.get('항'):
+                             for hang in jo_unit['항']:
+                                 if isinstance(hang, dict):
+                                     hang_content = hang.get('항내용', '')
+                                     if hang_content:
+                                         result += f"{hang_content}\n"
+                                     
+                                     # 호별 내용
+                                     if hang.get('호'):
+                                         for ho in hang['호']:
+                                             if isinstance(ho, dict):
+                                                 ho_content = ho.get('호내용', '')
+                                                 if ho_content:
+                                                     result += f"{ho_content}\n"
+                 result += "\n"
             
             # 부칙
             if law_data.get("부칙"):
