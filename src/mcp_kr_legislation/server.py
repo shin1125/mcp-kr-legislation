@@ -12,7 +12,6 @@
 - 별표서식 (4개)
 - 학칙공단 (2개)
 - 법령용어 (2개)
-- 모바일 (15개)
 - 맞춤형 (6개)
 - 지식베이스 (6개)
 - 기타 (1개)
@@ -140,7 +139,24 @@ mcp = FastMCP(
 
 # 도구 모듈 동적 로딩
 import importlib
-for module_name in ["legislation_tools", "legislation_tools_part2", "legislation_tools_part3", "legislation_tools_final", "analysis_tools", "advanced_analysis_tools", "ministry_detail_tools"]:
+tool_modules = [
+    "law_tools",
+    "optimized_law_tools",  # 캐싱 최적화된 도구들
+    "legislation_tools", 
+    "additional_service_tools",
+    "administrative_rule_tools", 
+    "ai_tools",
+    "committee_tools",
+    "custom_tools",
+    "legal_term_tools",
+    "linkage_tools",
+    "ministry_interpretation_tools",
+    "misc_tools",
+    "precedent_tools",
+    "specialized_tools"
+]
+
+for module_name in tool_modules:
     try:
         importlib.import_module(f"mcp_kr_legislation.tools.{module_name}")
         logger.info(f"Loaded tool module: {module_name}")

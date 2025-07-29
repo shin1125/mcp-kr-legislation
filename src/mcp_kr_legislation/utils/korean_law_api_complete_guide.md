@@ -1,8 +1,156 @@
 # 한국 법제처 OPEN API 완전 상세 가이드
 
-> 총 121개의 API 완전 문서화
+> 총 125개의 API 완전 문서화 (모바일 API 제외 후 105개)
 > 생성일: 2025. 7. 22.
+> 업데이트: 2025. 1. 15. - 완전한 API 구조 분석 추가
 > 모든 Request/Response 정보 포함
+
+## 🎯 API 구조 패턴
+
+### 📡 **핵심 URL 패턴**
+| 기능 | URL 패턴 | 설명 | 예시 |
+|------|-----------|------|------|
+| **목록 조회** | `lawSearch.do?target={value}` | 검색/목록 반환 | `lawSearch.do?target=law` |
+| **본문 조회** | `lawService.do?target={value}` | 상세 내용 반환 | `lawService.do?target=law` |
+
+### 🔑 **target 파라미터가 모든 기능 결정**
+- 동일한 URL에서 `target` 값만으로 API 카테고리 구분
+- 총 **50개 이상**의 고유한 target 값 존재
+- 목록/본문 조회는 URL로, 카테고리는 target으로 결정
+
+## 📊 API 카테고리별 완전 구분표
+
+| 대분류 | 중분류 | 목록 조회 API | target | 본문 조회 API | target |
+|--------|--------|---------------|--------|---------------|--------|
+| **법령** | **본문** | 현행법령 목록 조회 | `law` | 현행법령 본문 조회 | `law` |
+| | | 시행일 법령 목록 조회 | `eflaw` | 시행일 법령 본문 조회 | `eflaw` |
+| | | 법령 연혁 목록 조회 | `lsHistory` | 법령 연혁 본문 조회 | `lsHistory` |
+| | **조항호목** | - | - | 현행법령 본문 조항호목 조회 | `lawjosub` |
+| | | - | - | 시행일 법령 본문 조항호목 조회 | `eflawjosub` |
+| | **영문법령** | 영문 법령 목록 조회 | `elaw` | 영문 법령 본문 조회 | `elaw` |
+| | **이력** | 법령 변경이력 목록 조회 | `lsHstInf` | - | - |
+| | | 일자별 조문 개정 이력 목록 조회 | `lsJoHstInf` | - | - |
+| | | 조문별 변경 이력 목록 조회 | `lsJoHstInf` | - | - |
+| | **연계** | 법령 기준 자치법규 연계 관련 목록 조회 | `lnkLs` | - | - |
+| | | 법령-자치법규 연계현황 조회 | `lnkLsOrd` | - | - |
+| | | - | - | 위임법령 조회 | `lsDelegated` |
+| | **부가서비스** | 법령 체계도 목록 조회 | `lsStmd` | 법령 체계도 본문 조회 | `lsStmd` |
+| | | 신구법 목록 조회 | `oldAndNew` | 신구법 본문 조회 | `oldAndNew` |
+| | | 3단 비교 목록 조회 | `thdCmp` | 3단 비교 본문 조회 | `thdCmp` |
+| | | 법률명 약칭 조회 | `lsAbrv` | - | - |
+| | | 삭제 데이터 목록 조회 | `datDel` | - | - |
+| | | 한눈보기 목록 조회 | `oneview` | 한눈보기 본문 조회 | `oneview` |
+| **행정규칙** | **본문** | 행정규칙 목록 조회 | `admrul` | 행정규칙 본문 조회 | `admrul` |
+| | **부가서비스** | 행정규칙 신구법 비교 목록 조회 | `admrulOldAndNew` | 행정규칙 신구법 비교 본문 조회 | `admrulOldAndNew` |
+| **자치법규** | **본문** | 자치법규 목록 조회 | `ordinfd` | 자치법규 본문 조회 | `ordin` |
+| | **연계** | 자치법규 기준 법령 연계 관련 목록 조회 | `lnkOrd` | - | - |
+| **판례관련** | **판례** | 판례 목록 조회 | `prec` | 판례 본문 조회 | `prec` |
+| | **헌재결정례** | 헌재결정례 목록 조회 | `detc` | 헌재결정례 본문 조회 | `detc` |
+| | **법령해석례** | 법령해석례 목록 조회 | `expc` | 법령해석례 본문 조회 | `expc` |
+| | **행정심판례** | 행정심판례 목록 조회 | `decc` | 행정심판례 본문 조회 | `decc` |
+| **위원회결정문** | **개인정보보호위원회** | 개인정보보호위원회 결정문 목록 조회 | `ppc` | 개인정보보호위원회 결정문 본문 조회 | `ppc` |
+| | **고용보험심사위원회** | 고용보험심사위원회 결정문 목록 조회 | `eiac` | 고용보험심사위원회 결정문 본문 조회 | `eiac` |
+| | **공정거래위원회** | 공정거래위원회 결정문 목록 조회 | `ftc` | 공정거래위원회 결정문 본문 조회 | `ftc` |
+| | **국민권익위원회** | 국민권익위원회 결정문 목록 조회 | `acr` | 국민권익위원회 결정문 본문 조회 | `acr` |
+| | **금융위원회** | 금융위원회 결정문 목록 조회 | `fsc` | 금융위원회 결정문 본문 조회 | `fsc` |
+| | **노동위원회** | 노동위원회 결정문 목록 조회 | `nlrc` | 노동위원회 결정문 본문 조회 | `nlrc` |
+| | **방송통신위원회** | 방송통신위원회 결정문 목록 조회 | `kcc` | 방송통신위원회 결정문 본문 조회 | `kcc` |
+| | **산업재해보상보험재심사위원회** | 산업재해보상보험재심사위원회 결정문 목록 조회 | `iaciac` | 산업재해보상보험재심사위원회 결정문 본문 조회 | `iaciac` |
+| | **중앙토지수용위원회** | 중앙토지수용위원회 결정문 목록 조회 | `oclt` | 중앙토지수용위원회 결정문 본문 조회 | `oclt` |
+| | **중앙환경분쟁조정위원회** | 중앙환경분쟁조정위원회 결정문 목록 조회 | `ecc` | 중앙환경분쟁조정위원회 결정문 본문 조회 | `ecc` |
+| | **증권선물위원회** | 증권선물위원회 결정문 목록 조회 | `sfc` | 증권선물위원회 결정문 본문 조회 | `sfc` |
+| | **국가인권위원회** | 국가인권위원회 결정문 목록 조회 | `nhrck` | 국가인권위원회 결정문 본문 조회 | `nhrck` |
+| **조약** | **본문** | 조약 목록 조회 | `trty` | 조약 본문 조회 | `trty` |
+| **별표·서식** | **법령** | 법령 별표·서식 목록 조회 | `licbyl` | - | - |
+| | **행정규칙** | 행정규칙 별표·서식 목록 조회 | `admbyl` | - | - |
+| | **자치법규** | 자치법규 별표·서식 목록 조회 | `ordinbyl` | - | - |
+| **학칙·공단·공공기관** | **본문** | 학칙·공단·공공기관 목록 조회 | `pi` | 학칙·공단·공공기관 본문 조회 | `pi` |
+| **법령용어** | **본문** | 법령 용어 목록 조회 | `lstrm` | 법령 용어 본문 조회 | `lstrm` |
+| **맞춤형** | **법령** | 맞춤형 법령 목록 조회 | `couseLs` | - | - |
+| | | 맞춤형 법령 조문 목록 조회 | `couseLs` | - | - |
+| | **행정규칙** | 맞춤형 행정규칙 목록 조회 | `couseAdmrul` | - | - |
+| | | 맞춤형 행정규칙 조문 목록 조회 | `couseAdmrul` | - | - |
+| | **자치법규** | 맞춤형 자치법규 목록 조회 | `couseOrdin` | - | - |
+| | | 맞춤형 자치법규 조문 목록 조회 | `couseOrdin` | - | - |
+| **법령정보 지식베이스** | **용어** | 법령용어 조회 | `lstrmAI` | | |
+| | | 일상용어 조회 | `dlytrm` | | |
+| | **용어 간 관계** | 법령용어-일상용어 연계 조회 | `lstrmRlt` | | |
+| | | 일상용어-법령용어 연계 조회 | `dlytrmRlt` | | |
+| | **조문 간 관계** | 법령용어-조문 연계 조회 | `lstrmRltJo` | | |
+| | | 조문-법령용어 연계 조회 | `joRltLstrm` | | |
+| | **법령 간 관계** | 관련법령 조회 | `lsRlt` | | |
+| **중앙부처 1차 해석** | **고용노동부** | 고용노동부 법령해석 목록 조회 | `moelCgmExpc` | 고용노동부 법령해석 본문 조회 | `moelCgmExpc` |
+| | **국토교통부** | 국토교통부 법령해석 목록 조회 | `molitCgmExpc` | 국토교통부 법령해석 본문 조회 | `molitCgmExpc` |
+| | **기획재정부** | 기획재정부 법령해석 목록 조회 | `moefCgmExpc` | - | - |
+| | **해양수산부** | 해양수산부 법령해석 목록 조회 | `mofCgmExpc` | 해양수산부 법령해석 본문 조회 | `mofCgmExpc` |
+| | **행정안전부** | 행정안전부 법령해석 목록 조회 | `moisCgmExpc` | 행정안전부 법령해석 본문 조회 | `moisCgmExpc` |
+| | **환경부** | 환경부 법령해석 목록 조회 | `meCgmExpc` | 환경부 법령해석 본문 조회 | `meCgmExpc` |
+| | **관세청** | 관세청 법령해석 목록 조회 | `kcsCgmExpc` | 관세청 법령해석 본문 조회 | `kcsCgmExpc` |
+| | **국세청** | 국세청 법령해석 목록 조회 | `ntsCgmExpc` | - | - |
+| **특별행정심판** | **조세심판원** | 조세심판원 특별행정심판례 목록 조회 | `ttSpecialDecc` | 조세심판원 특별행정심판례 본문 조회 | `ttSpecialDecc` |
+| | **해양안전심판원** | 해양안전심판원 특별행정심판례 목록 조회 | `kmstSpecialDecc` | 해양안전심판원 특별행정심판례 본문 조회 | `kmstSpecialDecc` |
+
+### 📈 카테고리별 통계
+- **법령**: 26개 API (본문 6개, 조항호목 2개, 영문법령 2개, 이력 3개, 연계 3개, 부가서비스 10개)
+- **행정규칙**: 4개 API (본문 2개, 부가서비스 2개)  
+- **자치법규**: 3개 API (본문 2개, 연계 1개)
+- **판례관련**: 8개 API (판례 2개, 헌재결정례 2개, 법령해석례 2개, 행정심판례 2개)
+- **위원회결정문**: 24개 API (12개 위원회 × 2 = 목록+본문)
+- **조약**: 2개 API (목록 1개, 본문 1개)
+- **별표·서식**: 3개 API (법령별표서식 1개, 행정규칙별표서식 1개, 자치법규별표서식 1개)
+- **학칙·공단·공공기관**: 2개 API (목록 1개, 본문 1개)
+- **법령용어**: 2개 API (목록 1개, 본문 1개)
+- **맞춤형**: 6개 API (법령 2개, 행정규칙 2개, 자치법규 2개)
+- **법령정보 지식베이스**: 7개 API (용어 2개, 용어관계 2개, 조문관계 2개, 법령관계 1개)
+- **중앙부처 1차 해석**: 14개 API (8개 부처, 일부는 목록만/일부는 목록+본문)
+- **특별행정심판**: 4개 API (조세심판원 2개, 해양안전심판원 2개)
+- **모바일**: 17개 API (제외됨)
+
+**총 105개 API** (모바일 API 제외)
+
+### 💡 **중요한 발견사항**
+
+1. **API 구조의 일관성**:
+   - 모든 API가 동일한 URL 패턴 사용
+   - `target` 파라미터만으로 기능 구분
+   - 총 **50개 이상**의 고유한 target 값
+
+2. **코드 최적화 가능성**:
+   - 현재: 개별 함수들 (`search_law`, `search_effective_law`, `search_precedent` 등)
+   - 제안: 통합 함수 
+   - **대폭적인 코드 중복 제거** 가능
+
+3. **목록/본문 분리 필요성**:
+   - 목록 조회: 빠른 검색, 많은 결과
+   - 본문 조회: 상세 내용, 큰 데이터
+
+### 🚀 **개선 계획**
+
+#### **Phase 1: 법령 카테고리 우선 개선**
+- ✅ 현행법령 - 목록/본문 분리
+- ✅ 시행일법령 - 목록/본문 분리  
+- ✅ 법령연혁 - 목록/본문 분리
+- ✅ 영문법령 - 목록/본문 분리
+
+#### **Phase 2: 통합 함수 도입**
+```python
+# 기존: 4개 개별 함수
+def search_law(query): # target=law
+def search_effective_law(query): # target=eflaw
+def search_law_history(query): # target=lsHistory
+def search_english_law(query): # target=elaw
+
+# 신규: 1개 통합 함수
+def search_legislation(target, query, **params):
+    """통합 법령 검색 함수"""
+    return _make_legislation_request("lawSearch.do", target, query, **params)
+```
+
+#### **Phase 3: 단계별 확장**
+1. **법령 → 행정규칙 → 자치법규**
+2. **판례관련 4개 카테고리 통합**
+3. **위원회결정문 12개 위원회 통합**
+4. **중앙부처해석 8개 부처 통합**
 
 ## 📑 목차
 
@@ -97,22 +245,6 @@
   - [OPEN API 활용가이드](#open-api-활용가이드)
   - [OPEN API 활용가이드](#open-api-활용가이드)
 - [법령용어](#법령용어)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-- [모바일](#모바일)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
-  - [OPEN API 활용가이드](#open-api-활용가이드)
   - [OPEN API 활용가이드](#open-api-활용가이드)
   - [OPEN API 활용가이드](#open-api-활용가이드)
 - [맞춤형](#맞춤형)
@@ -3066,7 +3198,7 @@
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&ID=2026666`
-3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML&mobileYn=`
+3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML`
 
 #### 📥 요청 파라미터
 
@@ -3098,9 +3230,9 @@
 | 샘플 URL |
 | --- |
 | 1. 자치법규 MST 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML&mobileYn= |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML |
 | 2. 자치법규 ID 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2026666&type=HTML&mobileYn= |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2026666&type=HTML |
 
 
 | 필드 | 값 | 설명 | 자치법규ID | int | 자치법규ID |
@@ -5806,150 +5938,6 @@
 
 ### OPEN API 활용가이드
 
-**API ID**: `mobDeccListGuide`
-
-**상태**: ✅ 성공
-
-**샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML&mobileYn=Y&query=정보공개`
-
-#### 📥 요청 파라미터
-
-
-| 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
-| --- | --- | --- | --- | --- | --- |
-| target | string : decc(필수) | 서비스 대상 |
-| type | char | 출력 형태 : HTML/XML/JSON |
-| search | int | 검색범위 (기본 : 1 행정심판례명) 2 : 본문검색 |
-| query | string | 검색범위에서 검색을 원하는 질의(검색 결과 리스트) |
-| display | int | 검색된 결과 개수 (default=20 max=100) |
-| page | int | 검색 결과 페이지 (default=1) |
-| cls | string | 재결례유형(출력 결과 필드에 있는 재결구분코드) |
-| gana | string | 사전식 검색(ga,na,da…,etc) |
-| date | int | 의결일자 |
-| dpaYd | string | 처분일자 검색(20090101~20090130) |
-| rslYd | string | 의결일자 검색(20090101~20090130) |
-| sort | string | 정렬옵션 (기본 : lasc 재결례명 오름차순) ldes 재결례명 내림차순 dasc : 의결일자 오름차순 ddes : 의결일자 내림차순 nasc : 사건번호 오름차순 ndes : 사건번호 내림차순 |
-| mobileYn | char : Y (필수) | 모바일여부 |
-
-
-
-[TABLE_0]
-#### 📋 상세 내용
-
-
-##### 모바일 행정심판례 목록 조회 가이드API
-
-
-| 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
-| --- | --- | --- | --- | --- | --- |
-| target | string : decc(필수) | 서비스 대상 |
-| type | char | 출력 형태 : HTML/XML/JSON |
-| search | int | 검색범위 (기본 : 1 행정심판례명) 2 : 본문검색 |
-| query | string | 검색범위에서 검색을 원하는 질의(검색 결과 리스트) |
-| display | int | 검색된 결과 개수 (default=20 max=100) |
-| page | int | 검색 결과 페이지 (default=1) |
-| cls | string | 재결례유형(출력 결과 필드에 있는 재결구분코드) |
-| gana | string | 사전식 검색(ga,na,da…,etc) |
-| date | int | 의결일자 |
-| dpaYd | string | 처분일자 검색(20090101~20090130) |
-| rslYd | string | 의결일자 검색(20090101~20090130) |
-| sort | string | 정렬옵션 (기본 : lasc 재결례명 오름차순) ldes 재결례명 내림차순 dasc : 의결일자 오름차순 ddes : 의결일자 내림차순 nasc : 사건번호 오름차순 ndes : 사건번호 내림차순 |
-| mobileYn | char : Y (필수) | 모바일여부 |
-
-
-| 샘플 URL |
-| --- |
-| 1. 행정심판재결례 목록 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML&mobileYn=Y |
-| 2. 행정심판재결례 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=HTML&mobileYn=Y |
-| 3. 행정심판재결례명에 '정보공개'가 포함된 재결례 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML&mobileYn=Y&query=정보공개 |
-| 4. 행정심판재결례 목록 중 ‘ㄱ’으로 시작하는 재결례 목록 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML&gana=ga&mobileYn=Y |
-
-
-| 필드 | 값 | 설명 | target | string | 검색 대상 |
-| --- | --- | --- | --- | --- | --- |
-| 키워드 | string | 키워드 |
-| section | string | 검색범위(EvtNm:재결례명/bdyText:본문) |
-| totalCnt | int | 검색결과갯수 |
-| page | int | 출력페이지 |
-| decc id | int | 검색결과번호 |
-| 행정심판재결례일련번호 | int | 행정심판재결례일련번호 |
-| 사건명 | string | 사건명 |
-| 사건번호 | string | 사건번호 |
-| 처분일자 | string | 처분일자 |
-| 처분청 | string | 처분청 |
-| 재결청 | string | 재결청 |
-| 재결구분명 | string | 재결구분명 |
-| 재결구분코드 | string | 재결구분코드 |
-| 행정심판례상세링크 | string | 행정심판례상세링크 |
-
-
-
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=decc&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
-
----
-
-### OPEN API 활용가이드
-
-**API ID**: `mobDeccInfoGuide`
-
-**상태**: ✅ 성공
-
-**샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=2782&type=HTML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=222883&LM=산림기술자 자격취소처분 취소청구 등&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=2782&type=HTML&mobileYn=Y`
-
-#### 📥 요청 파라미터
-
-
-| 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
-| --- | --- | --- | --- | --- | --- |
-| target | string : decc(필수) | 서비스 대상 |
-| ID | char | 행정심판례 일련번호 |
-| LM | char | 행정심판례명 |
-| type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
-
-
-
-[TABLE_0]
-#### 📋 상세 내용
-
-
-##### 모바일 행정심판례 본문 조회 가이드API
-
-
-| 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
-| --- | --- | --- | --- | --- | --- |
-| target | string : decc(필수) | 서비스 대상 |
-| ID | char | 행정심판례 일련번호 |
-| LM | char | 행정심판례명 |
-| type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
-
-
-| 샘플 URL |
-| --- |
-| 1. 행정심판례 일련번호가 2782인 행정심판례 HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=2782&type=HTML&mobileYn=Y |
-| 2. 산림기술자 자격취소처분 취소청구 등 행정심판례 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=222883&LM=산림기술자 자격취소처분 취소청구 등&type=HTML&mobileYn=Y |
-
-
-
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=decc&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
-
----
-
-### OPEN API 활용가이드
-
 **API ID**: `specialDeccTtListGuide`
 
 **상태**: ✅ 성공
@@ -6583,9 +6571,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&org=1320000&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&org=1320000`
 
 #### 📥 요청 파라미터
 
@@ -6602,7 +6590,6 @@
 | org | string | 소관부처별 검색(소관부처코드 제공) |
 | knd | string | 별표종류 1 : 별표 2 : 서식 3 : 별지 4 : 별도 5 : 부록 |
 | gana | string | 사전식 검색(ga,na,da…,etc) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -6610,7 +6597,7 @@
 #### 📋 상세 내용
 
 
-##### 모바일 법령별표 목록 조회 가이드API
+
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6625,21 +6612,20 @@
 | org | string | 소관부처별 검색(소관부처코드 제공) |
 | knd | string | 별표종류 1 : 별표 2 : 서식 3 : 별지 4 : 별도 5 : 부록 |
 | gana | string | 사전식 검색(ga,na,da…,etc) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 법령 별표서식 목록 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML |
 | 2. 법령 별표서식 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=HTML |
 | 3. 경찰청 법령 별표서식 목록 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&org=1320000&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&org=1320000 |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=licbyl&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=licbyl 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -6650,9 +6636,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&org=1543000&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&org=1543000`
 
 #### 📥 요청 파라미터
 
@@ -6669,7 +6655,6 @@
 | knd | string | 별표종류 1 : 별표 2 : 서식 3 : 별지 |
 | gana | string | 사전식 검색(ga,na,da…,etc) |
 | type | char | 출력 형태 HTML/XML/JSON 생략시 기본값 : XML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -6677,7 +6662,7 @@
 #### 📋 상세 내용
 
 
-##### 모바일 행정규칙 별표 목록 조회 가이드API
+
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6692,21 +6677,20 @@
 | knd | string | 별표종류 1 : 별표 2 : 서식 3 : 별지 |
 | gana | string | 사전식 검색(ga,na,da…,etc) |
 | type | char | 출력 형태 HTML/XML/JSON 생략시 기본값 : XML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 행정규칙 별표서식 목록 XML 조회 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML |
 | 2. 행정규칙 별표서식 목록 HTML 조회 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=HTML |
 | 3. 농림축산식품부 행정규칙 별표서식 목록 조회 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&org=1543000&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&org=1543000 |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=admbyl&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=admbyl 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -6717,9 +6701,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&mobileYn=Y&type=XML`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&mobileYn=Y&type=XML`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=HTML`
+3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML`
 
 #### 📥 요청 파라미터
 
@@ -6736,7 +6720,6 @@
 | knd | string | 별표종류 1 : 별표 2 : 서식 3 : 별도 4 : 별지 |
 | gana | string | 사전식 검색(ga,na,da…,etc) |
 | type | char | 출력 형태 HTML/XML/JSON 생략시 기본값 : XML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -6744,7 +6727,7 @@
 #### 📋 상세 내용
 
 
-##### 모바일 자치법규 별표 목록 조회 가이드API
+
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6759,19 +6742,18 @@
 | knd | string | 별표종류 1 : 별표 2 : 서식 3 : 별도 4 : 별지 |
 | gana | string | 사전식 검색(ga,na,da…,etc) |
 | type | char | 출력 형태 HTML/XML/JSON 생략시 기본값 : XML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 자치법규 별표서식 목록 XML 조회 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&mobileYn=Y&type=XML |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML |
 | 2. 자치법규 별표서식 목록 HTML 조회 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=HTML |
 
 
 
---> [HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+--> [HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=ordinbyl 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -7102,41 +7084,30 @@
 
 ---
 
-## 모바일
+## 맞춤형
 
 ### OPEN API 활용가이드
 
-**API ID**: `mobLsListGuide`
+**API ID**: `custLsListGuide`
 
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=HTML&mobileYn=Y `
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&mobileYn=Y&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&vcode=L0000000003384`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=HTML&vcode=L0000000003384`
+3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&vcode=L0000000003384`
 
 #### 📥 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
 | --- | --- | --- | --- | --- | --- |
-| target | string : law(필수) | 서비스 대상 |
-| type | char(필수) | 출력 형태 HTML/XML/JSON |
-| search | int | 검색범위 (기본 : 1 법령명) 2 : 본문검색 |
-| query | string | 법령명에서 검색을 원하는 질의 |
+| target | string : couseLs(필수) | 서비스 대상 |
+| type | char(필수) | 출력 형태 : HTML/XML/JSON |
+| vcode | string(필수) | 분류코드 법령은 L로 시작하는 14자리 코드(L0000000000001) |
 | display | int | 검색된 결과 개수 (default=20 max=100) |
 | page | int | 검색 결과 페이지 (default=1) |
-| sort | string | 정렬옵션 (기본 : lasc 법령오름차순) ldes : 법령내림차순 dasc : 공포일자 오름차순 ddes : 공포일자 내림차순 nasc : 공포번호 오름차순 ndes : 공포번호 내림차순 efasc : 시행일자 오름차순 efdes : 시행일자 내림차순 |
-| date | int | 법령의 공포일자 검색 |
-| efYd | string | 시행일자 범위 검색(20090101~20090130) |
-| ancYd | string | 공포일자 범위 검색(20090101~20090130) |
-| ancNo | string | 공포번호 범위 검색(306~400) |
-| rrClsCd | string | 법령 제개정 종류 (300201-제정 / 300202-일부개정 / 300203-전부개정 300204-폐지 / 300205-폐지제정 / 300206-일괄개정 300207-일괄폐지 / 300209-타법개정 / 300210-타법폐지 300208-기타) |
-| nb | int | 법령의 공포번호 검색 |
-| org | string | 소관부처별 검색(소관부처코드 제공) |
-| knd | string | 법령종류(코드제공) |
-| gana | string | 사전식 검색 (ga,na,da…,etc) |
-| mobileYn | char : Y (필수) | 모바일여부 |
+| popYn | string | 상세화면 팝업창 여부(팝업창으로 띄우고 싶을 때만 'popYn=Y') |
 
 
 
@@ -7144,42 +7115,31 @@
 #### 📋 상세 내용
 
 
-##### 모바일 법령 목록 조회 가이드API
+##### 맞춤형 법령 목록 조회 API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
 | --- | --- | --- | --- | --- | --- |
-| target | string : law(필수) | 서비스 대상 |
-| type | char(필수) | 출력 형태 HTML/XML/JSON |
-| search | int | 검색범위 (기본 : 1 법령명) 2 : 본문검색 |
-| query | string | 법령명에서 검색을 원하는 질의 |
+| target | string : couseLs(필수) | 서비스 대상 |
+| type | char(필수) | 출력 형태 : HTML/XML/JSON |
+| vcode | string(필수) | 분류코드 법령은 L로 시작하는 14자리 코드(L0000000000001) |
 | display | int | 검색된 결과 개수 (default=20 max=100) |
 | page | int | 검색 결과 페이지 (default=1) |
-| sort | string | 정렬옵션 (기본 : lasc 법령오름차순) ldes : 법령내림차순 dasc : 공포일자 오름차순 ddes : 공포일자 내림차순 nasc : 공포번호 오름차순 ndes : 공포번호 내림차순 efasc : 시행일자 오름차순 efdes : 시행일자 내림차순 |
-| date | int | 법령의 공포일자 검색 |
-| efYd | string | 시행일자 범위 검색(20090101~20090130) |
-| ancYd | string | 공포일자 범위 검색(20090101~20090130) |
-| ancNo | string | 공포번호 범위 검색(306~400) |
-| rrClsCd | string | 법령 제개정 종류 (300201-제정 / 300202-일부개정 / 300203-전부개정 300204-폐지 / 300205-폐지제정 / 300206-일괄개정 300207-일괄폐지 / 300209-타법개정 / 300210-타법폐지 300208-기타) |
-| nb | int | 법령의 공포번호 검색 |
-| org | string | 소관부처별 검색(소관부처코드 제공) |
-| knd | string | 법령종류(코드제공) |
-| gana | string | 사전식 검색 (ga,na,da…,etc) |
-| mobileYn | char : Y (필수) | 모바일여부 |
+| popYn | string | 상세화면 팝업창 여부(팝업창으로 띄우고 싶을 때만 'popYn=Y') |
 
 
 | 샘플 URL |
 | --- |
 | 1. 현행법령 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML |
 | 2. 현행법령 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=HTML |
 | 3. 법령 검색 : 자동차관리법 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&mobileYn=Y&query=자동차관리법 |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&query=자동차관리법 |
 | 4. 법령 공포일자 내림차순 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&sort=ddes&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&sort=ddes |
 | 5. 소관부처가 경찰청인 법령 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&org=1320000&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&org=1320000 |
 
 
 | 필드 | 값 | 설명 | target | string | 검색서비스 대상 |
@@ -7208,7 +7168,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=law&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=law 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -7219,9 +7179,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=91689&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML`
+2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=91689&type=HTML`
+3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML`
 
 #### 📥 요청 파라미터
 
@@ -7242,7 +7202,6 @@
 | BN | int | 별표번호 별표표시가 on일 경우 값을 읽어들임 |
 | BG | int | 별표가지번호 별표표시가 on일 경우 값을 읽어들임 |
 | type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7250,7 +7209,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 법령 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7269,19 +7227,18 @@
 | BN | int | 별표번호 별표표시가 on일 경우 값을 읽어들임 |
 | BG | int | 별표가지번호 별표표시가 on일 경우 값을 읽어들임 |
 | type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 자동차관리법 ID HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML |
 | 2. 자동차관리법 법령 seq HTML조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=91689&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=91689&type=HTML |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=law&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=law 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -7292,9 +7249,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&mobileYn=Y&query=%EC%86%8C%EB%B0%A9`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&query=%EC%86%8C%EB%B0%A9`
 
 #### 📥 요청 파라미터
 
@@ -7315,7 +7272,6 @@
 | date | int | 행정규칙 발령일자 |
 | prmlYd | string | 발령일자 기간검색(20090101~20090130) |
 | nb | int | 행정규칙 발령번호 |
-| mobileYn | char:Y(필수) | 모바일여부 |
 
 
 
@@ -7323,7 +7279,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 행정규칙 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7342,21 +7297,20 @@
 | date | int | 행정규칙 발령일자 |
 | prmlYd | string | 발령일자 기간검색(20090101~20090130) |
 | nb | int | 행정규칙 발령번호 |
-| mobileYn | char:Y(필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 행정규칙 목록 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML |
 | 2. 행정규칙 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=HTML |
 | 3. 행정규칙명에 '소방'이 포함된 행정규칙 목록 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&mobileYn=Y&query=소방 |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&query=소방 |
 | 4. 발령일자가 2015년 3월 1일인 행정규칙 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&date=20150301&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&date=20150301 |
 | 5. 발령번호가 331인 행정규칙 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&nb=331&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&nb=331 |
 
 
 | 필드 | 값 | 설명 | target | string | 검색 대상 |
@@ -7382,7 +7336,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=admrul&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=admrul 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -7393,9 +7347,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML&mobileYn=Y`
-2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?target=admrul&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML`
+2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML`
+3. `http://www.law.go.kr/DRF/lawService.do?target=admrul`
 
 #### 📥 요청 파라미터
 
@@ -7406,7 +7360,6 @@
 | ID | char | 행정규칙 일련번호 |
 | LM | Char | 행정규칙명 조회하고자 하는 정확한 행정규칙명을 입력 |
 | type | Char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7414,7 +7367,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 행정규칙 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7423,17 +7375,16 @@
 | ID | char | 행정규칙 일련번호 |
 | LM | Char | 행정규칙명 조회하고자 하는 정확한 행정규칙명을 입력 |
 | type | Char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 행정규칙 HTML 상세조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=admrul&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=admrul 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -7444,9 +7395,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=XML&mobileYn=Y `
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=HTML&mobileYn=Y `
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&query=서울&type=HTML&mobileYn=Y `
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=XML `
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=HTML `
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&query=서울&type=HTML `
 
 #### 📥 요청 파라미터
 
@@ -7473,7 +7424,6 @@
 | ordinFd | int | 분류코드별 검색. 분류코드는 지자체 분야코드 openAPI 참조 |
 | lsChapNo | string | 법령분야별 검색(법령분야코드제공) (ex. 제1편 검색 lsChapNo=01000000 / 제1편2장,제1편2장1절 lsChapNo=01020000,01020100) |
 | gana | string(org 값 필수) | 사전식 검색 (ga,na,da…,etc) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7481,7 +7431,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 자치법규 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7506,17 +7455,16 @@
 | ordinFd | int | 분류코드별 검색. 분류코드는 지자체 분야코드 openAPI 참조 |
 | lsChapNo | string | 법령분야별 검색(법령분야코드제공) (ex. 제1편 검색 lsChapNo=01000000 / 제1편2장,제1편2장1절 lsChapNo=01020000,01020100) |
 | gana | string(org 값 필수) | 사전식 검색 (ga,na,da…,etc) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 자치법규 목록 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=XML |
 | 2. 자치법규 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=HTML |
 | 3. 자치법규명에 서울이 포함된 자치법규 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&query=서울&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&query=서울&type=HTML |
 
 
 | 필드 | 값 | 설명 | target | string | 검색 대상 |
@@ -7541,7 +7489,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=ordin&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=ordin 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -7552,9 +7500,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&mobileYn=Y&MST=1062134`
-3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML`
+2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&MST=1062134`
+3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML`
 
 #### 📥 요청 파라미터
 
@@ -7565,7 +7513,6 @@
 | ID | char | 자치법규 ID |
 | MST | string | 자치법규 마스터 번호 |
 | type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7573,7 +7520,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 자치법규 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7582,15 +7528,14 @@
 | ID | char | 자치법규 ID |
 | MST | string | 자치법규 마스터 번호 |
 | type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 자치법규 ID HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML |
 | 2. 자치법규 MST HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&mobileYn=Y&MST=1062134 |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&MST=1062134 |
 
 
 
@@ -7605,9 +7550,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&mobileYn=Y&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
 
 #### 📥 요청 파라미터
 
@@ -7629,7 +7574,6 @@
 | prncYd | string | 선고일자 검색(20090101~20090130) |
 | nb | int | 판례 사건번호 |
 | datSrcNm | string | 데이터출처명(국세법령정보시스템, 근로복지공단산재판례, 대법원) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7637,7 +7581,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 판례 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7657,21 +7600,20 @@
 | prncYd | string | 선고일자 검색(20090101~20090130) |
 | nb | int | 판례 사건번호 |
 | datSrcNm | string | 데이터출처명(국세법령정보시스템, 근로복지공단산재판례, 대법원) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 판례 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML |
 | 2. 판례 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML |
 | 3. 자동차가 포함된 판례 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&mobileYn=Y&query=자동차 |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&query=자동차 |
 | 4. 자동차가 포함된 판례 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&query=자동차&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&query=자동차&type=HTML |
 | 5. 선고일자가 2015년 1월 29일인 판례검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&date=20150129&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&date=20150129 |
 
 
 | 필드 | 값 | 설명 | target | string | 검색 대상 |
@@ -7696,7 +7638,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=prec&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=prec 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -7707,9 +7649,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML&mobileYn=Y`
-2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?target=prec&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML`
+2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML`
+3. `http://www.law.go.kr/DRF/lawService.do?target=prec`
 
 #### 📥 요청 파라미터
 
@@ -7720,7 +7662,6 @@
 | ID | char(필수) | 판례 일련번호 |
 | LM | string | 판례명 |
 | type | string | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7728,7 +7669,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 판례 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7737,17 +7677,16 @@
 | ID | char(필수) | 판례 일련번호 |
 | LM | string | 판례명 |
 | type | string | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 판례일련번호가 96538인 판례 HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=prec&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=prec 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -7758,9 +7697,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&mobileYn=Y&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
 
 #### 📥 요청 파라미터
 
@@ -7777,7 +7716,6 @@
 | sort | string | 정렬옵션 (기본 : lasc 사건명 오름차순) ldes 사건명 내림차순 dasc : 선고일자 오름차순 ddes : 선고일자 내림차순 nasc : 사건번호 오름차순 ndes : 사건번호 내림차순 efasc : 종국일자 오름차순 efdes : 종국일자 내림차순 |
 | date | int | 종국일자 |
 | nb | int | 사건번호 |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7785,7 +7723,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 헌재결정례 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7800,19 +7737,18 @@
 | sort | string | 정렬옵션 (기본 : lasc 사건명 오름차순) ldes 사건명 내림차순 dasc : 선고일자 오름차순 ddes : 선고일자 내림차순 nasc : 사건번호 오름차순 ndes : 사건번호 내림차순 efasc : 종국일자 오름차순 efdes : 종국일자 내림차순 |
 | date | int | 종국일자 |
 | nb | int | 사건번호 |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 헌재결정례 목록 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML |
 | 2. 헌재결정례 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=HTML |
 | 3. 자동차가 포함된 헌재결정례 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&mobileYn=Y&query=자동차 |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&query=자동차 |
 | 4. 선고일자가 2015년 2월 10일인 헌재결정례검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&date=20150210&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&date=20150210 |
 
 
 | 필드 | 값 | 설명 | target | string | 검색 대상 |
@@ -7830,7 +7766,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=detc&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=detc 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -7841,9 +7777,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=127830&LM=자동차관리법제26조등위헌확인등&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML`
+2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=127830&LM=자동차관리법제26조등위헌확인등&type=HTML`
+3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML`
 
 #### 📥 요청 파라미터
 
@@ -7854,7 +7790,6 @@
 | ID | char(필수) | 헌재결정례 일련번호 |
 | LM | string | 헌재결정례명 |
 | type | string | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7862,7 +7797,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 헌재결정례 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7871,19 +7805,18 @@
 | ID | char(필수) | 헌재결정례 일련번호 |
 | LM | string | 헌재결정례명 |
 | type | string | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 헌재결정례 일련번호가 58386인 헌재결정례 HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML |
 | 2. 산림기술자 자격취소처분 취소청구 등 헌재결정례 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=127830&&LM=자동차관리법제26조등위헌확인등&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=127830&&LM=자동차관리법제26조등위헌확인등&type=HTML |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=detc&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=detc 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -7894,9 +7827,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=xml&mobileYn=Y&query=%ED%97%88%EA%B0%80`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=xml&query=%ED%97%88%EA%B0%80`
 
 #### 📥 요청 파라미터
 
@@ -7916,7 +7849,6 @@
 | regYd | string | 등록일자 검색(20090101~20090130) |
 | explYd | string | 해석일자 검색(20090101~20090130) |
 | sort | string | 정렬옵션 (기본 : lasc 법령해석례명 오름차순) ldes 법령해석례명 내림차순 dasc : 해석일자 오름차순 ddes : 해석일자 내림차순 nasc : 안건번호 오름차순 ndes : 안건번호 내림차순 |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -7924,7 +7856,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 법령해석례 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7942,17 +7873,16 @@
 | regYd | string | 등록일자 검색(20090101~20090130) |
 | explYd | string | 해석일자 검색(20090101~20090130) |
 | sort | string | 정렬옵션 (기본 : lasc 법령해석례명 오름차순) ldes 법령해석례명 내림차순 dasc : 해석일자 오름차순 ddes : 해석일자 내림차순 nasc : 안건번호 오름차순 ndes : 안건번호 내림차순 |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 법령해석례 목록 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML |
 | 2. 법령해석례 목록 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&&type=HTML |
 | 3. 법령해석례명에 '허가'가 포함된 법령해석례 찾기 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML&mobileYn=Y&query=허가 |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML&query=허가 |
 
 
 | 필드 | 값 | 설명 | target | string | 검색 대상 |
@@ -7974,7 +7904,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=expc&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=expc 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -7985,9 +7915,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=315191&LM=%EC%97%AC%EC%84%B1%EA%B0%80%EC%A1%B1%EB%B6%80%20-%20%EA%B1%B4%EA%B0%95%EA%B0%80%EC%A0%95%EA%B8%B0%EB%B3%B8%EB%B2%95%20%EC%A0%9C35%EC%A1%B0%20%EC%A0%9C2%ED%95%AD%20%EA%B4%80%EB%A0%A8&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML`
+2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=315191&LM=%EC%97%AC%EC%84%B1%EA%B0%80%EC%A1%B1%EB%B6%80%20-%20%EA%B1%B4%EA%B0%95%EA%B0%80%EC%A0%95%EA%B8%B0%EB%B3%B8%EB%B2%95%20%EC%A0%9C35%EC%A1%B0%20%EC%A0%9C2%ED%95%AD%20%EA%B4%80%EB%A0%A8&type=HTML`
+3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML`
 
 #### 📥 요청 파라미터
 
@@ -7998,7 +7928,6 @@
 | ID | int | 법령해석례 일련번호 |
 | LM | string | 법령해석례명 |
 | type | string | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -8006,7 +7935,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 법령해석례 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8015,19 +7943,18 @@
 | ID | int | 법령해석례 일련번호 |
 | LM | string | 법령해석례명 |
 | type | string | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 법령해석례일련번호가 281909인 해석례 HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML |
 | 2. 여성가족부 - 건강가정기본법 제35조 제2항 관련 법령해석례 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=315191&LM=여성가족부 - 건강가정기본법 제35조 제2항 관련&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=315191&LM=여성가족부 - 건강가정기본법 제35조 제2항 관련&type=HTML |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=expc&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=expc 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -8038,9 +7965,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&ID=284&type=HTML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&cls=2&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&ID=284&type=HTML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&cls=2`
 
 #### 📥 요청 파라미터
 
@@ -8058,7 +7985,6 @@
 | concYd | string | 체결일자 검색(20090101~20090130) |
 | cls | int | 1 : 양자조약 2 : 다자조약 |
 | sort | string | 정렬옵션 (기본 : lasc 조약명오름차순) ldes 조약명내림차순 dasc : 발효일자 오름차순 ddes : 발효일자 내림차순 nasc : 조약번호 오름차순 ndes : 조약번호 내림차순 rasc : 관보게재일 오름차순 rdes : 관보게재일 내림차순 |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -8066,7 +7992,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 조약 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8082,17 +8007,16 @@
 | concYd | string | 체결일자 검색(20090101~20090130) |
 | cls | int | 1 : 양자조약 2 : 다자조약 |
 | sort | string | 정렬옵션 (기본 : lasc 조약명오름차순) ldes 조약명내림차순 dasc : 발효일자 오름차순 ddes : 발효일자 내림차순 nasc : 조약번호 오름차순 ndes : 조약번호 내림차순 rasc : 관보게재일 오름차순 rdes : 관보게재일 내림차순 |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 조약 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML |
 | 2. 조약 HTML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&ID=284&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&ID=284&type=HTML |
 | 3. 다자조약 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&cls=2&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&cls=2 |
 
 
 | 필드 | 값 | 설명 | target | string | 검색 대상 |
@@ -8114,7 +8038,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=trty&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=trty 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 
@@ -8125,9 +8049,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML&mobileYn=Y`
-2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML&mobileYn=Y`
-3. `http://www.law.go.kr/DRF/lawService.do?target=trty&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML`
+2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML`
+3. `http://www.law.go.kr/DRF/lawService.do?target=trty`
 
 #### 📥 요청 파라미터
 
@@ -8137,7 +8061,6 @@
 | target | string : trty(필수) | 서비스 대상 |
 | ID | char | 조약 ID |
 | type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -8145,7 +8068,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 조약 본문 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8153,17 +8075,16 @@
 | target | string : trty(필수) | 서비스 대상 |
 | ID | char | 조약 ID |
 | type | char | 출력 형태 : HTML |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 조약 HTML 조회 |
-| http://www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML |
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=trty&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawService.do?target=trty 요청 변수 (request parameter) [TABLE_0] [TABLE_1]
 
 ---
 
@@ -8174,9 +8095,9 @@
 **상태**: ✅ 성공
 
 **샘플 URL**:
-1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&type=XML&mobileYn=Y`
-2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&gana=ga&type=XML&mobileYn=Y`
-3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=%EC%9E%90%EB%8F%99%EC%B0%A8&type=HTML&mobileYn=Y`
+1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&type=XML`
+2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&gana=ga&type=XML`
+3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=%EC%9E%90%EB%8F%99%EC%B0%A8&type=HTML`
 
 #### 📥 요청 파라미터
 
@@ -8191,7 +8112,6 @@
 | gana | string | 사전식 검색 (ga,na,da…,etc) |
 | type | char | 출력 형태 : HTML/XML/JSON생략시 기본값 : XML |
 | dicKndCd | int | 법령 종류 코드 (법령 : 010101, 행정규칙 : 010102) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 
@@ -8199,7 +8119,6 @@
 #### 📋 상세 내용
 
 
-##### 모바일 법령용어 목록 조회 가이드API
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8212,19 +8131,18 @@
 | gana | string | 사전식 검색 (ga,na,da…,etc) |
 | type | char | 출력 형태 : HTML/XML/JSON생략시 기본값 : XML |
 | dicKndCd | int | 법령 종류 코드 (법령 : 010101, 행정규칙 : 010102) |
-| mobileYn | char : Y (필수) | 모바일여부 |
 
 
 | 샘플 URL |
 | --- |
 | 1. 법령용어 XML 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&type=XML |
 | 2. 'ㄱ'로 시작하는 법령용어 검색 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&gana=ga&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&gana=ga&type=XML |
 | 3. 법령용어 검색 : 자동차 |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=자동차&type=HTML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=자동차&type=HTML |
 | 4. 법령용어 검색 : 자동차 XML |
-| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=자동차&type=XML&mobileYn=Y |
+| http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=자동차&type=XML |
 
 
 | 필드 | 값 | 설명 | target | string | 검색서비스 대상 |
@@ -8243,7 +8161,7 @@
 
 
 
-[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=lstrm&mobileYn=Y 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
+[HEADING_0] - 요청 URL : http://www.law.go.kr/DRF/lawSearch.do?target=lstrm 요청 변수 (request parameter) [TABLE_0] [TABLE_1] 출력 결과 필드(response field) [TABLE_2]
 
 ---
 

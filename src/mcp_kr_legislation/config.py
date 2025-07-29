@@ -33,9 +33,10 @@ class LegislationConfig:
 
     @classmethod
     def from_env(cls) -> "LegislationConfig":
-        oc = os.getenv("LEGISLATION_API_KEY")
-        if not oc:
-            raise ValueError("법제처 API 키(OC)가 설정되지 않았습니다. .env 파일을 확인하세요.")
+        oc = os.getenv("LEGISLATION_API_KEY", "lchangoo")  # 작동하는 기본값 설정
+        # 이메일 형태면 @앞 부분만 사용
+        if "@" in oc:
+            oc = oc.split("@")[0]
         
         return cls(
             oc=oc,

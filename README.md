@@ -8,7 +8,7 @@
 ![GitHub Stars](https://img.shields.io/github/stars/ChangooLee/mcp-kr-legislation)
 ![GitHub Issues](https://img.shields.io/github/issues/ChangooLee/mcp-kr-legislation)
 
-한국 법제처 OPEN API를 통합한 Model Context Protocol(MCP) 서버입니다. **150개 이상의 포괄적인 도구**를 통해 법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 모바일, 맞춤형, 지식베이스, 특별행정심판, 중앙부처해석 등 **모든 법률 정보에 대한 완전한 접근**을 제공합니다.
+한국 법제처 OPEN API를 통합한 Model Context Protocol(MCP) 서버입니다. **150개 이상의 포괄적인 도구**를 통해 법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 맞춤형, 지식베이스, 특별행정심판, 중앙부처해석 등 **모든 법률 정보에 대한 완전한 접근**을 제공합니다.
 
 **🔗 GitHub Repository**: https://github.com/ChangooLee/mcp-kr-legislation
 
@@ -95,7 +95,6 @@ AI 어시스턴트에게 다음과 같은 요청을 할 수 있습니다:
 | `search_legal_interpretation` | 법령해석례 검색 | "개인정보수집 관련 법령해석례를 보여줘" |
 | `search_administrative_trial` | 행정심판례 검색 | "개인정보보호 관련 행정심판례는?" |
 | `get_administrative_trial_detail` | 행정심판례 상세 조회 | "특정 행정심판례의 상세 내용을 보여줘" |
-| `search_mobile_administrative_trial` | 모바일 행정심판례 | "모바일용 행정심판례를 보여줘" |
 
 ### 6. 위원회 결정문 도구 (24개)
 | 도구명 | 설명 | 테스트 질문 |
@@ -118,13 +117,11 @@ AI 어시스턴트에게 다음과 같은 요청을 할 수 있습니다:
 | 도구명 | 설명 | 테스트 질문 |
 |--------|------|------------|
 | `search_treaty` | 조약 검색 | "개인정보보호 관련 국제조약을 찾아줘" |
-| `search_mobile_treaty` | 모바일 조약 검색 | "모바일용 조약 정보를 보여줘" |
 
 ### 8. 별표서식 도구 (2개)
 | 도구명 | 설명 | 테스트 질문 |
 |--------|------|------------|
 | `search_law_appendix` | 법령 별표서식 검색 | "개인정보보호법의 별표와 서식을 보여줘" |
-| `search_mobile_law_appendix` | 모바일 별표서식 | "모바일용 별표서식을 찾아줘" |
 
 ### 9. 학칙·공단·공공기관 도구 (6개)
 | 도구명 | 설명 | 테스트 질문 |
@@ -148,18 +145,11 @@ AI 어시스턴트에게 다음과 같은 요청을 할 수 있습니다:
 | 도구명 | 설명 | 테스트 질문 |
 |--------|------|------------|
 | `search_legal_term` | 법령용어 검색 | "개인정보의 법령용어 정의를 보여줘" |
-| `search_mobile_legal_term` | 모바일 법령용어 | "모바일용 법령용어를 찾아줘" |
 
-### 12. 모바일 최적화 도구 (15개)
 | 도구명 | 설명 | 테스트 질문 |
 |--------|------|------------|
-| `search_mobile_law` | 모바일 법령 검색 | "모바일용 개인정보보호법을 보여줘" |
-| `search_mobile_english_law` | 모바일 영문법령 | "모바일용 영문 개인정보보호법을 찾아줘" |
-| `search_mobile_administrative_rule` | 모바일 행정규칙 | "모바일용 행정규칙을 보여줘" |
-| `search_mobile_local_ordinance` | 모바일 자치법규 | "모바일용 자치법규를 찾아줘" |
-| `search_mobile_precedent` | 모바일 판례 | "모바일용 판례를 보여줘" |
 
-### 13. 맞춤형 서비스 도구 (6개)
+### 12. 맞춤형 서비스 도구 (6개)
 | 도구명 | 설명 | 테스트 질문 |
 |--------|------|------------|
 | `search_custom_law` | 맞춤형 법령 검색 | "분류코드별 맞춤형 법령을 보여줘" |

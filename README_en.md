@@ -8,7 +8,7 @@
 ![GitHub Stars](https://img.shields.io/github/stars/ChangooLee/mcp-kr-legislation)
 ![GitHub Issues](https://img.shields.io/github/issues/ChangooLee/mcp-kr-legislation)
 
-Model Context Protocol (MCP) server integrating Korean Ministry of Legislation OPEN APIs. **150+ comprehensive tools** provide complete access to all Korean legal information including laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, mobile services, custom services, knowledge base, special administrative trials, and ministry interpretations.
+Model Context Protocol (MCP) server integrating Korean Ministry of Legislation OPEN APIs. **150+ comprehensive tools** provide complete access to all Korean legal information including laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, custom services, knowledge base, special administrative trials, and ministry interpretations.
 
 **🔗 GitHub Repository**: https://github.com/ChangooLee/mcp-kr-legislation
 
@@ -93,7 +93,6 @@ Ask your AI assistant to:
 | `search_legal_interpretation` | Legal interpretation cases | "Show legal interpretations on personal information collection" |
 | `search_administrative_trial` | Administrative trial cases | "What are administrative trial cases on personal information protection?" |
 | `get_administrative_trial_detail` | Administrative trial details | "Show detailed content of specific administrative trial case" |
-| `search_mobile_administrative_trial` | Mobile administrative trials | "Show mobile administrative trial cases" |
 
 ### 6. Committee Decision Tools (24 tools)
 | Tool Name | Description | Test Question |
@@ -116,13 +115,11 @@ Ask your AI assistant to:
 | Tool Name | Description | Test Question |
 |-----------|-------------|---------------|
 | `search_treaty` | Treaty search | "Find international treaties related to personal information protection" |
-| `search_mobile_treaty` | Mobile treaty search | "Show mobile treaty information" |
 
 ### 8. Appendix and Forms Tools (2 tools)
 | Tool Name | Description | Test Question |
 |-----------|-------------|---------------|
 | `search_law_appendix` | Law appendix and forms search | "Show appendices and forms of Personal Information Protection Act" |
-| `search_mobile_law_appendix` | Mobile appendix and forms | "Find mobile appendix and forms" |
 
 ### 9. School/Corporation/Institution Tools (6 tools)
 | Tool Name | Description | Test Question |
@@ -146,16 +143,9 @@ Ask your AI assistant to:
 | Tool Name | Description | Test Question |
 |-----------|-------------|---------------|
 | `search_legal_term` | Legal term search | "Show legal definition of personal information" |
-| `search_mobile_legal_term` | Mobile legal terms | "Find mobile legal terms" |
 
-### 12. Mobile Optimized Tools (15 tools)
 | Tool Name | Description | Test Question |
 |-----------|-------------|---------------|
-| `search_mobile_law` | Mobile law search | "Show mobile Personal Information Protection Act" |
-| `search_mobile_english_law` | Mobile English law | "Find mobile English Personal Information Protection Act" |
-| `search_mobile_administrative_rule` | Mobile administrative rules | "Show mobile administrative rules" |
-| `search_mobile_local_ordinance` | Mobile local ordinances | "Find mobile local ordinances" |
-| `search_mobile_precedent` | Mobile precedents | "Show mobile precedents" |
 
 ### 13. Custom Service Tools (5 tools)
 | Tool Name | Description | Test Question |
