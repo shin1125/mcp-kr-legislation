@@ -7,7 +7,7 @@ AI 기반 종합 법률 검색 등 인공지능 기반 검색 기능을 제공�
 import logging
 import json
 import os
-import requests
+import requests  # type: ignore
 from urllib.parse import urlencode
 from typing import Optional, Union
 from mcp.types import TextContent

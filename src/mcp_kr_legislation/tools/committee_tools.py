@@ -72,7 +72,7 @@ def search_privacy_committee(
     try:
         data = _make_legislation_request("ppc", params)
         url = _generate_api_url("ppc", params)
-        result = _format_search_results(data, "ppc", search_query, url)
+        result = _format_search_results(data, "ppc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"개인정보보호위원회 결정문 검색 중 오류: {str(e)}")
@@ -120,7 +120,7 @@ def search_financial_committee(
     try:
         data = _make_legislation_request("fsc", params)
         url = _generate_api_url("fsc", params)
-        result = _format_search_results(data, "fsc", search_query, url)
+        result = _format_search_results(data, "fsc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"금융위원회 결정문 검색 중 오류: {str(e)}")
@@ -168,7 +168,7 @@ def search_monopoly_committee(
     try:
         data = _make_legislation_request("ftc", params)
         url = _generate_api_url("ftc", params)
-        result = _format_search_results(data, "ftc", search_query, url)
+        result = _format_search_results(data, "ftc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"공정거래위원회 결정문 검색 중 오류: {str(e)}")
@@ -216,7 +216,7 @@ def search_anticorruption_committee(
     try:
         data = _make_legislation_request("acr", params)
         url = _generate_api_url("acr", params)
-        result = _format_search_results(data, "acr", search_query, url)
+        result = _format_search_results(data, "acr", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"국민권익위원회 결정문 검색 중 오류: {str(e)}")
@@ -264,7 +264,7 @@ def search_labor_committee(
     try:
         data = _make_legislation_request("nlrc", params)
         url = _generate_api_url("nlrc", params)
-        result = _format_search_results(data, "nlrc", search_query, url)
+        result = _format_search_results(data, "nlrc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"노동위원회 결정문 검색 중 오류: {str(e)}")
@@ -312,7 +312,7 @@ def search_environment_committee(
     try:
         data = _make_legislation_request("ecc", params)
         url = _generate_api_url("ecc", params)
-        result = _format_search_results(data, "ecc", search_query, url)
+        result = _format_search_results(data, "ecc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"중앙환경분쟁조정위원회 결정문 검색 중 오류: {str(e)}")
@@ -360,7 +360,7 @@ def search_securities_committee(
     try:
         data = _make_legislation_request("sfc", params)
         url = _generate_api_url("sfc", params)
-        result = _format_search_results(data, "sfc", search_query, url)
+        result = _format_search_results(data, "sfc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"증권선물위원회 결정문 검색 중 오류: {str(e)}")
@@ -408,7 +408,7 @@ def search_human_rights_committee(
     try:
         data = _make_legislation_request("nhrck", params)
         url = _generate_api_url("nhrck", params)
-        result = _format_search_results(data, "nhrck", search_query, url)
+        result = _format_search_results(data, "nhrck", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"국가인권위원회 결정문 검색 중 오류: {str(e)}")
@@ -456,7 +456,7 @@ def search_broadcasting_committee(
     try:
         data = _make_legislation_request("kcc", params)
         url = _generate_api_url("kcc", params)
-        result = _format_search_results(data, "kcc", search_query, url)
+        result = _format_search_results(data, "kcc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"방송통신위원회 결정문 검색 중 오류: {str(e)}")
@@ -504,7 +504,7 @@ def search_industrial_accident_committee(
     try:
         data = _make_legislation_request("iaciac", params)
         url = _generate_api_url("iaciac", params)
-        result = _format_search_results(data, "iaciac", search_query, url)
+        result = _format_search_results(data, "iaciac", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"산업재해보상보험재심사위원회 결정문 검색 중 오류: {str(e)}")
@@ -552,7 +552,7 @@ def search_land_tribunal(
     try:
         data = _make_legislation_request("oclt", params)
         url = _generate_api_url("oclt", params)
-        result = _format_search_results(data, "oclt", search_query, url)
+        result = _format_search_results(data, "oclt", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"중앙토지수용위원회 결정문 검색 중 오류: {str(e)}")
@@ -600,7 +600,7 @@ def search_employment_insurance_committee(
     try:
         data = _make_legislation_request("eiac", params)
         url = _generate_api_url("eiac", params)
-        result = _format_search_results(data, "eiac", search_query, url)
+        result = _format_search_results(data, "eiac", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"고용보험심사위원회 결정문 검색 중 오류: {str(e)}")
@@ -621,7 +621,7 @@ def get_privacy_committee_detail(decision_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("ppc", params, is_detail=True)
         url = _generate_api_url("ppc", params, is_detail=True)
-        result = _format_search_results(data, "ppc", str(decision_id), url)
+        result = _format_search_results(data, "ppc", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"개인정보보호위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -654,7 +654,7 @@ def get_financial_committee_detail(decision_id: Union[str, int]) -> TextContent:
         if isinstance(data, dict) and not data:
             return TextContent(type="text", text=f"ID '{decision_id}'에 해당하는 결정문의 상세 내용이 없습니다.\n\nAPI URL: {url}")
         
-        result = _format_search_results(data, "fsc", str(decision_id), url)
+        result = _format_search_results(data, "fsc", str(decision_id))
         return TextContent(type="text", text=result)
     except json.JSONDecodeError as e:
         return TextContent(type="text", text=f"응답 데이터 파싱 오류: {str(e)}\n\nAPI 응답 형식에 문제가 있을 수 있습니다. 다른 ID로 시도해보세요.")
@@ -673,7 +673,7 @@ def get_monopoly_committee_detail(decision_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("ftc", params, is_detail=True)
         url = _generate_api_url("ftc", params, is_detail=True)
-        result = _format_search_results(data, "ftc", str(decision_id), url)
+        result = _format_search_results(data, "ftc", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"공정거래위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -690,7 +690,7 @@ def get_anticorruption_committee_detail(decision_id: Union[str, int]) -> TextCon
     try:
         data = _make_legislation_request("acr", params)
         url = _generate_api_url("acr", params)
-        result = _format_search_results(data, "acr", str(decision_id), url)
+        result = _format_search_results(data, "acr", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"국민권익위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -707,7 +707,7 @@ def get_labor_committee_detail(decision_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("nlrc", params)
         url = _generate_api_url("nlrc", params)
-        result = _format_search_results(data, "nlrc", str(decision_id), url)
+        result = _format_search_results(data, "nlrc", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"노동위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -724,7 +724,7 @@ def get_environment_committee_detail(decision_id: Union[str, int]) -> TextConten
     try:
         data = _make_legislation_request("ecc", params)
         url = _generate_api_url("ecc", params)
-        result = _format_search_results(data, "ecc", str(decision_id), url)
+        result = _format_search_results(data, "ecc", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"중앙환경분쟁조정위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -741,7 +741,7 @@ def get_securities_committee_detail(decision_id: Union[str, int]) -> TextContent
     try:
         data = _make_legislation_request("sfc", params)
         url = _generate_api_url("sfc", params)
-        result = _format_search_results(data, "sfc", str(decision_id), url)
+        result = _format_search_results(data, "sfc", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"증권선물위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -758,7 +758,7 @@ def get_human_rights_committee_detail(decision_id: Union[str, int]) -> TextConte
     try:
         data = _make_legislation_request("nhrck", params)
         url = _generate_api_url("nhrck", params)
-        result = _format_search_results(data, "nhrck", str(decision_id), url)
+        result = _format_search_results(data, "nhrck", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"국가인권위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -775,7 +775,7 @@ def get_broadcasting_committee_detail(decision_id: Union[str, int]) -> TextConte
     try:
         data = _make_legislation_request("kcc", params)
         url = _generate_api_url("kcc", params)
-        result = _format_search_results(data, "kcc", str(decision_id), url)
+        result = _format_search_results(data, "kcc", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"방송통신위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -792,7 +792,7 @@ def get_industrial_accident_committee_detail(decision_id: Union[str, int]) -> Te
     try:
         data = _make_legislation_request("eiac", params)
         url = _generate_api_url("eiac", params)
-        result = _format_search_results(data, "eiac", str(decision_id), url)
+        result = _format_search_results(data, "eiac", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"산업재해보상보험 재심사위원회 결정문 상세조회 중 오류: {str(e)}")
@@ -809,7 +809,7 @@ def get_land_tribunal_detail(decision_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("oclt", params)
         url = _generate_api_url("oclt", params)
-        result = _format_search_results(data, "oclt", str(decision_id), url)
+        result = _format_search_results(data, "oclt", str(decision_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"중앙토지수용위원회 결정문 상세조회 중 오류: {str(e)}")

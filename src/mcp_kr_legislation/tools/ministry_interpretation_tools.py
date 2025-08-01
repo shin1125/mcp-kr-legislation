@@ -8,7 +8,7 @@
 import logging
 import json
 import os
-import requests
+import requests  # type: ignore
 from urllib.parse import urlencode
 from typing import Optional, Union
 from mcp.types import TextContent
@@ -397,7 +397,7 @@ def get_moef_interpretation_detail(interpretation_id: Union[str, int]) -> TextCo
     try:
         data = _make_legislation_request("moef", params, is_detail=True)
         url = _generate_api_url("moef", params, is_detail=True)
-        result = _format_search_results(data, "moef", str(interpretation_id), url)
+        result = _format_search_results(data, "moef", str(interpretation_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"기획재정부 법령해석 상세조회 중 오류: {str(e)}")
@@ -414,7 +414,7 @@ def get_nts_interpretation_detail(interpretation_id: Union[str, int]) -> TextCon
     try:
         data = _make_legislation_request("nts", params, is_detail=True)
         url = _generate_api_url("nts", params, is_detail=True)
-        result = _format_search_results(data, "nts", str(interpretation_id), url)
+        result = _format_search_results(data, "nts", str(interpretation_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"국세청 법령해석 상세조회 중 오류: {str(e)}")
@@ -431,7 +431,7 @@ def get_kcs_interpretation_detail(interpretation_id: Union[str, int]) -> TextCon
     try:
         data = _make_legislation_request("kcs", params, is_detail=True)
         url = _generate_api_url("kcs", params, is_detail=True)
-        result = _format_search_results(data, "kcs", str(interpretation_id), url)
+        result = _format_search_results(data, "kcs", str(interpretation_id))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"관세청 법령해석 상세조회 중 오류: {str(e)}")

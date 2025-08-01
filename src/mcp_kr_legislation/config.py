@@ -1,5 +1,5 @@
 """
-한국 법제처 OPEN API 121개 완전 통합 MCP 서버 설정
+한국 법제처 OPEN API MCP 서버 설정
 """
 
 import os

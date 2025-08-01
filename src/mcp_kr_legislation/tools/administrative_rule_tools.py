@@ -32,7 +32,7 @@ from .law_tools import (
 def search_administrative_rule(query: Optional[str] = None, search: int = 2, display: int = 20, page: int = 1) -> TextContent:
     """행정규칙 검색"""
     if not query or not query.strip():
-        return TextContent(type="text", text="❌ 검색어를 입력해주세요.")
+        return TextContent(type="text", text="검색어를 입력해주세요.")
     
     search_query = query.strip()
     params = {"target": "admrul", "query": search_query, "search": search, "display": min(display, 100), "page": page}
@@ -60,7 +60,7 @@ def get_administrative_rule_detail(rule_id: Union[str, int]) -> TextContent:
 def search_administrative_rule_comparison(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
     """행정규칙 신구법 비교 목록 조회"""
     if not query or not query.strip():
-        return TextContent(type="text", text="❌ 검색어를 입력해주세요.")
+        return TextContent(type="text", text="검색어를 입력해주세요.")
     
     search_query = query.strip()
     params = {"target": "admrulOldAndNew", "query": search_query, "display": min(display, 100), "page": page}
@@ -92,7 +92,7 @@ def get_administrative_rule_comparison_detail(comparison_id: Union[str, int]) ->
 def search_local_ordinance(query: Optional[str] = None, search: int = 2, display: int = 20, page: int = 1) -> TextContent:
     """자치법규 검색"""
     if not query or not query.strip():
-        return TextContent(type="text", text="❌ 검색어를 입력해주세요.")
+        return TextContent(type="text", text="검색어를 입력해주세요.")
     
     search_query = query.strip()
     params = {"target": "ordinance", "query": search_query, "search": search, "display": min(display, 100), "page": page}
@@ -108,7 +108,7 @@ def search_local_ordinance(query: Optional[str] = None, search: int = 2, display
 def search_ordinance_appendix(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
     """자치법규 별표서식 검색"""
     if not query or not query.strip():
-        return TextContent(type="text", text="❌ 검색어를 입력해주세요.")
+        return TextContent(type="text", text="검색어를 입력해주세요.")
     
     search_query = query.strip()
     params = {"target": "ordinanceApp", "query": search_query, "display": min(display, 100), "page": page}
@@ -154,7 +154,7 @@ def get_local_ordinance_detail(ordinance_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("ordinance", params)
         url = _generate_api_url("ordinance", params)
-        result = _format_search_results(data, "ordinance", f"자치법규ID:{ordinance_id}", url)
+        result = _format_search_results(data, "ordinance", f"자치법규ID:{ordinance_id}")
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"자치법규 상세 조회 중 오류: {str(e)}") 

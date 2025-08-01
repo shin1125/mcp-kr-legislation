@@ -1,5 +1,5 @@
 """
-한국 법제처 OPEN API 121개 완전 통합 MCP 도구
+한국 법제처 OPEN API MCP 도구
 
 search_simple_law의 성공 패턴을 적용한 안전하고 간단한 모든 도구들
 모든 카테고리: 법령, 부가서비스, 행정규칙, 자치법규, 판례관련, 위원회결정문, 
@@ -9,7 +9,7 @@ search_simple_law의 성공 패턴을 적용한 안전하고 간단한 모든 �
 import logging
 import json
 import os
-import requests
+import requests  # type: ignore
 from urllib.parse import urlencode
 from typing import Optional, Union
 from mcp.types import TextContent
@@ -212,12 +212,14 @@ def _make_legislation_request(target: str, params: dict, is_detail: bool = False
         # API 키 설정
         oc = os.getenv("LEGISLATION_API_KEY", "lchangoo")
         
-        # 기본 파라미터 설정 (params의 type이 있으면 우선 사용)
+        # 기본 파라미터 설정
         base_params = {
-            "OC": oc,
-            "type": "JSON"
+            "OC": oc
         }
-        base_params.update(params)  # params에 type이 있으면 기본값 덮어씀
+        base_params.update(params)
+        
+        # JSON 응답 강제 사용
+        base_params["type"] = "JSON"
         
         # URL 결정: 상세조회 vs 검색
         if is_detail and ("ID" in params or "MST" in params):
@@ -290,17 +292,17 @@ def _format_html_precedent_response(data: dict, case_id: str, url: str) -> str:
                 else:
                     result += f"**내용**: {text_content}\n\n"
                     
-                result += "💡 **안내**: 국세청 판례는 HTML 형태로 제공됩니다. 전체 내용은 위 URL에서 확인하세요."
+                result += "안내: 국세청 판례는 HTML 형태로 제공됩니다. 전체 내용은 위 URL에서 확인하세요."
             except:
-                result += "✅ HTML 형태로 판례 내용이 조회되었습니다.\n"
-                result += "💡 **안내**: 국세청 판례는 HTML 형태로만 제공됩니다. 전체 내용은 위 URL에서 확인하세요."
+                result += "HTML 형태로 판례 내용이 조회되었습니다.\n"
+                result += "안내: 국세청 판례는 HTML 형태로만 제공됩니다. 전체 내용은 위 URL에서 확인하세요."
         else:
             # 일반적인 딕셔너리 응답 처리
-            result += f"📄 **판례 응답 (ID: {case_id})**\n\n"
+            result += f"**판례 응답 (ID: {case_id})**\n\n"
             import json
             result += f"```json\n{json.dumps(data, ensure_ascii=False, indent=2)[:1500]}{'...' if len(json.dumps(data, ensure_ascii=False)) > 1500 else ''}\n```"
     else:
-        result += f"📄 **HTML 응답 내용**:\n{str(data)[:1000]}{'...' if len(str(data)) > 1000 else ''}"
+        result += f"**HTML 응답 내용**:\n{str(data)[:1000]}{'...' if len(str(data)) > 1000 else ''}"
     
     return result
 
@@ -422,8 +424,17 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             keyword = search_data.get("키워드", query)
             result += f"'{keyword}' 법령 검색 결과 (총 {total_count}건)\n\n"
             
-            # 단일 객체 또는 배열 처리
-            law_data = search_data.get("law")
+            # 단일 객체 또는 배열 처리 (다양한 타겟 지원)
+            if search_type in ["eflaw", "elaw"]:
+                # 시행일법령과 영문법령은 'law' 키 사용
+                law_data = search_data.get("law")
+            elif search_type == "eflawjosub":
+                # 시행일법령 조항호목은 'eflawjosub' 키 사용
+                law_data = search_data.get("eflawjosub")
+            else:
+                # 기타 타겟은 해당 키 또는 'law' 키 사용
+                law_data = search_data.get(search_type) or search_data.get("law")
+                
             if isinstance(law_data, dict):
                 items = [law_data]
             elif isinstance(law_data, list):
@@ -462,12 +473,16 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             keyword = search_data.get("키워드", query)
             result += f"'{keyword}' 판례 검색 결과 (총 {total_count}건)\n\n"
             
-            # 단일 객체 또는 배열 처리
+            # 단일 객체 또는 배열 처리 (슬라이스 오류 방지)
             prec_data = search_data.get("prec")
             if isinstance(prec_data, dict):
                 items = [prec_data]
             elif isinstance(prec_data, list):
                 items = prec_data
+            elif isinstance(prec_data, str):
+                # 문자열인 경우 빈 리스트로 변환 (슬라이스 오류 방지)
+                logger.warning(f"판례 검색 결과가 문자열로 반환됨: {prec_data[:100]}...")
+                items = []
             else:
                 items = []
                 
@@ -498,12 +513,16 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             keyword = search_data.get("키워드", query)
             result += f"'{keyword}' 해석례 검색 결과 (총 {total_count}건)\n\n"
             
-            # 단일 객체 또는 배열 처리
+            # 단일 객체 또는 배열 처리 (슬라이스 오류 방지)
             expc_data = search_data.get("expc")
             if isinstance(expc_data, dict):
                 items = [expc_data]
             elif isinstance(expc_data, list):
                 items = expc_data
+            elif isinstance(expc_data, str):
+                # 문자열인 경우 빈 리스트로 변환 (슬라이스 오류 방지)
+                logger.warning(f"해석례 검색 결과가 문자열로 반환됨: {expc_data[:100]}...")
+                items = []
             else:
                 items = []
                 
@@ -532,12 +551,16 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             keyword = search_data.get("키워드", query)
             result += f"'{keyword}' 행정규칙 검색 결과 (총 {total_count}건)\n\n"
             
-            # 단일 객체 또는 배열 처리
+            # 단일 객체 또는 배열 처리 (슬라이스 오류 방지)
             admrul_data = search_data.get("admrul")
             if isinstance(admrul_data, dict):
                 items = [admrul_data]
             elif isinstance(admrul_data, list):
                 items = admrul_data
+            elif isinstance(admrul_data, str):
+                # 문자열인 경우 빈 리스트로 변환 (슬라이스 오류 방지)
+                logger.warning(f"행정규칙 검색 결과가 문자열로 반환됨: {admrul_data[:100]}...")
+                items = []
             else:
                 items = []
                 
@@ -570,8 +593,17 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             keyword = search_data.get("키워드", query)
             result += f"금융위원회 '{keyword}' 검색 결과 (총 {total_count}건)\n\n"
             
-            items = search_data.get("fsc", [])
-            if not isinstance(items, list):
+            # 금융위원회 결정문 데이터 처리 (슬라이스 오류 방지)
+            fsc_data = search_data.get("fsc", [])
+            if isinstance(fsc_data, dict):
+                items = [fsc_data]
+            elif isinstance(fsc_data, list):
+                items = fsc_data
+            elif isinstance(fsc_data, str):
+                # 문자열인 경우 빈 리스트로 변환 (슬라이스 오류 방지)
+                logger.warning(f"금융위원회 결정문 검색 결과가 문자열로 반환됨: {fsc_data[:100]}...")
+                items = []
+            else:
                 items = []
                 
             if items:
@@ -632,8 +664,17 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
             agency = search_data.get("기관명", "개인정보보호위원회")
             result += f"{agency} '{keyword}' 검색 결과 (총 {total_count}건)\n\n"
             
-            items = search_data.get("ppc", [])
-            if not isinstance(items, list):
+            # 개인정보보호위원회 결정문 데이터 처리 (슬라이스 오류 방지)
+            ppc_data = search_data.get("ppc", [])
+            if isinstance(ppc_data, dict):
+                items = [ppc_data]
+            elif isinstance(ppc_data, list):
+                items = ppc_data
+            elif isinstance(ppc_data, str):
+                # 문자열인 경우 빈 리스트로 변환 (슬라이스 오류 방지)
+                logger.warning(f"개인정보보호위원회 결정문 검색 결과가 문자열로 반환됨: {ppc_data[:100]}...")
+                items = []
+            else:
                 items = []
                 
             if items:
@@ -1054,7 +1095,7 @@ def _format_search_results(data: dict, search_type: str, query: str = "", url: s
         
     except Exception as e:
         logger.error(f"결과 포맷팅 실패: {e}")
-        return f"📊 **원본 응답 데이터**:\n```json\n{json.dumps(data, ensure_ascii=False, indent=2)[:1000]}{'...' if len(json.dumps(data, ensure_ascii=False)) > 1000 else ''}\n```\n\n🔗 **API URL**: {url}\n\n**포맷팅 오류**: {str(e)}"
+        return f"**원본 응답 데이터**:\n```json\n{json.dumps(data, ensure_ascii=False, indent=2)[:1000]}{'...' if len(json.dumps(data, ensure_ascii=False)) > 1000 else ''}\n```\n\n**API URL**: {url}\n\n**포맷팅 오류**: {str(e)}"
 
 # ===========================================
 # 1. 법령 관련 API (16개)

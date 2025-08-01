@@ -106,7 +106,7 @@ def search_precedent(
     try:
         data = _make_legislation_request("prec", params)
         url = _generate_api_url("prec", params)
-        result = _format_search_results(data, "prec", search_query, url)
+        result = _format_search_results(data, "prec", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"판례 검색 중 오류: {str(e)}")
@@ -122,7 +122,7 @@ def search_constitutional_court(query: Optional[str] = None, display: int = 20, 
     try:
         data = _make_legislation_request("detc", params)
         url = _generate_api_url("detc", params)
-        result = _format_search_results(data, "detc", search_query, url)
+        result = _format_search_results(data, "detc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"헌법재판소 결정례 검색 중 오류: {str(e)}")
@@ -138,7 +138,7 @@ def search_legal_interpretation(query: Optional[str] = None, display: int = 20, 
     try:
         data = _make_legislation_request("expc", params)
         url = _generate_api_url("expc", params)
-        result = _format_search_results(data, "expc", search_query, url)
+        result = _format_search_results(data, "expc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 검색 중 오류: {str(e)}")
@@ -154,7 +154,7 @@ def search_administrative_trial(query: Optional[str] = None, search: int = 1, di
     try:
         data = _make_legislation_request("decc", params)
         url = _generate_api_url("decc", params)
-        result = _format_search_results(data, "decc", search_query, url)
+        result = _format_search_results(data, "decc", search_query)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정심판례 검색 중 오류: {str(e)}")
@@ -171,7 +171,7 @@ def get_administrative_trial_detail(trial_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("decc", params)
         url = _generate_api_url("decc", params)
-        result = _format_search_results(data, "decc", f"행정심판례ID:{trial_id}", url)
+        result = _format_search_results(data, "decc", f"행정심판례ID:{trial_id}")
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정심판례 상세 조회 중 오류: {str(e)}")
@@ -194,7 +194,7 @@ def get_precedent_detail(case_id: Union[str, int]) -> TextContent:
         
         # JSON 응답 확인
         if isinstance(data, dict) and data:
-            result = _format_search_results(data, "prec", f"판례ID:{case_id}", url)
+            result = _format_search_results(data, "prec", f"판례ID:{case_id}")
             return TextContent(type="text", text=result)
         else:
             # HTML 폴백 (국세청 판례 등)
@@ -238,7 +238,7 @@ def get_constitutional_court_detail(decision_id: Union[str, int]) -> TextContent
     try:
         data = _make_legislation_request("detc", params)
         url = _generate_api_url("detc", params)
-        result = _format_search_results(data, "detc", f"헌법재판소결정례ID:{decision_id}", url)
+        result = _format_search_results(data, "detc", f"헌법재판소결정례ID:{decision_id}")
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"헌법재판소 결정례 상세 조회 중 오류: {str(e)}")
@@ -255,7 +255,7 @@ def get_legal_interpretation_detail(interpretation_id: Union[str, int]) -> TextC
     try:
         data = _make_legislation_request("expc", params)
         url = _generate_api_url("expc", params)
-        result = _format_search_results(data, "expc", f"법령해석례ID:{interpretation_id}", url)
+        result = _format_search_results(data, "expc", f"법령해석례ID:{interpretation_id}")
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 상세 조회 중 오류: {str(e)}")

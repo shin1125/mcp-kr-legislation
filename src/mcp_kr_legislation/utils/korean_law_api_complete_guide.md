@@ -1,143 +1,325 @@
-# 한국 법제처 OPEN API 완전 상세 가이드
+# 한국 법제처 OPEN API 상세 가이드
 
-> 총 125개의 API 완전 문서화 (모바일 API 제외 후 105개)
+> 총 125개의 API 문서화 (모바일 API 제외 후 105개)
 > 생성일: 2025. 7. 22.
-> 업데이트: 2025. 1. 15. - 완전한 API 구조 분석 추가
+> 업데이트: 2025. 1. 15. - API 구조 분석 추가
 > 모든 Request/Response 정보 포함
 
-## 🎯 API 구조 패턴
+## API 구조 패턴
 
-### 📡 **핵심 URL 패턴**
+### 핵심 URL 패턴
 | 기능 | URL 패턴 | 설명 | 예시 |
 |------|-----------|------|------|
 | **목록 조회** | `lawSearch.do?target={value}` | 검색/목록 반환 | `lawSearch.do?target=law` |
 | **본문 조회** | `lawService.do?target={value}` | 상세 내용 반환 | `lawService.do?target=law` |
 
-### 🔑 **target 파라미터가 모든 기능 결정**
+### target 파라미터가 기능 결정
 - 동일한 URL에서 `target` 값만으로 API 카테고리 구분
 - 총 **50개 이상**의 고유한 target 값 존재
 - 목록/본문 조회는 URL로, 카테고리는 target으로 결정
 
-## 📊 API 카테고리별 완전 구분표
+## API 카테고리별 구분표
 
-| 대분류 | 중분류 | 목록 조회 API | target | 본문 조회 API | target |
-|--------|--------|---------------|--------|---------------|--------|
-| **법령** | **본문** | 현행법령 목록 조회 | `law` | 현행법령 본문 조회 | `law` |
-| | | 시행일 법령 목록 조회 | `eflaw` | 시행일 법령 본문 조회 | `eflaw` |
-| | | 법령 연혁 목록 조회 | `lsHistory` | 법령 연혁 본문 조회 | `lsHistory` |
-| | **조항호목** | - | - | 현행법령 본문 조항호목 조회 | `lawjosub` |
-| | | - | - | 시행일 법령 본문 조항호목 조회 | `eflawjosub` |
-| | **영문법령** | 영문 법령 목록 조회 | `elaw` | 영문 법령 본문 조회 | `elaw` |
-| | **이력** | 법령 변경이력 목록 조회 | `lsHstInf` | - | - |
-| | | 일자별 조문 개정 이력 목록 조회 | `lsJoHstInf` | - | - |
-| | | 조문별 변경 이력 목록 조회 | `lsJoHstInf` | - | - |
-| | **연계** | 법령 기준 자치법규 연계 관련 목록 조회 | `lnkLs` | - | - |
-| | | 법령-자치법규 연계현황 조회 | `lnkLsOrd` | - | - |
-| | | - | - | 위임법령 조회 | `lsDelegated` |
-| | **부가서비스** | 법령 체계도 목록 조회 | `lsStmd` | 법령 체계도 본문 조회 | `lsStmd` |
-| | | 신구법 목록 조회 | `oldAndNew` | 신구법 본문 조회 | `oldAndNew` |
-| | | 3단 비교 목록 조회 | `thdCmp` | 3단 비교 본문 조회 | `thdCmp` |
-| | | 법률명 약칭 조회 | `lsAbrv` | - | - |
-| | | 삭제 데이터 목록 조회 | `datDel` | - | - |
-| | | 한눈보기 목록 조회 | `oneview` | 한눈보기 본문 조회 | `oneview` |
-| **행정규칙** | **본문** | 행정규칙 목록 조회 | `admrul` | 행정규칙 본문 조회 | `admrul` |
-| | **부가서비스** | 행정규칙 신구법 비교 목록 조회 | `admrulOldAndNew` | 행정규칙 신구법 비교 본문 조회 | `admrulOldAndNew` |
-| **자치법규** | **본문** | 자치법규 목록 조회 | `ordinfd` | 자치법규 본문 조회 | `ordin` |
-| | **연계** | 자치법규 기준 법령 연계 관련 목록 조회 | `lnkOrd` | - | - |
-| **판례관련** | **판례** | 판례 목록 조회 | `prec` | 판례 본문 조회 | `prec` |
-| | **헌재결정례** | 헌재결정례 목록 조회 | `detc` | 헌재결정례 본문 조회 | `detc` |
-| | **법령해석례** | 법령해석례 목록 조회 | `expc` | 법령해석례 본문 조회 | `expc` |
-| | **행정심판례** | 행정심판례 목록 조회 | `decc` | 행정심판례 본문 조회 | `decc` |
-| **위원회결정문** | **개인정보보호위원회** | 개인정보보호위원회 결정문 목록 조회 | `ppc` | 개인정보보호위원회 결정문 본문 조회 | `ppc` |
-| | **고용보험심사위원회** | 고용보험심사위원회 결정문 목록 조회 | `eiac` | 고용보험심사위원회 결정문 본문 조회 | `eiac` |
-| | **공정거래위원회** | 공정거래위원회 결정문 목록 조회 | `ftc` | 공정거래위원회 결정문 본문 조회 | `ftc` |
-| | **국민권익위원회** | 국민권익위원회 결정문 목록 조회 | `acr` | 국민권익위원회 결정문 본문 조회 | `acr` |
-| | **금융위원회** | 금융위원회 결정문 목록 조회 | `fsc` | 금융위원회 결정문 본문 조회 | `fsc` |
-| | **노동위원회** | 노동위원회 결정문 목록 조회 | `nlrc` | 노동위원회 결정문 본문 조회 | `nlrc` |
-| | **방송통신위원회** | 방송통신위원회 결정문 목록 조회 | `kcc` | 방송통신위원회 결정문 본문 조회 | `kcc` |
-| | **산업재해보상보험재심사위원회** | 산업재해보상보험재심사위원회 결정문 목록 조회 | `iaciac` | 산업재해보상보험재심사위원회 결정문 본문 조회 | `iaciac` |
-| | **중앙토지수용위원회** | 중앙토지수용위원회 결정문 목록 조회 | `oclt` | 중앙토지수용위원회 결정문 본문 조회 | `oclt` |
-| | **중앙환경분쟁조정위원회** | 중앙환경분쟁조정위원회 결정문 목록 조회 | `ecc` | 중앙환경분쟁조정위원회 결정문 본문 조회 | `ecc` |
-| | **증권선물위원회** | 증권선물위원회 결정문 목록 조회 | `sfc` | 증권선물위원회 결정문 본문 조회 | `sfc` |
-| | **국가인권위원회** | 국가인권위원회 결정문 목록 조회 | `nhrck` | 국가인권위원회 결정문 본문 조회 | `nhrck` |
-| **조약** | **본문** | 조약 목록 조회 | `trty` | 조약 본문 조회 | `trty` |
-| **별표·서식** | **법령** | 법령 별표·서식 목록 조회 | `licbyl` | - | - |
-| | **행정규칙** | 행정규칙 별표·서식 목록 조회 | `admbyl` | - | - |
-| | **자치법규** | 자치법규 별표·서식 목록 조회 | `ordinbyl` | - | - |
-| **학칙·공단·공공기관** | **본문** | 학칙·공단·공공기관 목록 조회 | `pi` | 학칙·공단·공공기관 본문 조회 | `pi` |
-| **법령용어** | **본문** | 법령 용어 목록 조회 | `lstrm` | 법령 용어 본문 조회 | `lstrm` |
-| **맞춤형** | **법령** | 맞춤형 법령 목록 조회 | `couseLs` | - | - |
-| | | 맞춤형 법령 조문 목록 조회 | `couseLs` | - | - |
-| | **행정규칙** | 맞춤형 행정규칙 목록 조회 | `couseAdmrul` | - | - |
-| | | 맞춤형 행정규칙 조문 목록 조회 | `couseAdmrul` | - | - |
-| | **자치법규** | 맞춤형 자치법규 목록 조회 | `couseOrdin` | - | - |
-| | | 맞춤형 자치법규 조문 목록 조회 | `couseOrdin` | - | - |
-| **법령정보 지식베이스** | **용어** | 법령용어 조회 | `lstrmAI` | | |
-| | | 일상용어 조회 | `dlytrm` | | |
-| | **용어 간 관계** | 법령용어-일상용어 연계 조회 | `lstrmRlt` | | |
-| | | 일상용어-법령용어 연계 조회 | `dlytrmRlt` | | |
-| | **조문 간 관계** | 법령용어-조문 연계 조회 | `lstrmRltJo` | | |
-| | | 조문-법령용어 연계 조회 | `joRltLstrm` | | |
-| | **법령 간 관계** | 관련법령 조회 | `lsRlt` | | |
-| **중앙부처 1차 해석** | **고용노동부** | 고용노동부 법령해석 목록 조회 | `moelCgmExpc` | 고용노동부 법령해석 본문 조회 | `moelCgmExpc` |
-| | **국토교통부** | 국토교통부 법령해석 목록 조회 | `molitCgmExpc` | 국토교통부 법령해석 본문 조회 | `molitCgmExpc` |
-| | **기획재정부** | 기획재정부 법령해석 목록 조회 | `moefCgmExpc` | - | - |
-| | **해양수산부** | 해양수산부 법령해석 목록 조회 | `mofCgmExpc` | 해양수산부 법령해석 본문 조회 | `mofCgmExpc` |
-| | **행정안전부** | 행정안전부 법령해석 목록 조회 | `moisCgmExpc` | 행정안전부 법령해석 본문 조회 | `moisCgmExpc` |
-| | **환경부** | 환경부 법령해석 목록 조회 | `meCgmExpc` | 환경부 법령해석 본문 조회 | `meCgmExpc` |
-| | **관세청** | 관세청 법령해석 목록 조회 | `kcsCgmExpc` | 관세청 법령해석 본문 조회 | `kcsCgmExpc` |
-| | **국세청** | 국세청 법령해석 목록 조회 | `ntsCgmExpc` | - | - |
-| **특별행정심판** | **조세심판원** | 조세심판원 특별행정심판례 목록 조회 | `ttSpecialDecc` | 조세심판원 특별행정심판례 본문 조회 | `ttSpecialDecc` |
-| | **해양안전심판원** | 해양안전심판원 특별행정심판례 목록 조회 | `kmstSpecialDecc` | 해양안전심판원 특별행정심판례 본문 조회 | `kmstSpecialDecc` |
+| 대분류 | 중분류 | 목록 조회 API | target | 본문 조회 API | target | 목록 조회 도구 | 본문/상세 조회 도구 |
+|--------|--------|---------------|--------|---------------|--------|------------|---------------|
+| **법령** | **본문** | 현행법령 목록 조회 | `law` | 현행법령 본문 조회 | `law` | `search_law` | `get_law_detail` (통합) |
+| | | 시행일 법령 목록 조회 | `eflaw` | 시행일 법령 본문 조회 | `eflaw` | `search_effective_law` | `get_effective_law_detail` |
+| | **조항호목** | - | - | 현행법령 본문 조항호목 조회 | `lawjosub` | - | `get_current_law_articles`, `search_law_articles` |
+| | | - | - | 시행일 법령 본문 조항호목 조회 | `eflawjosub` | - | `get_effective_law_articles` |
+| | **영문법령** | 영문 법령 목록 조회 | `elaw` | 영문 법령 본문 조회 | `elaw` | `search_english_law` | `get_english_law_detail` |
+| | **이력** | 법령 변경이력 목록 조회 | `lsHstInf` | - | - | `search_law_change_history` | - |
+| | | 일자별 조문 개정 이력 목록 조회 | `lsJoHstInf` | - | - | `search_daily_article_revision` | - |
+| | | 조문별 변경 이력 목록 조회 | `lsJoHstInf` | - | - | `search_article_change_history` | - |
+| | **연계** | 법령 기준 자치법규 연계 관련 목록 조회 | `lnkLs` | - | - | `search_law_ordinance_link` | - |
+| | | - | - | 위임법령 조회 | `lsDelegated` | - | `get_delegated_law` |
+| | **부가서비스** | 법령 체계도 목록 조회 | `lsStmd` | 법령 체계도 본문 조회 | `lsStmd` | `search_law_system_diagram` | `get_law_system_diagram_detail` |
+| | | 신구법 목록 조회 | `oldAndNew` | 신구법 본문 조회 | `oldAndNew` | `search_old_and_new_law` | `get_old_and_new_law_detail` |
+| | | 3단 비교 목록 조회 | `thdCmp` | 3단 비교 본문 조회 | `thdCmp` | `search_three_way_comparison` | `get_three_way_comparison_detail` |
+| | | 법률명 약칭 조회 | `lsAbrv` | - | - | `search_law_nickname` | - |
+| | | 삭제 데이터 목록 조회 | `datDel` | - | - | `search_deleted_law_data` | - |
+| | | 한눈보기 목록 조회 | `oneview` | 한눈보기 본문 조회 | `oneview` | `search_one_view` | `get_one_view_detail` |
+| | | 별표·서식 목록 조회 | `licbyl` | - | - | `search_law_appendix` | `get_law_appendix_detail` |
+| **행정규칙** | **본문** | 행정규칙 목록 조회 | `admrul` | 행정규칙 본문 조회 | `admrul` | `search_administrative_rule` | `get_administrative_rule_detail` |
+| | **부가서비스** | 행정규칙 신구법 비교 목록 조회 | `admrulOldAndNew` | 행정규칙 신구법 비교 본문 조회 | `admrulOldAndNew` | `search_administrative_rule_comparison` | `get_administrative_rule_comparison_detail` |
+| | | 별표·서식 목록 조회 | `admbyl` | - | - | `search_administrative_rule_appendix` | `get_administrative_rule_appendix_detail` |
+| **자치법규** | **본문** | 자치법규 목록 조회 | `ordinfd` | 자치법규 본문 조회 | `ordin` | `search_local_ordinance` | `get_local_ordinance_detail`, `get_ordinance_detail` |
+| | **연계** | 자치법규 기준 법령 연계 관련 목록 조회 | `lnkOrd` | - | - | `search_linked_ordinance` | - |
+| | | 별표·서식 목록 조회 | `ordinbyl` | - | - | `search_ordinance_appendix` | `get_ordinance_appendix_detail` |
+| **판례관련** | **판례** | 판례 목록 조회 | `prec` | 판례 본문 조회 | `prec` | `search_precedent` | `get_precedent_detail` |
+| | **헌재결정례** | 헌재결정례 목록 조회 | `detc` | 헌재결정례 본문 조회 | `detc` | `search_constitutional_court` | `get_constitutional_court_detail` |
+| | **법령해석례** | 법령해석례 목록 조회 | `expc` | 법령해석례 본문 조회 | `expc` | `search_legal_interpretation` | `get_legal_interpretation_detail` |
+| | **행정심판례** | 행정심판례 목록 조회 | `decc` | 행정심판례 본문 조회 | `decc` | `search_administrative_trial` | `get_administrative_trial_detail` |
+| **위원회결정문** | **개인정보보호위원회** | 개인정보보호위원회 결정문 목록 조회 | `ppc` | 개인정보보호위원회 결정문 본문 조회 | `ppc` | `search_privacy_committee` | `get_privacy_committee_detail` |
+| | **고용보험심사위원회** | 고용보험심사위원회 결정문 목록 조회 | `eiac` | 고용보험심사위원회 결정문 본문 조회 | `eiac` | `search_employment_insurance_committee` | `get_employment_insurance_committee_detail` |
+| | **공정거래위원회** | 공정거래위원회 결정문 목록 조회 | `ftc` | 공정거래위원회 결정문 본문 조회 | `ftc` | `search_monopoly_committee` | `get_monopoly_committee_detail` |
+| | **국민권익위원회** | 국민권익위원회 결정문 목록 조회 | `acr` | 국민권익위원회 결정문 본문 조회 | `acr` | `search_anticorruption_committee` | `get_anticorruption_committee_detail` |
+| | **금융위원회** | 금융위원회 결정문 목록 조회 | `fsc` | 금융위원회 결정문 본문 조회 | `fsc` | `search_financial_committee` | `get_financial_committee_detail` |
+| | **노동위원회** | 노동위원회 결정문 목록 조회 | `nlrc` | 노동위원회 결정문 본문 조회 | `nlrc` | `search_labor_committee` | `get_labor_committee_detail` |
+| | **방송통신위원회** | 방송통신위원회 결정문 목록 조회 | `kcc` | 방송통신위원회 결정문 본문 조회 | `kcc` | `search_broadcasting_committee` | `get_broadcasting_committee_detail` |
+| | **산업재해보상보험재심사위원회** | 산업재해보상보험재심사위원회 결정문 목록 조회 | `iaciac` | 산업재해보상보험재심사위원회 결정문 본문 조회 | `iaciac` | `search_industrial_accident_committee` | `get_industrial_accident_committee_detail` |
+| | **중앙토지수용위원회** | 중앙토지수용위원회 결정문 목록 조회 | `oclt` | 중앙토지수용위원회 결정문 본문 조회 | `oclt` | `search_land_tribunal` | `get_land_tribunal_detail` |
+| | **중앙환경분쟁조정위원회** | 중앙환경분쟁조정위원회 결정문 목록 조회 | `ecc` | 중앙환경분쟁조정위원회 결정문 본문 조회 | `ecc` | `search_environment_committee` | `get_environment_committee_detail` |
+| | **증권선물위원회** | 증권선물위원회 결정문 목록 조회 | `sfc` | 증권선물위원회 결정문 본문 조회 | `sfc` | `search_securities_committee` | `get_securities_committee_detail` |
+| | **국가인권위원회** | 국가인권위원회 결정문 목록 조회 | `nhrck` | 국가인권위원회 결정문 본문 조회 | `nhrck` | `search_human_rights_committee` | `get_human_rights_committee_detail` |
+| **조약** | **본문** | 조약 목록 조회 | `trty` | 조약 본문 조회 | `trty` | `search_treaty` | `get_treaty_detail` |
+| **학칙·공단·공공기관** | **학칙** | 학칙 목록 조회 | `pi` | 학칙 본문 조회 | `pi` | `search_university_regulation` | `get_university_regulation_detail` |
+| | **공단** | 공단 목록 조회 | `pi` | 공단 본문 조회 | `pi` | `search_public_corporation_regulation` | `get_public_corporation_regulation_detail` |
+| | **공공기관** | 공공기관 목록 조회 | `pi` | 공공기관 본문 조회 | `pi` | `search_public_institution_regulation` | `get_public_institution_regulation_detail` |
+| **법령용어** | **본문** | 법령 용어 목록 조회 | `lstrm` | 법령 용어 본문 조회 | `lstrm` | `search_legal_term` | `get_legal_term_detail` |
+| **맞춤형** | **법령** | 맞춤형 법령 목록 조회 | `couseLs` | - | - | `search_custom_law` | - |
+| | | 맞춤형 법령 조문 목록 조회 | `couseLs` | - | - | `search_custom_law_articles` | - |
+| | **행정규칙** | 맞춤형 행정규칙 목록 조회 | `couseAdmrul` | - | - | `search_custom_administrative_rule` | - |
+| | | 맞춤형 행정규칙 조문 목록 조회 | `couseAdmrul` | - | - | `search_custom_administrative_rule_articles` | - |
+| | **자치법규** | 맞춤형 자치법규 목록 조회 | `couseOrdin` | - | - | `search_custom_ordinance` | - |
+| | | 맞춤형 자치법규 조문 목록 조회 | `couseOrdin` | - | - | `search_custom_ordinance_articles` | - |
+| **법령정보 지식베이스** | **용어** | 법령용어 조회 | `lstrmAI` | | | `search_legal_term_ai` | - |
+| | | 일상용어 조회 | `dlytrm` | | | `search_daily_term` | - |
+| | **용어 간 관계** | 법령용어-일상용어 연계 조회 | `lstrmRlt` | | | `search_legal_daily_term_link` | - |
+| | | 일상용어-법령용어 연계 조회 | `dlytrmRlt` | | | `search_daily_legal_term_link` | - |
+| | **조문 간 관계** | 법령용어-조문 연계 조회 | `lstrmRltJo` | | | `search_legal_term_article_link` | - |
+| | | 조문-법령용어 연계 조회 | `joRltLstrm` | | | `search_article_legal_term_link` | - |
+| | **법령 간 관계** | 관련법령 조회 | `lsRlt` | | | `search_related_law` | - |
+| **중앙부처 1차 해석** | **고용노동부** | 고용노동부 법령해석 목록 조회 | `moelCgmExpc` | 고용노동부 법령해석 본문 조회 | `moelCgmExpc` | `search_moel_interpretation` | `get_moel_interpretation_detail` |
+| | **국토교통부** | 국토교통부 법령해석 목록 조회 | `molitCgmExpc` | 국토교통부 법령해석 본문 조회 | `molitCgmExpc` | `search_molit_interpretation` | `get_molit_interpretation_detail` |
+| | **기획재정부** | 기획재정부 법령해석 목록 조회 | `moefCgmExpc` | - | - | `search_moef_interpretation` | `get_moef_interpretation_detail` |
+| | **해양수산부** | 해양수산부 법령해석 목록 조회 | `mofCgmExpc` | 해양수산부 법령해석 본문 조회 | `mofCgmExpc` | `search_mof_interpretation` | `get_mof_interpretation_detail` |
+| | **행정안전부** | 행정안전부 법령해석 목록 조회 | `moisCgmExpc` | 행정안전부 법령해석 본문 조회 | `moisCgmExpc` | `search_mois_interpretation` | `get_mois_interpretation_detail` |
+| | **환경부** | 환경부 법령해석 목록 조회 | `meCgmExpc` | 환경부 법령해석 본문 조회 | `meCgmExpc` | `search_me_interpretation` | `get_me_interpretation_detail` |
+| | **관세청** | 관세청 법령해석 목록 조회 | `kcsCgmExpc` | 관세청 법령해석 본문 조회 | `kcsCgmExpc` | `search_kcs_interpretation` | `get_kcs_interpretation_detail` |
+| | **국세청** | 국세청 법령해석 목록 조회 | `ntsCgmExpc` | - | - | `search_nts_interpretation` | `get_nts_interpretation_detail` |
+| **특별행정심판** | **조세심판원** | 조세심판원 특별행정심판례 목록 조회 | `ttSpecialDecc` | 조세심판원 특별행정심판례 본문 조회 | `ttSpecialDecc` | `search_tax_tribunal` | `get_tax_tribunal_detail` |
+| | **해양안전심판원** | 해양안전심판원 특별행정심판례 목록 조회 | `kmstSpecialDecc` | 해양안전심판원 특별행정심판례 본문 조회 | `kmstSpecialDecc` | `search_maritime_safety_tribunal` | `get_maritime_safety_tribunal_detail` |
 
-### 📈 카테고리별 통계
-- **법령**: 26개 API (본문 6개, 조항호목 2개, 영문법령 2개, 이력 3개, 연계 3개, 부가서비스 10개)
-- **행정규칙**: 4개 API (본문 2개, 부가서비스 2개)  
-- **자치법규**: 3개 API (본문 2개, 연계 1개)
-- **판례관련**: 8개 API (판례 2개, 헌재결정례 2개, 법령해석례 2개, 행정심판례 2개)
-- **위원회결정문**: 24개 API (12개 위원회 × 2 = 목록+본문)
-- **조약**: 2개 API (목록 1개, 본문 1개)
-- **별표·서식**: 3개 API (법령별표서식 1개, 행정규칙별표서식 1개, 자치법규별표서식 1개)
-- **학칙·공단·공공기관**: 2개 API (목록 1개, 본문 1개)
-- **법령용어**: 2개 API (목록 1개, 본문 1개)
-- **맞춤형**: 6개 API (법령 2개, 행정규칙 2개, 자치법규 2개)
-- **법령정보 지식베이스**: 7개 API (용어 2개, 용어관계 2개, 조문관계 2개, 법령관계 1개)
-- **중앙부처 1차 해석**: 14개 API (8개 부처, 일부는 목록만/일부는 목록+본문)
-- **특별행정심판**: 4개 API (조세심판원 2개, 해양안전심판원 2개)
-- **모바일**: 17개 API (제외됨)
+### 카테고리별 통계
 
-**총 105개 API** (모바일 API 제외)
+| 대분류 | API 수 | 목록 조회 도구 | 본문/상세 조회 도구 | 총 도구 수 |
+|--------|--------|-------------|----------------|---------|
+| **법령** | 27개 | 14개 | 13개 | 27개 |
+| **행정규칙** | 5개 | 3개 | 3개 | 6개 |
+| **자치법규** | 4개 | 3개 | 3개 | 6개 |
+| **판례관련** | 8개 | 4개 | 4개 | 8개 |
+| **위원회결정문** | 24개 | 12개 | 12개 | 24개 |
+| **조약** | 2개 | 1개 | 1개 | 2개 |
+| **학칙·공단·공공기관** | 2개 | 3개 | 3개 | 6개 |
+| **법령용어** | 2개 | 1개 | 1개 | 2개 |
+| **맞춤형** | 6개 | 6개 | 0개 | 6개 |
+| **법령정보 지식베이스** | 7개 | 7개 | 0개 | 7개 |
+| **중앙부처 1차 해석** | 14개 | 8개 | 8개 | 16개 |
+| **특별행정심판** | 4개 | 2개 | 2개 | 4개 |
 
-### 💡 **중요한 발견사항**
+**총 105개 API → 114개 도구** (일부 API는 여러 도구로 분할 구현)
 
-1. **API 구조의 일관성**:
+### 추가 도구 분류
+
+| 분류 | 도구명 | 목적 | 파일 위치 |
+|------|--------|------|----------|
+| **최적화 도구** | `get_law_summary` | 법령 요약 조회 (캐싱 최적화) | optimized_law_tools.py |
+| | `get_law_articles_summary` | 법령 조문 요약 (성능 최적화) | optimized_law_tools.py |
+| | `get_law_article_detail` | 단일 조문 상세 조회 | optimized_law_tools.py |
+| | `search_law_with_cache` | 캐시 기반 법령 검색 | optimized_law_tools.py |
+| **AI/스마트 도구** | `search_legal_ai` | AI 기반 법령 검색 | ai_tools.py |
+| | `search_law_articles_semantic` | 의미론적 조문 검색 | law_tools.py |
+| | `search_english_law_articles_semantic` | 영문법령 의미론적 검색 | law_tools.py |
+| **부가 서비스** | `search_knowledge_base` | 법령 지식베이스 검색 | additional_service_tools.py |
+| | `search_faq` | 자주묻는질문 검색 | additional_service_tools.py |
+| | `search_qna` | 질의응답 검색 | additional_service_tools.py |
+| | `search_counsel` | 법령상담 검색 | additional_service_tools.py |
+| | `search_precedent_counsel` | 판례상담 검색 | additional_service_tools.py |
+| | `search_civil_petition` | 민원사례 검색 | additional_service_tools.py |
+| ** 분석/비교 도구** | `compare_law_versions` | 법령 버전 비교 분석 | law_tools.py |
+| | `compare_article_before_after` | 조문 개정 전후 비교 | law_tools.py |
+| **🏢 실무 가이드** | `get_practical_law_guide` | 실무 가이드 제공 | law_tools.py |
+| | `search_financial_laws` | 금융법령 통합 검색 | law_tools.py |
+| | `search_tax_laws` | 세법 통합 검색 | law_tools.py |
+| | `search_privacy_laws` | 개인정보보호법령 통합 검색 | law_tools.py |
+| ** 통합 검색** | `search_all_legal_documents` | 전체 법령문서 통합 검색 | legislation_tools.py |
+
+**총 134개 도구** = 114개 (API 매핑) + 20개 (추가 기능)
+
+#### ** 추가 도구 사용 시나리오**
+
+** 최적화 도구 활용**
+```
+# 성능이 중요한 경우
+get_law_summary(law_id) - 캐시된 요약 정보로 빠른 조회
+search_law_with_cache(query) - 반복 검색 시 성능 향상
+```
+
+**AI/스마트 도구 활용**
+```
+# 자연어 기반 검색
+search_legal_ai(query="계약 해지 조건은?")
+search_law_articles_semantic(query="부당해고 관련 조문")
+```
+
+**부가 서비스 활용**
+```
+# 실무 지원
+search_counsel(query="계약서 작성") - 법령상담 사례
+search_faq(query="개인정보처리방침") - 자주묻는질문
+search_civil_petition(query="소비자분쟁") - 민원처리 사례
+```
+
+** 분석/비교 도구 활용**
+```
+# 법령 변화 추적
+compare_law_versions(law_name="개인정보보호법")
+compare_article_before_after(law_name="근로기준법", article_no="25")
+```
+
+**🏢 실무 가이드 활용**
+```
+# 분야별 통합 조회
+search_financial_laws(query="가상화폐") - 금융 관련 법령 통합
+search_privacy_laws(query="CCTV") - 개인정보 관련 법령 통합
+get_practical_law_guide(law_name="전자상거래법") - 실무 가이드
+```
+
+###  **연결된 도구 워크플로우**
+
+#### **기본 2단계 워크플로우**
+```
+1️⃣ 목록 조회 (search_*) → 2️⃣ 상세 조회 (get_*_detail)
+```
+
+#### **주요 워크플로우 예시**
+
+** 법령 검색 플로우**
+```
+search_law(query="민법") 
+→ 결과에서 ID 선택 
+→ get_law_detail(law_id) 또는 get_current_law_articles(law_id)
+```
+
+** 판례 검색 플로우**
+```
+search_precedent(query="계약") 
+→ 결과에서 사건번호 선택 
+→ get_precedent_detail(case_id)
+```
+
+** 위원회결정문 검색 플로우**
+```
+search_privacy_committee(query="개인정보") 
+→ 결과에서 결정문번호 선택 
+→ get_privacy_committee_detail(decision_id)
+```
+
+** 영문법령 검색 플로우**
+```
+search_english_law(query="Civil Act") 
+→ 결과에서 법령ID 선택 
+→ get_english_law_detail(law_id)
+```
+
+#### **특수 워크플로우**
+
+** 연계 조회 플로우**
+```
+search_law_ordinance_link() → get_local_ordinance_detail(ordinance_id)
+```
+
+** 비교 분석 플로우**
+```
+search_old_and_new_law() → get_old_and_new_law_detail(comparison_id)
+search_three_way_comparison() → get_three_way_comparison_detail(comparison_id)
+```
+
+**별표서식 플로우**
+```
+search_law_appendix() → get_law_appendix_detail(appendix_id)
+search_ordinance_appendix() → get_ordinance_appendix_detail(appendix_id)
+```
+
+###  **도구 사용 가이드라인**
+
+#### ** 목록 조회 도구 (`search_*`) 사용법**
+- **목적**: 여러 건의 결과를 빠르게 검색
+- **반환**: 목록 형태의 요약 정보 (제목, ID, 요약 등)
+- **다음 단계**: 관심 있는 항목의 ID를 사용해 상세 조회
+
+#### **🔍 상세 조회 도구 (`get_*_detail`) 사용법**
+- **목적**: 특정 문서의 전체 내용 조회
+- **입력**: 목록 조회에서 얻은 ID
+- **반환**: 해당 문서의 한 내용
+
+#### **⚡ 성능 최적화 팁**
+1. **단계적 접근**: 목록 조회 → 필요한 것만 상세 조회
+2. **적절한 페이징**: `display`와 `page` 파라미터 활용
+3. **구체적 검색어**: 너무 일반적인 용어보다는 구체적인 키워드 사용
+
+#### ** 도구 선택 가이드**
+
+**법령 관련 작업**
+- 현행법령: `search_law` → `get_law_detail`
+- 시행일별 법령: `search_effective_law` → `get_effective_law_detail`
+- 영문법령: `search_english_law` → `get_english_law_detail`
+- 법령 조문: `get_current_law_articles` (직접 조회)
+
+**판례 관련 작업**
+- 일반 판례: `search_precedent` → `get_precedent_detail`
+- 헌법재판소: `search_constitutional_court` → `get_constitutional_court_detail`
+- 행정심판: `search_administrative_trial` → `get_administrative_trial_detail`
+
+**위원회 결정문**
+- 각 위원회별 전용 도구 사용 (총 12개 위원회)
+- 예: `search_privacy_committee` → `get_privacy_committee_detail`
+
+**부처별 해석**
+- 각 부처별 전용 도구 사용 (총 8개 부처)
+- 예: `search_moel_interpretation` → `get_moel_interpretation_detail`
+
+###  **중요한 발견사항**
+
+1. **한 도구 생태계 구축**: 
+   - **134개 도구** = 105개 API  매핑 + 29개 추가 기능
+   - API 외 도구들로 실무 활용도 대폭 향상
+
+2. **계층화된 도구 구조**:
+   - **기본 레이어**: API 직접 매핑 (114개)
+   - **최적화 레이어**: 성능/캐싱 도구 (4개)
+   - **지능화 레이어**: AI/스마트 검색 (3개)
+   - **실무 레이어**: 분석/가이드 도구 (13개)
+
+3. **API-도구 매핑 성**: 
+   - 105개 API → 114개 도구로  매핑
+   - 일부 API는 여러 도구로 분할 구현 (예: 학칙·공단·공공기관)
+   - 목록 조회와 상세 조회의 명확한 분리
+
+4. **다양한 사용자 요구 대응**:
+   - **개발자**: API 직접 매핑 도구
+   - **연구자**: AI/의미론적 검색 도구  
+   - **실무자**: 분야별 통합 검색, 실무 가이드
+   - **일반인**: FAQ, 상담사례, 민원사례
+
+5. **API 구조의 일관성**:
    - 모든 API가 동일한 URL 패턴 사용
    - `target` 파라미터만으로 기능 구분
    - 총 **50개 이상**의 고유한 target 값
 
-2. **코드 최적화 가능성**:
-   - 현재: 개별 함수들 (`search_law`, `search_effective_law`, `search_precedent` 등)
-   - 제안: 통합 함수 
-   - **대폭적인 코드 중복 제거** 가능
+6. **성능 최적화 전략**:
+   - 캐싱 시스템 적용 (`search_law_with_cache`)
+   - 요약 정보 우선 제공 (`get_law_summary`)
+   - 단계적 상세 조회 패턴
 
-3. **목록/본문 분리 필요성**:
-   - 목록 조회: 빠른 검색, 많은 결과
-   - 본문 조회: 상세 내용, 큰 데이터
+7. **실무 중심 설계**:
+   - 분야별 통합 검색 (금융법, 세법, 개인정보법)
+   - 비교/분석 도구 (법령 버전 비교, 조문 변화 추적)
+   - 실무 가이드 제공 (체크리스트, 절차 안내)
 
-### 🚀 **개선 계획**
+###  **개선 계획**
 
 #### **Phase 1: 법령 카테고리 우선 개선**
-- ✅ 현행법령 - 목록/본문 분리
-- ✅ 시행일법령 - 목록/본문 분리  
-- ✅ 법령연혁 - 목록/본문 분리
-- ✅ 영문법령 - 목록/본문 분리
+-  현행법령 - 목록/본문 분리
+-  시행일법령 - 목록/본문 분리  
+-  법령연혁 - 목록/본문 분리
+-  영문법령 - 목록/본문 분리
 
 #### **Phase 2: 통합 함수 도입**
 ```python
 # 기존: 4개 개별 함수
 def search_law(query): # target=law
 def search_effective_law(query): # target=eflaw
-def search_law_history(query): # target=lsHistory
 def search_english_law(query): # target=elaw
 
 # 신규: 1개 통합 함수
@@ -287,14 +469,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsNwListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=law&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -321,7 +503,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 목록 조회 API
@@ -393,14 +575,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsNwInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=152338&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=152033&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=152338&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -418,7 +600,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 본문 조회 API
@@ -517,14 +699,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsEfYdListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=eflaw&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=eflaw&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=eflaw&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -552,7 +734,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 시행일 법령 목록 조회 API
@@ -631,14 +813,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsEfYdInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eflaw&ID=1747&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eflaw&MST=166520&efYd=20151007&type=XML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eflaw&MST=166520&efYd=20151007&JO=000300&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -654,7 +836,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 시행일 법령 본문 조회 API
@@ -753,14 +935,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsHstListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsHistory&type=HTML&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsHistory&type=HTML&org=1741000`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsHistory&type=HTML&query=자동차관리법`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -785,7 +967,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 연혁 목록 조회 가이드API
@@ -828,14 +1010,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsHstInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsHistory&MST=9094&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsHistory&MST=166500&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=lsHistory&MST=9094&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -852,7 +1034,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 연혁 본문 조회 가이드API
@@ -886,14 +1068,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsNwJoListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lawjosub&type=XML&ID=001823&JO=000300&HANG=000100&HO=000200&MOK=%EB%8B%A4`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lawjosub&type=HTML&ID=001823&JO=000300&HANG=000100&HO=000200&MOK=%EB%8B%A4`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=lawjosub&type=XML&ID=001823&JO=000300&HANG=000100&HO=000200&MOK=다`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -910,7 +1092,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 현행법령 본문 조항호목 조회 API
@@ -988,14 +1170,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsEfYdJoListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eflawjosub&type=XML&MST=193412&efYd=20171019&JO=000300&HANG=000100&HO=000200&MOK=%EB%8B%A4`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eflawjosub&type=HTML&MST=193412&efYd=20171019&JO=000300&HANG=000100&HO=000200&MOK=%EB%8B%A4`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=eflawjosub&type=XML&MST=193412&efYd=20171019&JO=000300&HANG=000100&HO=000200&MOK=다`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1013,7 +1195,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 시행일법령 본문 조항호목 조회 API
@@ -1091,14 +1273,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsEngListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=elaw&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=elaw&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=elaw&type=XML&query=%EA%B0%80%EC%A0%95%ED%8F%AD%EB%A0%A5%EB%B0%A9%EC%A7%80`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1124,7 +1306,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 영문법령 목록 조회 API
@@ -1193,14 +1375,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsEngInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=elaw&ID=000744&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=elaw&MST=127280&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=elaw&ID=000744&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1216,7 +1398,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 영문법령 본문 조회 가이드API
@@ -1250,14 +1432,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsChgListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?target=lsHstInf&OC=test&regDt=20170726&type=HTML`
 2. `http://www.law.go.kr/DRF/lawSearch.do?target=lsHstInf&OC=test&regDt=20170726&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?target=lsHstInf`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1273,7 +1455,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 변경이력 목록 조회 API
@@ -1325,14 +1507,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsDayJoRvsListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?target=lsJoHstInf&OC=test&regDt=20150211`
 2. `//www.law.go.kr/DRF/lawSearch.do?target=lsJoHstInf&OC=test&fromRegDt=20150201`
 3. `//www.law.go.kr/DRF/lawSearch.do?target=lsJoHstInf&OC=test&regDt=20150211&org=1270000`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1350,7 +1532,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 일자별 조문 개정 이력 목록 조회 API
@@ -1412,14 +1594,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsJoChgListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsJoHstInf&ID=001971&JO=000500&type=XML`
 2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=lsJoHstInf&ID=001971&JO=000500&type=XML`
 3. `http://www.law.go.kr/DRF/lawService.do?target=lsJoHstInf`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1434,7 +1616,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 조문별 변경 이력 목록 조회 API
@@ -1482,14 +1664,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsOrdinConListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lnkLs&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lnkLs&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lnkLs&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1505,7 +1687,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 자치법규 연계 목록 조회 API
@@ -1648,14 +1830,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsOrdinConGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=drlaw&type=HTML`
 2. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=drlaw&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?target=drlaw`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1666,7 +1848,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령-자치법규 연계현황 조회 API
@@ -1693,14 +1875,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsDelegated`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsDelegated&type=XML&ID=000900`
 2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=lsDelegated&type=XML&ID=000900`
 3. `http://www.law.go.kr/DRF/lawService.do?target=lsDelegated`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1713,7 +1895,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 위임 법령 조회 API
@@ -1776,14 +1958,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsStmdListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsStmd&type=HTML&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsStmd&type=HTML&gana=ga`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsStmd&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1808,7 +1990,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 체계도 목록 조회 가이드API
@@ -1876,14 +2058,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsStmdInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsStmd&MST=142362&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsStmd&MST=166519&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lsStmd&MST=142362&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1899,7 +2081,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령 체계도 본문 조회 가이드API
@@ -1951,14 +2133,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `oldAndNewListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oldAndNew&type=HTML&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oldAndNew&type=HTML&efYd=20150101~20150131`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oldAndNew&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -1983,7 +2165,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 신구법 목록 조회 가이드API
@@ -2052,14 +2234,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `oldAndNewInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oldAndNew&ID=000170&MST=122682&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oldAndNew&MST=136931&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oldAndNew&MST=122682&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2075,7 +2257,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 신구법 본문 조회 가이드API
@@ -2129,14 +2311,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `thdCmpListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=thdCmp&type=HTML&query=%EC%9E%90%EB%8F%99%EC%B0%A8%EA%B4%80%EB%A6%AC%EB%B2%95`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=thdCmp&type=HTML&rrClsCd=300201`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=thdCmp&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2161,7 +2343,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 3단 비교 목록 조회 가이드API
@@ -2230,14 +2412,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `thdCmpInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=thdCmp&ID=001372&MST=162662&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=thdCmp&ID=001570&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=thdCmp&MST=236231&knd=1&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2254,7 +2436,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 3단비교 본문 조회 가이드API
@@ -2357,14 +2539,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsAbrvListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsAbrv`
 2. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsAbrv`
 3. `http://www.law.go.kr/DRF/lawSearch.do?target=lsAbrv`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2377,7 +2559,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령명 약칭 조회 API
@@ -2427,14 +2609,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `datDelHstGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=delHst`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=delHst&knd=13&delDt=20231013`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=delHst&knd=3&frmDt=20231013&toDt=20231016`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2450,7 +2632,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 삭제 데이터 목록 조회 API
@@ -2496,14 +2678,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `oneViewListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oneview&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oneview&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=oneview&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2517,7 +2699,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 한눈보기 목록 조회 API
@@ -2565,14 +2747,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `oneViewInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oneview&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oneview&type=XML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oneview&type=XML&MST=260889&JO=004000`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2588,7 +2770,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 한눈보기 본문 조회 API
@@ -2641,14 +2823,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `admrulListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=HTML&query=%ED%95%99%EA%B5%90`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&date=20150301&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&query=학교&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -2673,7 +2855,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정규칙 목록 조회 API
@@ -2737,14 +2919,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `admrulInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=10000005747&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2758,7 +2940,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정규칙 본문 조회 API
@@ -2825,14 +3007,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `admrulOldAndNewListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrulOldAndNew&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrulOldAndNew&type=XML&query=119%ED%95%AD%EA%B3%B5%EB%8C%80%20%EC%9A%B4%EC%98%81%20%EA%B7%9C%EC%A0%95`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrulOldAndNew&type=JSON&query=119%ED%95%AD%EA%B3%B5%EB%8C%80%20%EC%9A%B4%EC%98%81%20%EA%B7%9C%EC%A0%95`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2854,7 +3036,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정규칙 신구법비교 목록 조회 가이드API
@@ -2920,14 +3102,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `admrulOldAndNewInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `http://law.go.kr/DRF/lawService.do?OC=test&target=admrulOldAndNew&ID=2100000248758&type=HTML`
 2. `http://law.go.kr/DRF/lawService.do?OC=test&target=admrulOldAndNew&ID=2100000248758&type=XML`
 3. `http://law.go.kr/DRF/lawService.do?OC=test&target=admrulOldAndNew&ID=2100000248758&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -2941,7 +3123,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정규칙 신구법 본문 조회 가이드API
@@ -2994,14 +3176,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `admrulBylListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&org=1543000`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3021,7 +3203,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 별표서식 목록 조회 API
@@ -3085,14 +3267,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ordinListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&query=%EC%B2%AD%EC%86%8C%EB%85%84&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3103,7 +3285,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 자치법규 목록 조회 API
@@ -3193,14 +3375,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ordinInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&ID=2026666`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&MST=1316146&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3213,7 +3395,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 자치법규 본문 조회 API
@@ -3277,14 +3459,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ordinLsConListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lnkOrd&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lnkOrd&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lnkOrd&type=XML&query=%EC%B2%AD%EC%86%8C%EB%85%84`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3300,7 +3482,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 자치법규 법령 연계 목록 조회 API
@@ -3433,14 +3615,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ordinBylListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3461,7 +3643,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 별표서식 목록 조회 API
@@ -3525,14 +3707,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `precListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&query=%EB%8B%B4%EB%B3%B4%EA%B6%8C`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML&query=%EB%8B%B4%EB%B3%B4%EA%B6%8C&curt=%EB%8C%80%EB%B2%95%EC%9B%90`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML&nb=2009%EB%8A%90%ED%95%A9133,2010%EB%8A%90%ED%95%A921`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3557,7 +3739,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 판례 목록 조회 API
@@ -3624,14 +3806,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `precInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228541&type=HTML`
 2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228541&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?target=prec`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3644,7 +3826,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 판례 본문 조회 API
@@ -3693,14 +3875,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `detcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&query=%EB%B2%8C%EA%B8%88`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=HTML&date=20150210`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3721,7 +3903,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 헌재결정례 목록 조회 API
@@ -3776,14 +3958,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `detcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=127830&LM=자동차관리법제26조등위헌확인등&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3796,7 +3978,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 헌재결정례 본문 조회 API
@@ -3845,14 +4027,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `expcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML&query=%EC%9E%84%EC%B0%A8`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=HTML&query=%EC%A3%BC%EC%B0%A8`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3875,7 +4057,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령해석례 목록 조회 API
@@ -3936,14 +4118,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `expcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=315191&LM=%EC%97%AC%EC%84%B1%EA%B0%80%EC%A1%B1%EB%B6%80%20-%20%EA%B1%B4%EA%B0%95%EA%B0%80%EC%A0%95%EA%B8%B0%EB%B3%B8%EB%B2%95%20%EC%A0%9C35%EC%A1%B0%20%EC%A0%9C2%ED%95%AD%20%EA%B4%80%EB%A0%A8&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -3956,7 +4138,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령해석례 본문 조회 API
@@ -4005,14 +4187,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `deccListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=decc&type=XML&gana=ga`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4034,7 +4216,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정심판례 목록 조회 API
@@ -4095,14 +4277,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `deccInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=243263&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=245011&LM=과징금 부과처분 취소청구&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=decc&ID=243263&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4115,7 +4297,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정심판례 본문 조회 API
@@ -4166,14 +4348,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ppcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ppc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ppc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ppc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -4191,7 +4373,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 개인정보보호위원회 결정문 목록 조회 API
@@ -4244,14 +4426,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ppcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ppc&ID=5&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ppc&ID=3&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=ppc&ID=5&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4263,7 +4445,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 개인정보보호위원회 위원회 결정문 본문 조회 API
@@ -4316,14 +4498,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `eiacListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=eiac&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=eiac&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=eiac&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -4341,7 +4523,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 고용보험심사위원회 결정문 목록 조회 API
@@ -4392,14 +4574,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `eiacInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eiac&ID=11347&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=eiac&ID=11327&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=eiac&ID=11347&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4411,7 +4593,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 고용보험심사위원회 결정문 본문 조회 API
@@ -4463,14 +4645,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ftcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ftc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ftc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ftc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -4488,7 +4670,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 공정거래위원회 결정문 목록 조회 API
@@ -4542,14 +4724,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ftcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ftc&ID=331&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ftc&ID=335&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=ftc&ID=331&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4561,7 +4743,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 공정거래위원회 결정문 본문 조회 API
@@ -4641,14 +4823,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `acrListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=acr&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=acr&type=XML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=acr&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -4666,7 +4848,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국민권익위원회 결정문 목록 조회 API
@@ -4720,14 +4902,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `acrInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=acr&ID=53&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=acr&ID=89&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=acr&ID=53&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4739,7 +4921,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국민권익위원회 결정문 본문 조회 API
@@ -4794,14 +4976,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `fscListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=fsc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=fsc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=fsc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -4819,7 +5001,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 금융위원회 결정문 목록 조회 API
@@ -4869,14 +5051,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `fscInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=fsc&ID=9211&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=fsc&ID=9169&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=fsc&ID=9211&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -4888,7 +5070,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 금융위원회 결정문 본문 조회 API
@@ -4931,14 +5113,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `nlrcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=nlrc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=nlrc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=nlrc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -4956,7 +5138,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 노동위원회 결정문 목록 조회 API
@@ -5007,14 +5189,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `nlrcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=nlrc&ID=55&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=nlrc&ID=71&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=nlrc&ID=55&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5026,7 +5208,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 노동위원회 결정문 본문 조회 API
@@ -5072,14 +5254,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `kccListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kcc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kcc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=kcc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -5097,7 +5279,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 방송통신위원회 결정문 목록 조회 API
@@ -5148,14 +5330,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `kccInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kcc&ID=12549&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kcc&ID=12547&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=kcc&ID=12549&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5167,7 +5349,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 방송통신위원회 결정문 본문 조회 API
@@ -5219,14 +5401,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `iaciacListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=iaciac&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=iaciac&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=iaciac&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -5244,7 +5426,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 산업재해보상보험재심사위원회 결정문 목록 조회 API
@@ -5295,14 +5477,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `iaciacInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=iaciac&ID=7515&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=iaciac&ID=7513&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=iaciac&ID=7515&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5314,7 +5496,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 산업재해보상보험재심사위원회 결정문 본문 조회 API
@@ -5369,14 +5551,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ocltListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oclt&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=oclt&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=oclt&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -5394,7 +5576,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 중앙토지수용위원회 결정문 목록 조회 API
@@ -5443,14 +5625,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `ocltInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oclt&ID=4973&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=oclt&ID=4965&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=oclt&ID=4973&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5462,7 +5644,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 중앙토지수용위원회 결정문 본문 조회 API
@@ -5504,14 +5686,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `eccListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ecc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ecc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ecc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -5529,7 +5711,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 중앙환경분쟁조정위원회 결정문 목록 조회 API
@@ -5579,14 +5761,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `eccInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ecc&ID=5883&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ecc&ID=5877&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=ecc&ID=5883&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5598,7 +5780,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 중앙환경분쟁조정위원회 결정문 본문 조회 API
@@ -5645,14 +5827,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `sfcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=sfc&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=sfc&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=sfc&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -5670,7 +5852,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 증권선물위원회 결정문 목록 조회 API
@@ -5720,14 +5902,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `sfcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=sfc&ID=7919&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=sfc&ID=7929&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=sfc&ID=7919&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5739,7 +5921,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 증권선물위원회 결정문 본문 조회 API
@@ -5782,14 +5964,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `nhrckListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=nhrck&type=HTML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=nhrck&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=nhrck&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -5808,7 +5990,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국가인권위원회 결정문 목록 조회 API
@@ -5861,14 +6043,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `nhrckInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=nhrck&ID=331&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=nhrck&ID=335&type=XML`
 3. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=nhrck&ID=331&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5882,7 +6064,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국가인권위원회 결정문 본문 조회 API
@@ -5940,14 +6122,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `specialDeccTtListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ttSpecialDecc&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ttSpecialDecc&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ttSpecialDecc&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -5970,7 +6152,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 조세심판원 특별행정심판재결례 목록 조회 API
@@ -6035,14 +6217,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `specialDeccTtInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ttSpecialDecc&ID=1018160&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ttSpecialDecc&ID=1018160&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ttSpecialDecc&ID=1018160&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6056,7 +6238,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 조세심판원 특별행정심판재결례 본문 조회 API
@@ -6114,14 +6296,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `specialDeccKmstListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kmstSpecialDecc&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kmstSpecialDecc&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kmstSpecialDecc&type=XML&gana=ga`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6144,7 +6326,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 해양안전심판원 특별행정심판재결례 목록 조회 API
@@ -6209,14 +6391,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `specialDeccKmstInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kmstSpecialDecc&ID=2&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kmstSpecialDecc&ID=2&LM=기선 제12금영호 침몰사건&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kmstSpecialDecc&ID=2&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6230,7 +6412,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 해양안전심판원 특별행정심판재결례 본문 조회 API
@@ -6294,14 +6476,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `trtyListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&ID=284&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&cls=2`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6323,7 +6505,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 조약 목록 조회 API
@@ -6384,14 +6566,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `trtyInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=2120&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6404,7 +6586,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 조약 본문 조회 API
@@ -6471,14 +6653,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsBylListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&org=1320000`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6499,7 +6681,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 별표서식 목록 조회 API
@@ -6568,14 +6750,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobLsBylListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=licbyl&type=XML&org=1320000`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6594,7 +6776,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -6633,14 +6815,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobAdmrulBylListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admbyl&type=XML&org=1543000`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6659,7 +6841,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -6698,14 +6880,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobOrdinBylListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordinbyl&type=XML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6724,7 +6906,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -6763,14 +6945,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `schlPubRulListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=school&type=HTML&query=%ED%95%99%EA%B5%90`
 2. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=school&query=학교&type=HTML`
 3. `http://www.law.go.kr/DRF/lawSearch.do?target=school(or`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -6794,7 +6976,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 학칙공단공공기관 목록 조회 API
@@ -6862,14 +7044,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `schlPubRulInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=school&LID=2055825&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=school&ID=2200000075994&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=school&LID=2055825&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6883,7 +7065,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 학칙공단공공기관 본문 조회 API
@@ -6949,14 +7131,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsTrmListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&gana=ra&type=XML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=%EC%9E%90%EB%8F%99%EC%B0%A8&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -6975,7 +7157,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령용어 목록 조회 가이드API
@@ -7029,14 +7211,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsTrmInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lstrm&query=%EC%84%A0%EB%B0%95&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lstrm&query=%EC%84%A0%EB%B0%95&type=XML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=lstrm&query=선박&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7048,7 +7230,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령용어 본문 조회 가이드API
@@ -7090,14 +7272,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custLsListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&vcode=L0000000003384`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=HTML&vcode=L0000000003384`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&vcode=L0000000003384`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7112,7 +7294,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 법령 목록 조회 API
@@ -7176,14 +7358,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobLsInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=law&MST=91689&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=law&ID=1747&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7206,7 +7388,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7246,14 +7428,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobAdmrulListguide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=admrul&type=XML&query=%EC%86%8C%EB%B0%A9`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7276,7 +7458,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7344,14 +7526,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobAdmrulInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML`
 2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=admrul&ID=62505&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?target=admrul`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7364,7 +7546,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7392,14 +7574,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobOrdinListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=XML `
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&type=HTML `
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ordin&query=서울&type=HTML `
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7428,7 +7610,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7497,14 +7679,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobOrdinInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&type=HTML&MST=1062134`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=ordin&ID=2047729&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7517,7 +7699,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7547,14 +7729,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobPrecListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=prec&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7578,7 +7760,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7646,14 +7828,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobPrecInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML`
 2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=prec&ID=228547&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?target=prec`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7666,7 +7848,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7694,14 +7876,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobDetcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=detc&type=XML&query=%EC%9E%90%EB%8F%99%EC%B0%A8`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7720,7 +7902,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7774,14 +7956,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobDetcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=127830&LM=자동차관리법제26조등위헌확인등&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=detc&ID=58386&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7794,7 +7976,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7824,14 +8006,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobExpcListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=expc&type=xml&query=%ED%97%88%EA%B0%80`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7853,7 +8035,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7912,14 +8094,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobExpcInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=315191&LM=%EC%97%AC%EC%84%B1%EA%B0%80%EC%A1%B1%EB%B6%80%20-%20%EA%B1%B4%EA%B0%95%EA%B0%80%EC%A0%95%EA%B8%B0%EB%B3%B8%EB%B2%95%20%EC%A0%9C35%EC%A1%B0%20%EC%A0%9C2%ED%95%AD%20%EA%B4%80%EB%A0%A8&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=expc&ID=334617&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7932,7 +8114,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -7962,14 +8144,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobTrtyListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&ID=284&type=HTML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=trty&type=XML&cls=2`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -7989,7 +8171,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -8046,14 +8228,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobTrtyInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML`
 2. `http://www.law.go.kr/DRF/lawService.do?OC=test&target=trty&ID=983&type=HTML`
 3. `http://www.law.go.kr/DRF/lawService.do?target=trty`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8065,7 +8247,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -8092,14 +8274,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `mobLsTrmListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&type=XML`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&gana=ga&type=XML`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrm&query=%EC%9E%90%EB%8F%99%EC%B0%A8&type=HTML`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8116,7 +8298,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 
@@ -8171,14 +8353,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custLsListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&vcode=L0000000003384`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=HTML&vcode=L0000000003384`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&vcode=L0000000003384`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8193,7 +8375,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 법령 목록 조회 API
@@ -8246,14 +8428,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custLsJoListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&lj=jo&vcode=L0000000003384`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=HTML&lj=jo&vcode=L0000000003384`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseLs&type=XML&lj=jo&vcode=L0000000003384`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8269,7 +8451,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 법령 조문 목록 조회 API
@@ -8326,14 +8508,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custAdmrulListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseAdmrul&type=XML&vcode=A0000000000601`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseAdmrul&type=HTML&vcode=A0000000000601`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseAdmrul&type=XML&vcode=A0000000000601`
 
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 행정규칙 목록 조회 API
@@ -8385,14 +8567,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custAdmrulJoListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseAdmrul&type=XML&lj=jo&vcode=A0000000000601`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseAdmrul&type=HTML&lj=jo&vcode=A0000000000601`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseAdmrul&type=XML&lj=jo&vcode=A0000000000601`
 
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 행정규칙 조문 목록 조회 API
@@ -8450,14 +8632,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custOrdinListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseOrdin&type=XML&vcode=O0000000000602`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseOrdin&type=HTML&vcode=O0000000000602`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseOrdin&type=XML&vcode=O0000000000602`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8472,7 +8654,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 자치법규 목록 조회 API
@@ -8525,14 +8707,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `custOrdinJoListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseOrdin&type=XML&lj=jo&vcode=O0000000000602`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseOrdin&type=HTML&lj=jo&vcode=O0000000000602`
 3. `http://www.law.go.kr/DRF/lawSearch.do?OC=test&target=couseOrdin&type=XML&lj=jo&vcode=O0000000000602`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -8548,7 +8730,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 맞춤형 자치법규 조문 목록 조회 API
@@ -8607,14 +8789,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lstrmAIGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrmAI&type=XML`
 2. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lstrmAI&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?target=lstrmAI`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -8629,7 +8811,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 법령용어 조회 API
@@ -8678,14 +8860,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `dlytrmGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=dlytrm&type=XML`
 2. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=dlytrm&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?target=dlytrm`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -8699,7 +8881,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 일상용어 조회 API
@@ -8745,14 +8927,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lstrmRltGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lstrmRlt&type=XML&query=청원`
 2. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=lstrmRlt&type=XML&query=청원`
 3. `https://www.law.go.kr/DRF/lawService.do?target=lstrmRlt`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -8766,7 +8948,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 법령용어-일상용어 연계 API
@@ -8814,14 +8996,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `dlytrmRltGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=dlytrmRlt&type=XML&query=민원`
 2. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=dlytrmRlt&type=XML&query=민원`
 3. `https://www.law.go.kr/DRF/lawService.do?target=dlytrmRlt`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -8835,7 +9017,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 일상용어-법령용어 연계 API
@@ -8883,14 +9065,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lstrmRltJoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=lstrmRltJo&type=XML&query=민원`
 2. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=lstrmRltJo&type=XML&query=민원`
 3. `https://www.law.go.kr/DRF/lawService.do?target=lstrmRltJo`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -8902,7 +9084,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 법령용어-조문 연계 API
@@ -8951,14 +9133,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `lsRltGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsRlt&type=XML`
 2. `https://www.law.go.kr/DRF/lawSearch.do?OC=test&target=lsRlt&type=XML`
 3. `https://www.law.go.kr/DRF/lawSearch.do?target=lsRlt`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -8972,7 +9154,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 관련법령 API
@@ -9023,14 +9205,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `joRltLstrmGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=joRltLstrm&type=XML&query=상법시행법&JO=000400`
 2. `https://www.law.go.kr/DRF/lawService.do?OC=test&target=joRltLstrm&type=XML&query=상법시행법&JO=000400`
 3. `https://www.law.go.kr/DRF/lawService.do?target=joRltLstrm`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID (g4c@korea.kr일경우 OC값=g4c) |
@@ -9044,7 +9226,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 법령정보지식베이스 조문-법령용어 연계 API
@@ -9097,14 +9279,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMoelListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moelCgmExpc&type=XML&query=퇴직`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moelCgmExpc&type=HTML&query=월급`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moelCgmExpc&type=JSON&query=연차`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9127,7 +9309,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 고용노동부 법령해석 목록 조회 API
@@ -9189,14 +9371,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMoelInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=moelCgmExpc&ID=21822&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=moelCgmExpc&ID=21822&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=moelCgmExpc&ID=21822&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9210,7 +9392,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 고용노동부 법령해석 본문 조회 API
@@ -9264,14 +9446,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMolitListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=molitCgmExpc&type=XML&query=도로`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=molitCgmExpc&type=HTML&query=아파트`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=molitCgmExpc&type=JSON&query=상업`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9294,7 +9476,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국토교통부 법령해석 목록 조회 API
@@ -9356,14 +9538,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMolitInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=molitCgmExpc&ID=315912&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=molitCgmExpc&ID=315912&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=molitCgmExpc&ID=315912&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9377,7 +9559,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국토교통부 법령해석 본문 조회 API
@@ -9434,14 +9616,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMoefListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moefCgmExpc&type=XML&query=조합`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moefCgmExpc&type=HTML&query=승계`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moefCgmExpc&type=JSON&query=지분`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9464,7 +9646,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 기획재정부 법령해석 목록 조회 API
@@ -9526,14 +9708,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMofListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=mofCgmExpc&type=XML&query=항만`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=mofCgmExpc&type=HTML&query=비관리청`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=mofCgmExpc&type=JSON&query=시설`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9556,7 +9738,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 해양수산부 법령해석 목록 조회 API
@@ -9618,14 +9800,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMofInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=mofCgmExpc&ID=319468&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=mofCgmExpc&ID=319468&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=mofCgmExpc&ID=319468&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9639,7 +9821,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 해양수산부 법령해석 본문 조회 API
@@ -9693,14 +9875,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMoisListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moisCgmExpc&type=XML&query=재해`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moisCgmExpc&type=HTML&query=임대`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=moisCgmExpc&type=JSON&query=행정`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9723,7 +9905,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정안전부 법령해석 목록 조회 API
@@ -9785,14 +9967,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMoisInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=moisCgmExpc&ID=279110&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=moisCgmExpc&ID=279110&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=moisCgmExpc&ID=279110&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9806,7 +9988,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 행정안전부 법령해석 본문 조회 API
@@ -9860,14 +10042,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMeListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=meCgmExpc&type=XML&query=폐기물`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=meCgmExpc&type=HTML&query=오염`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=meCgmExpc&type=JSON&query=대기`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9890,7 +10072,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 환경부 법령해석 목록 조회 API
@@ -9952,14 +10134,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcMeInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=meCgmExpc&ID=9636&type=XML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=meCgmExpc&ID=9636&type=HTML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=meCgmExpc&ID=9636&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -9973,7 +10155,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 환경부 법령해석 본문 조회 API
@@ -10027,14 +10209,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcKcsListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kcsCgmExpc&type=XML&query=거래명세서`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kcsCgmExpc&type=HTML&query=세금`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=kcsCgmExpc&type=JSON&query=생산`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -10056,7 +10238,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 관세청 법령해석 목록 조회 API
@@ -10116,14 +10298,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcKcsInfoGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kcsCgmExpc&ID=31584&type=HTML`
 2. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kcsCgmExpc&ID=31584&type=XML`
 3. `//www.law.go.kr/DRF/lawService.do?OC=test&target=kcsCgmExpc&ID=31584&type=JSON`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -10137,7 +10319,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 관세청 법령해석 본문 조회 API
@@ -10190,14 +10372,14 @@ def search_legislation(target, query, **params):
 
 **API ID**: `cgmExpcNtsListGuide`
 
-**상태**: ✅ 성공
+**상태**:  성공
 
 **샘플 URL**:
 1. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ntsCgmExpc&type=XML&query=세금`
 2. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ntsCgmExpc&type=HTML&query=증여`
 3. `//www.law.go.kr/DRF/lawSearch.do?OC=test&target=ntsCgmExpc&type=JSON&query=재산`
 
-#### 📥 요청 파라미터
+#### 요청 파라미터
 
 
 | 요청변수 | 값 | 설명 | OC | string(필수) | 사용자 이메일의 ID(g4c@korea.kr일경우 OC값=g4c) |
@@ -10220,7 +10402,7 @@ def search_legislation(target, query, **params):
 
 
 [TABLE_0]
-#### 📋 상세 내용
+####  상세 내용
 
 
 ##### 국세청 법령해석 목록 조회 API
@@ -10278,7 +10460,7 @@ def search_legislation(target, query, **params):
 
 ---
 
-## 📊 수집 통계
+##  수집 통계
 
 - 총 API 수: 121
 - 성공: 121

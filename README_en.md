@@ -54,7 +54,6 @@ Ask your AI assistant to:
 | `get_law_detail` | Specific legislation details | "Show details of law ID 011357" |
 | `search_english_law` | English legislation search | "Find Personal Information Protection Act in English" |
 | `search_effective_law` | Effective date legislation search | "What personal information related laws are scheduled to take effect recently?" |
-| `search_law_history` | Legislation change history | "Show revision history of Personal Information Protection Act" |
 | `search_law_nickname` | Legislation nickname search | "What is the official name for the nickname 'Privacy Act'?" |
 | `search_deleted_law_data` | Deleted legislation data search | "Find repealed personal information related laws" |
 | `search_law_articles` | Legislation articles search | "Show article-by-article content of Personal Information Protection Act" |

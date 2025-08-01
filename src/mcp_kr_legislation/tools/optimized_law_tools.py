@@ -26,26 +26,29 @@ logger = logging.getLogger(__name__)
 
 @mcp.tool(
     name="get_law_summary", 
-    description="""📋 법령 요약 정보를 조회합니다 (캐싱 최적화).
+    description="""법령의 기본정보와 조문 요약을 조회합니다.
 
-✨ **주요 특징**:
-- 485KB 응답을 175KB로 압축하여 빠른 조회
-- 법령 기본정보 + 조문 미리보기 + 제개정 이유 제공
-- 7일간 캐시 유지로 초고속 재조회
-- 온라인 쇼핑, 근로관계 등 일상생활 법령 해석에 최적
+언제 사용:
+- 법령의 기본 정보가 필요할 때
+- 조문 미리보기로 법령 전체 구조를 파악할 때
+- 정확한 MST(법령일련번호)를 알고 있을 때
 
-🎯 **제공 정보**:
-- **기본정보**: 법령명, 법령ID, 공포일자, 시행일자, 소관부처
-- **조문 미리보기**: 처음 10개 조문 요약
-- **제개정 이유**: 법령의 목적과 배경
-- **원본 크기**: 전체 데이터 정보
+언제 사용 안함:
+- 특정 키워드로 조문을 찾을 때 → get_law_summary (law_tools.py) 사용
+- 법령 검색이 필요할 때 → search_law_unified 사용
 
-💡 **사용법**: 법령일련번호(MST) 또는 법령명으로 조회
-- MST: get_law_summary(law_id="248613")  # 개인정보보호법
-- 법령명: get_law_summary(law_name="개인정보보호법")
+매개변수:
+- law_id: 법령일련번호(MST) (선택) - 예: "248613"
+- law_name: 법령명 (선택) - 예: "은행법", "소득세법", "개인정보보호법"
+※ 둘 중 하나는 반드시 입력
 
-🚀 **성능**: 첫 조회 후 캐시에서 즉시 응답""",
-    tags={"법령요약", "캐싱", "최적화", "개인정보", "근로기준법", "일상법령", "성능개선"}
+반환정보: 법령명, 기본정보, 조문 미리보기, 제개정 이유, 총 조문 수
+
+사용 예시:
+- get_law_summary(law_id="248613")  # 개인정보보호법
+- get_law_summary(law_name="은행법")
+- get_law_summary(law_name="소득세법")""",
+    tags={"법령요약", "캐싱", "최적화", "금융", "세무", "개인정보", "은행법", "소득세법"}
 )
 def get_law_summary(
     law_id: Optional[str] = None,
@@ -55,44 +58,89 @@ def get_law_summary(
     if not law_id and not law_name:
         return TextContent(
             type="text", 
-            text="❌ 법령ID(MST) 또는 법령명 중 하나를 입력해주세요.\n\n"
-                 "💡 예시:\n"
+                    text="법령ID(MST) 또는 법령명 중 하나를 입력해주세요.\n\n"
+             "예시:\n"
                  "- get_law_summary(law_id=\"248613\")  # 개인정보보호법\n"
-                 "- get_law_summary(law_name=\"근로기준법\")"
+                 "- get_law_summary(law_name=\"은행법\")\n"
+                 "- get_law_summary(law_name=\"소득세법\")"
         )
     
     try:
-        # 법령명으로 검색하는 경우 법령일련번호를 찾아야 함
+        # 법령명으로 검색하는 경우 법령일련번호를 먼저 찾아야 함
         if law_name and not law_id:
-            # 여기서는 간단히 알려진 법령들만 매핑
-            law_mapping = {
-                "개인정보보호법": "248613",
-                "개인정보 보호법": "248613", 
-                "근로기준법": "265959",
-                "민법": "009847",
-                "상법": "009848"
+            from .law_tools import _make_legislation_request
+            
+            # 법령 검색 API로 정확한 법령ID 찾기
+            logger.info(f"법령명으로 검색: {law_name}")
+            search_params = {
+                "OC": "lchangoo",
+                "type": "JSON",
+                "query": law_name,
+                "display": 5
             }
             
-            law_id = law_mapping.get(law_name)
-            if not law_id:
+            search_result = _make_legislation_request("law", search_params)
+            if search_result and search_result.get("법령"):
+                laws = search_result.get("법령", [])
+                if isinstance(laws, dict):
+                    laws = [laws]
+                
+                # 법령명 일치 우선
+                target_law = None
+                for law in laws:
+                    law_info = law.get("기본정보", {}) if isinstance(law, dict) else {}
+                    api_law_name = (law_info.get("법령명_한글") or 
+                                  law_info.get("법령명한글") or 
+                                  law_info.get("법령명", ""))
+                    
+                    # 정확한 이름 매칭
+                    if api_law_name == law_name:
+                        target_law = law
+                        break
+                    # 부분 매칭
+                    elif law_name in api_law_name or api_law_name in law_name:
+                        if not target_law:  # 첫 번째 부분 일치만 사용
+                            target_law = law
+                
+                if target_law:
+                    basic_info = target_law.get("기본정보", {})
+                    law_id = (basic_info.get("법령일련번호") or 
+                             basic_info.get("법령MST") or
+                             target_law.get("법령키", "")[:10] if target_law.get("법령키") else None)
+                    
+                    actual_law_name = (basic_info.get("법령명_한글") or 
+                                     basic_info.get("법령명한글") or 
+                                     basic_info.get("법령명", ""))
+                    logger.info(f"법령 검색 성공: {actual_law_name} (MST: {law_id})")
+                else:
+                    return TextContent(
+                        type="text",
+                        text=f"'{law_name}'와 일치하는 법령을 찾을 수 없습니다.\n\n"
+                             f"🔍 다른 검색어로 시도해보세요:\n"
+                             f"- 정확한 법령명 사용\n"
+                             f"- 핵심 키워드만 입력 (예: '개인정보', '근로기준' 등)\n"
+                             f"- search_law 도구로 먼저 검색해보세요."
+                    )
+            else:
                 return TextContent(
                     type="text",
-                    text=f"❌ '{law_name}'에 대한 법령일련번호를 찾을 수 없습니다.\n\n"
-                         f"💡 현재 지원되는 법령들:\n"
-                         f"- 개인정보보호법 (MST: 248613)\n"
-                         f"- 근로기준법 (MST: 265959)\n"
-                         f"- 민법 (MST: 009847)\n"
-                         f"- 상법 (MST: 009848)\n\n"
-                         f"🔍 다른 법령은 search_law 도구로 먼저 검색해주세요."
+                    text=f"'{law_name}' 검색 중 오류가 발생했습니다.\n\n"
+                         f"🔍 search_law 도구로 먼저 검색해보세요."
                 )
         
-        # 캐시에서 법령 데이터 조회
+        if not law_id:
+            return TextContent(
+                type="text",
+                text="법령일련번호를 찾을 수 없습니다."
+            )
+        
+        # 캐시에서 법령 데이터 조회 (없으면 자동으로 API 호출)
         law_data = fetch_law_data(str(law_id), use_cache=True)
         
         if not law_data:
             return TextContent(
                 type="text",
-                text=f"❌ 법령을 조회할 수 없습니다. (ID: {law_id})\n\n"
+                text=f"법령을 조회할 수 없습니다. (ID: {law_id})\n\n"
                      f"🔍 법령ID가 올바른지 확인하거나 search_law 도구로 검색해보세요."
             )
         
@@ -106,8 +154,8 @@ def get_law_summary(
         logger.error(f"법령 요약 조회 실패: {e}")
         return TextContent(
             type="text",
-            text=f"❌ 법령 요약 조회 중 오류가 발생했습니다: {str(e)}\n\n"
-                 f"🔄 잠시 후 다시 시도해주세요."
+            text=f"법령 요약 조회 중 오류가 발생했습니다: {str(e)}\n\n"
+                 f"잠시 후 다시 시도해주세요."
         )
 
 def get_law_articles_summary(
@@ -120,7 +168,7 @@ def get_law_articles_summary(
     if not law_id and not law_name:
         return TextContent(
             type="text",
-            text="❌ 법령ID(MST) 또는 법령명 중 하나를 입력해주세요."
+            text="법령ID(MST) 또는 법령명 중 하나를 입력해주세요."
         )
     try:
         # 법령명으로 검색하는 경우 법령일련번호 찾기
@@ -128,26 +176,29 @@ def get_law_articles_summary(
             law_mapping = {
                 "개인정보보호법": "248613",
                 "개인정보 보호법": "248613", 
-                "근로기준법": "265959",
-                "민법": "009847",
-                "상법": "009848"
+                "은행법": "001635",
+                "소득세법": "001234",
+                "법인세법": "001567",
+                "부가가치세법": "001890",
+                "자본시장법": "002345",
+                "자본시장과 금융투자업에 관한 법률": "002345"
             }
             law_id = law_mapping.get(law_name)
             if not law_id:
                 return TextContent(
                     type="text",
-                    text=f"❌ '{law_name}'에 대한 법령일련번호를 찾을 수 없습니다."
+                    text=f"'{law_name}'에 대한 법령일련번호를 찾을 수 없습니다."
                 )
         law_data = fetch_law_data(str(law_id), use_cache=True)
         if not law_data:
-            return TextContent(type="text", text=f"❌ 법령을 조회할 수 없습니다. (ID: {law_id})")
+            return TextContent(type="text", text=f"법령을 조회할 수 없습니다. (ID: {law_id})")
         # 법령명 검증
         basic_info = law_data.get("법령", {}).get("기본정보", {})
         actual_law_name = basic_info.get("법령명_한글") or basic_info.get("법령명한글") or basic_info.get("법령명")
         if law_name and actual_law_name and law_name != actual_law_name:
             return TextContent(
                 type="text",
-                text=f"❌ [경고] 요청한 법령명({law_name})과 실제 데이터의 법령명({actual_law_name})이 다릅니다.\n"
+                text=f"[경고] 요청한 법령명({law_name})과 실제 데이터의 법령명({actual_law_name})이 다릅니다.\n"
                      f"law_id: {law_id}\n정확한 법령명을 확인해주세요."
             )
         # 조문 요약 생성
@@ -155,7 +206,7 @@ def get_law_articles_summary(
         if not articles:
             return TextContent(
                 type="text",
-                text=f"❌ 법령 '{actual_law_name}'의 조문 정보가 없습니다."
+                text=f"법령 '{actual_law_name}'의 조문 정보가 없습니다."
             )
         
         # 조문단위 배열 추출
@@ -170,7 +221,7 @@ def get_law_articles_summary(
         if not article_units:
             return TextContent(
                 type="text",
-                text=f"❌ 법령 '{actual_law_name}'의 조문 정보가 없습니다."
+                text=f"법령 '{actual_law_name}'의 조문 정보가 없습니다."
             )
         
         # 실제 조문만 필터링 (부칙 제외)
@@ -182,7 +233,7 @@ def get_law_articles_summary(
         if not actual_articles:
             return TextContent(
                 type="text",
-                text=f"❌ 법령 '{actual_law_name}'의 조문 정보가 없습니다."
+                text=f"법령 '{actual_law_name}'의 조문 정보가 없습니다."
             )
         
         # 조문 번호로 정렬
@@ -191,7 +242,7 @@ def get_law_articles_summary(
         total_articles = len(actual_articles)
         end_article = min(start_article + count - 1, total_articles)
         
-        result = f"📋 **{actual_law_name}** 조문 요약\n\n"
+        result = f"**{actual_law_name}** 조문 요약\n\n"
         result += f"**전체 조문 수**: {total_articles}개\n"
         result += f"**현재 범위**: 제{start_article}조 ~ 제{end_article}조\n\n"
         result += "---\n\n"
@@ -214,7 +265,7 @@ def get_law_articles_summary(
                 result += f"**제{article_num}조** {article_title}\n"
         
         result += f"\n---\n"
-        result += f"💡 **상세 조회**: `get_law_article_detail(law_id=\"{law_id}\", article_number=조번호)`로 특정 조문의 전체 내용을 확인하세요.\n"
+        result += f"**상세 조회**: `get_law_article_detail(law_id=\"{law_id}\", article_number=조번호)`로 특정 조문의 전체 내용을 확인하세요.\n"
         
         # 페이징 정보
         if end_article < total_articles:
@@ -224,7 +275,7 @@ def get_law_articles_summary(
         return TextContent(type="text", text=result)
     except Exception as e:
         logger.error(f"법령 조문 요약/목차 조회 실패: {e}")
-        return TextContent(type="text", text=f"❌ 법령 조문 요약/목차 조회 중 오류가 발생했습니다: {str(e)}")
+        return TextContent(type="text", text=f"법령 조문 요약/목차 조회 중 오류가 발생했습니다: {str(e)}")
 
 @mcp.tool(
     name="get_law_article_detail",
@@ -236,11 +287,11 @@ def get_law_article_detail(
 ) -> TextContent:
     """특정 조문 전체 내용 반환"""
     if not law_id or not article_no:
-        return TextContent(type="text", text="❌ law_id와 article_no(예: '제50조')를 모두 입력하세요.")
+        return TextContent(type="text", text="law_id와 article_no(예: '제50조')를 모두 입력하세요.")
     try:
         law_data = fetch_law_data(str(law_id), use_cache=True)
         if not law_data:
-            return TextContent(type="text", text=f"❌ 법령을 조회할 수 없습니다. (ID: {law_id})")
+            return TextContent(type="text", text=f"법령을 조회할 수 없습니다. (ID: {law_id})")
         
         # 법령명 가져오기
         basic_info = law_data.get("법령", {}).get("기본정보", {})
@@ -259,7 +310,7 @@ def get_law_article_detail(
             article_units = []
             
         if not article_units:
-            return TextContent(type="text", text=f"❌ 법령 '{law_name}'의 조문 정보가 없습니다.")
+            return TextContent(type="text", text=f"법령 '{law_name}'의 조문 정보가 없습니다.")
         
         # 조문 번호 정규화 (예: "제50조" -> "50", "50" -> "50")
         import re
@@ -283,7 +334,7 @@ def get_law_article_detail(
                     break
         
         if not found_article:
-            return TextContent(type="text", text=f"❌ 해당 조문({article_no})을 찾을 수 없습니다.")
+            return TextContent(type="text", text=f"해당 조문({article_no})을 찾을 수 없습니다.")
         
         # 조문 내용 구성
         result = f"📖 **{law_name}**\n\n"
@@ -332,7 +383,7 @@ def get_law_article_detail(
         return TextContent(type="text", text=result)
     except Exception as e:
         logger.error(f"특정 조문 전체 내용 조회 실패: {e}")
-        return TextContent(type="text", text=f"❌ 특정 조문 전체 내용 조회 중 오류가 발생했습니다: {str(e)}")
+        return TextContent(type="text", text=f"특정 조문 전체 내용 조회 중 오류가 발생했습니다: {str(e)}")
 
 # 기존 get_law_articles는 요약/목차만 반환하도록 변경(또는 안내)
 @mcp.tool(
@@ -353,107 +404,153 @@ def get_law_articles_summary_tool(
 
 ✨ **주요 특징**:
 - 검색 + 캐싱 + 요약을 한 번에 처리
-- 온라인 쇼핑, 근로관계, 개인정보 등 일상법령에 특화
+- 금융, 세무, 개인정보보호 등 업무필수 법령에 특화
 - 검색 결과에서 가장 관련성 높은 법령의 요약 자동 제공
 - 필요시 상세 조문 조회 안내
 
-🎯 **검색 최적화**:
+**검색 최적화**:
 - 정확한 법령명 우선 검색
 - 본문 키워드 검색으로 확장
 - 관련도 높은 상위 결과 선별
 
-💡 **사용 예시**:
+사용 예시:
+- search_law_with_cache("은행법")        # 은행법 자동 요약
+- search_law_with_cache("소득세")        # 소득세법 자동 요약
 - search_law_with_cache("개인정보보호")  # 개인정보보호법 자동 요약
-- search_law_with_cache("근로시간")      # 근로기준법 자동 요약
-- search_law_with_cache("계약")          # 민법 관련 법령 요약
 
-🚀 **성능**: 검색 후 즉시 캐싱으로 재검색 시 초고속""",
-    tags={"검색", "캐싱", "자동요약", "일상법령", "개인정보", "근로", "계약", "통합조회"}
+성능: 검색 후 즉시 캐싱으로 재검색 시 초고속""",
+    tags={"검색", "캐싱", "자동요약", "금융법령", "세무법령", "개인정보", "은행법", "소득세법", "통합조회"}
 )
 def search_law_with_cache(query: str) -> TextContent:
     """법령 검색 + 자동 요약 (캐싱 최적화)"""
     if not query or not query.strip():
         return TextContent(
             type="text",
-            text="❌ 검색어를 입력해주세요.\n\n"
-                 "💡 예시: '개인정보보호', '근로시간', '계약' 등"
+            text="검색어를 입력해주세요.\n\n"
+                 "예시: '은행법', '소득세', '개인정보보호' 등"
         )
     
     try:
-        # 미리 정의된 키워드 매핑
-        keyword_mapping = {
-            "개인정보": "248613",  # 개인정보보호법
-            "개인정보보호": "248613",
-            "프라이버시": "248613",
-            "쇼핑몰": "248613",
-            "근로": "265959",  # 근로기준법
-            "근로시간": "265959",
-            "야근": "265959",
-            "휴가": "265959",
-            "급여": "265959",
-            "노동": "265959",
-            "계약": "009847",  # 민법
-            "민법": "009847",
-            "상법": "009848",
-            "회사": "009848"
+        # 실제 법령 검색을 통한 정확한 매칭
+        from .law_tools import _make_legislation_request
+        
+        # 검색어 정규화
+        normalized_query = query.strip()
+        
+        # 법령명 매핑 (더 정확한 검색을 위해)
+        exact_law_names = {
+            "개인정보": "개인정보 보호법",
+            "개인정보보호": "개인정보 보호법", 
+            "프라이버시": "개인정보 보호법",
+            "은행": "은행법",
+            "은행법": "은행법",
+            "금융": "은행법",
+            "대출": "은행법",
+            "여신": "은행법",
+            "소득세": "소득세법",
+            "소득세법": "소득세법",
+            "세금": "소득세법",
+            "법인세": "법인세법",
+            "법인세법": "법인세법",
+            "부가세": "부가가치세법",
+            "부가가치세": "부가가치세법",
+            "자본시장": "자본시장과 금융투자업에 관한 법률",
+            "투자": "자본시장과 금융투자업에 관한 법률",
+            "증권": "자본시장과 금융투자업에 관한 법률"
         }
         
-        # 키워드 매칭
-        matched_law_id = None
-        for keyword, law_id in keyword_mapping.items():
-            if keyword in query:
-                matched_law_id = law_id
+        # 정확한 법령명 찾기
+        target_law_name = None
+        for keyword, law_name in exact_law_names.items():
+            if keyword in normalized_query:
+                target_law_name = law_name
                 break
         
-        if matched_law_id:
-            # 매칭된 법령의 요약 정보 제공
-            law_data = fetch_law_data(matched_law_id, use_cache=True)
-            if law_data:
-                summary = extract_law_summary(law_data)
-                
-                # 소관부처 정보 개선
-                basic_info = law_data.get("법령", {}).get("기본정보", {})
-                ministry_info = basic_info.get("소관부처", "")
-                if isinstance(ministry_info, dict):
-                    ministry = ministry_info.get("content", ministry_info.get("소관부처명", "미지정"))
-                else:
-                    ministry = ministry_info or basic_info.get("소관부처명", "미지정")
-                summary["소관부처"] = ministry
-                
-                # 법령일련번호 추출 개선
-                mst = (basic_info.get("법령일련번호") or 
-                       basic_info.get("법령MST") or
-                       law_data.get("법령", {}).get("법령키", "")[:10] if law_data.get("법령", {}).get("법령키") else matched_law_id)
-                summary["법령일련번호"] = mst
-                
-                formatted = format_law_summary(summary, query)
-                
-                # 메타데이터 추출
-                actual_law_name = basic_info.get("법령명_한글") or basic_info.get("법령명한글") or basic_info.get("법령명")
-                
-                # 추가 안내 메시지
-                formatted += f"\n---\n[메타데이터] law_id: {matched_law_id}, law_name: {actual_law_name}, mst_id: {mst}\n"
-                formatted += f"💡 **더 자세한 조문 보기**: get_law_articles(law_id=\"{mst}\") 또는 get_law_articles(law_name=\"{actual_law_name}\")를 사용하세요.\n"
-                formatted += f"🔍 **{actual_law_name} 관련 질문**: 구체적인 조항이나 시행령이 궁금하시면 말씀해주세요!"
-                return TextContent(type="text", text=formatted)
+        if not target_law_name:
+            target_law_name = normalized_query
+        
+        # 실제 API로 법령 검색
+        search_params = {
+            "OC": "lchangoo",
+            "type": "JSON", 
+            "query": target_law_name,
+            "display": 3
+        }
+        
+        search_result = _make_legislation_request("law", search_params)
+        
+        # 검색 결과에서 가장 적합한 법령 찾기
+        target_law = None
+        if search_result and "LawSearch" in search_result:
+            laws = search_result["LawSearch"].get("law", [])
+            if isinstance(laws, dict):
+                laws = [laws]
+            
+            # 일치하는 법령 찾기
+            for law in laws:
+                law_name = law.get("법령명한글", "")
+                if target_law_name in law_name or law_name in target_law_name:
+                    target_law = law
+                    break
+            
+            # 일치하는 법령이 없는 경우 첫 번째 결과 사용
+            if not target_law and laws:
+                target_law = laws[0]
+        
+        if target_law:
+            # 법령일련번호로 상세 정보 조회
+            mst = target_law.get("법령일련번호")
+            if mst:
+                law_data = fetch_law_data(mst, use_cache=True)
+                if law_data:
+                    summary = extract_law_summary(law_data)
+                    
+                    # 기본 정보 추출
+                    basic_info = law_data.get("법령", {}).get("기본정보", {})
+                    
+                    # 소관부처 정보 개선  
+                    ministry_info = basic_info.get("소관부처", "")
+                    if isinstance(ministry_info, dict):
+                        ministry = ministry_info.get("content", ministry_info.get("소관부처명", "미지정"))
+                    else:
+                        ministry = ministry_info or basic_info.get("소관부처명", "미지정")
+                    summary["소관부처"] = ministry
+                    
+                    # 법령일련번호 설정
+                    summary["법령일련번호"] = mst
+                    
+                    formatted = format_law_summary(summary, query)
+                    
+                    # 실제 법령명 추출
+                    actual_law_name = (basic_info.get("법령명_한글") or 
+                                     basic_info.get("법령명한글") or 
+                                     basic_info.get("법령명") or
+                                     target_law.get("법령명한글", ""))
+                    
+                    # 메타데이터 추가
+                    formatted += f"\n---\n[메타데이터] mst: {mst}, law_name: {actual_law_name}\n"
+                    formatted += f"**더 자세한 조문 보기**: get_law_detail_unified(mst=\"{mst}\", target=\"law\")를 사용하세요.\n"
+                    formatted += f"🔍 **{actual_law_name} 관련 질문**: 구체적인 조항이나 시행령이 궁금하시면 말씀해주세요!"
+                    
+                    return TextContent(type="text", text=formatted)
         
         # 매칭되지 않는 경우 일반 검색 안내
         return TextContent(
             type="text",
             text=f"🔍 '{query}' 검색 결과\n\n"
-                 f"💡 **지원되는 주요 법령들**:\n"
-                 f"• **개인정보보호법**: 온라인 쇼핑, 개인정보 처리\n"
-                 f"• **근로기준법**: 근로시간, 야근, 휴가, 급여\n" 
-                 f"• **민법**: 계약, 손해배상, 재산권\n"
-                 f"• **상법**: 회사 설립, 주식, 상거래\n\n"
-                 f"🎯 **구체적 검색어로 다시 시도해보세요**:\n"
-                 f"- '개인정보보호', '근로시간', '계약' 등\n\n"
-                 f"🔧 **전체 법령 검색**: search_law(query=\"{query}\") 도구를 사용하세요."
+                 f"**지원되는 주요 법령들**:\n"
+                 f"• **은행법**: 여신업무, 대출규제, 금융감독\n"
+                 f"• **소득세법**: 소득공제, 세율, 과세표준\n" 
+                 f"• **개인정보보호법**: 개인정보 수집·이용, 안전조치\n"
+                 f"• **자본시장법**: 투자업 인가, 투자권유 규제\n\n"
+                 f"**구체적 검색어로 다시 시도해보세요**:\n"
+                 f"- '은행법', '소득세', '개인정보보호' 등\n\n"
+                 f"**전체 법령 검색**: search_law(query=\"{query}\") 도구를 사용하세요."
         )
         
     except Exception as e:
         logger.error(f"법령 검색 실패: {e}")
         return TextContent(
             type="text",
-            text=f"❌ 검색 중 오류가 발생했습니다: {str(e)}"
+            text=f"검색 중 오류가 발생했습니다: {str(e)}"
         ) 
