@@ -379,14 +379,14 @@ def _make_legislation_request(target: str, params: dict, is_detail: bool = False
             targets_without_result_code = ["elaw", "lsHstInf", "lsJoHstInf"]
             
             if target not in targets_without_result_code:
-                result_code = data['LawSearch'].get('resultCode')
+                result_code = search_data.get('resultCode')
                 if result_code and result_code != '00':
-                    result_msg = data['LawSearch'].get('resultMsg', '알 수 없는 오류')
+                    result_msg = search_data.get('resultMsg', '알 수 없는 오류')
                     raise ValueError(f"API 오류: {result_msg} (코드: {result_code})")
             else:
                 # resultCode가 없는 API들은 totalCnt로 결과 유무 판단
-                total_cnt = data['LawSearch'].get('totalCnt', '0')
-                if str(total_cnt) == '0' and 'law' not in data['LawSearch']:
+                total_cnt = search_data.get('totalCnt', '0')
+                if str(total_cnt) == '0' and 'law' not in search_data:
                     # 실제로 결과가 없는 경우만 처리 (빈 검색 결과는 오류가 아님)
                     pass
         
@@ -574,10 +574,10 @@ def _format_law_service_history(data: dict, search_query: str) -> str:
 def _filter_law_history_results(data: dict, query: str) -> dict:
     """법령연혁 검색 결과를 키워드로 필터링"""
     try:
-        if 'LawSearch' not in data or 'law' not in data['LawSearch']:
+        if 'LawSearch' not in data or 'law' not in search_data:
             return data
         
-        laws = data['LawSearch']['law']
+        laws = search_data['law']
         if not isinstance(laws, list):
             return data
         
@@ -636,8 +636,8 @@ def _filter_law_history_results(data: dict, query: str) -> dict:
         
         # 필터링된 결과로 데이터 업데이트
         if filtered_laws:
-            data['LawSearch']['law'] = filtered_laws
-            data['LawSearch']['totalCnt'] = len(filtered_laws)
+            search_data['law'] = filtered_laws
+            search_data['totalCnt'] = len(filtered_laws)
         else:
             # 정확한 매칭이 없는 경우 원본 유지하되 경고 메시지 추가
             logger.warning(f"'{query}' 키워드로 관련 법령을 찾지 못했습니다. 전체 결과를 반환합니다.")
@@ -651,30 +651,60 @@ def _filter_law_history_results(data: dict, query: str) -> dict:
 def _format_search_results(data: dict, target: str, search_query: str, max_results: int = 50) -> str:
     """검색 결과 포맷팅 공통 함수"""
     try:
+        # 타겟별 루트 키 매핑 (실제 API 응답 구조 기준)
+        target_root_map = {
+            "law": "LawSearch",
+            "eflaw": "EflawSearch", 
+            "admrul": "AdmrulSearch",
+            "prec": "PrecSearch",
+            "expc": "Expc",
+            "detc": "DetcSearch", 
+            "decc": "Decc",
+            "elaw": "LawSearch",  # 영문법령도 LawSearch 사용
+            # 위원회 타겟들 추가
+            "ppc": "Ppc",  # 개인정보보호위원회
+            "fsc": "Fsc",  # 금융위원회
+            "ftc": "Ftc",  # 공정거래위원회
+            "nlrc": "Nlrc",  # 노동위원회
+            "acr": "Acr",  # 국민권익위원회
+            "ecc": "Ecc",  # 중앙환경분쟁조정위원회
+            "sfc": "Sfc",  # 증권선물위원회
+            "nhrck": "Nhrck",  # 국가인권위원회
+            "kcc": "Kcc",  # 방송통신위원회
+            "eiac": "Eiac"  # 고용보험심사위원회
+        }
+        
+        # 실제 루트 키 결정
+        root_key = target_root_map.get(target, "LawSearch")
+        if root_key not in data:
+            return f"'{search_query}'에 대한 검색 결과가 없습니다."
+        
+        search_data = data[root_key]
+        
         # 다양한 응답 구조 처리
-        if 'LawSearch' in data:
+        if search_data:
             # 기본 검색 구조
             if target == "elaw":
                 # 영문 법령은 'law' 키 사용
-                target_data = data['LawSearch'].get('law', [])
+                target_data = search_data.get('law', [])
             elif target == "eflaw":
                 # 시행일 법령도 'law' 키 사용
-                target_data = data['LawSearch'].get('law', [])
+                target_data = search_data.get('law', [])
             elif target == "eflawjosub":
                 # 시행일 법령 조항호목은 'eflawjosub' 키 사용
-                target_data = data['LawSearch'].get('eflawjosub', [])
+                target_data = search_data.get('eflawjosub', [])
             elif target == "lsHstInf":
                 # 법령 변경이력은 'law' 키 사용
-                target_data = data['LawSearch'].get('law', [])
+                target_data = search_data.get('law', [])
             elif target == "lsHistory":
                 # 법령 연혁은 HTML 파싱된 경우 'law' 키 사용
-                target_data = data['LawSearch'].get('law', [])
+                target_data = search_data.get('law', [])
             elif target == "lnkLs":
                 # 법령-자치법규 연계는 'law' 키 사용
-                target_data = data['LawSearch'].get('law', [])
+                target_data = search_data.get('law', [])
             elif target in ["ppc", "fsc", "ftc", "acr", "nlrc", "ecc", "sfc", "nhrck", "kcc", "iaciac", "oclt", "eiac"]:
                 # 위원회 결정문 타겟들 처리
-                target_data = data['LawSearch'].get(target, [])
+                target_data = search_data.get(target, [])
                 # 위원회 데이터는 종종 문자열로 반환되므로 안전하게 처리
                 if isinstance(target_data, str):
                     if target_data.strip() == "" or "검색 결과가 없습니다" in target_data:
@@ -684,8 +714,64 @@ def _format_search_results(data: dict, target: str, search_query: str, max_resul
                         target_data = []
             elif target in ["prec", "expc", "decc", "detc"]:
                 # 판례/해석례 타겟들 처리
-                target_data = data['LawSearch'].get(target, [])
-                # 판례 데이터도 종종 문자열로 반환되므로 안전하게 처리
+                if target == "detc":
+                    # 헌법재판소는 대문자 Detc 단수형으로 반환 (특수한 구조)
+                    detc_item = search_data.get('Detc', search_data.get(target, {}))
+                    if isinstance(detc_item, dict) and detc_item:
+                        target_data = [detc_item]  # 배열로 통일
+                    else:
+                        target_data = []
+                elif target in search_data and isinstance(search_data[target], list):
+                    # 배열로 반환된 경우 (정상)
+                    target_data = search_data[target]
+                elif target in search_data and isinstance(search_data[target], dict):
+                    # 단일 객체로 반환된 경우
+                    target_data = [search_data[target]]
+                else:
+                    # 타겟 키 자체가 없거나 메타데이터만 있는 경우
+                    # LawSearch 하위에서 실제 데이터 배열 찾기
+                    target_data = []
+                    search_data = search_data
+                    
+                    # 타겟별 실제 데이터 키명 확인 (API 문서 기준)
+                    # prec: 판례 데이터는 보통 별도 키나 직접 배열
+                    # expc: 법령해석례는 expc 키 하위나 별도 키
+                    # decc/detc: 행정심판례/헌재결정례도 유사
+                    
+                    # 메타데이터 키 목록 정의
+                    metadata_keys = {
+                        '키워드', 'page', 'target', 'totalCnt', 'section', 'resultMsg', 'resultCode', 'numOfRows'
+                    }
+                    
+                    # 실제 데이터 배열을 우선순위로 찾기
+                    potential_data_keys = []
+                    for key, value in search_data.items():
+                        if key not in metadata_keys:
+                            if isinstance(value, list) and value and isinstance(value[0], dict):
+                                # 실제 결과 데이터 배열 발견
+                                potential_data_keys.append((key, value))
+                            elif isinstance(value, dict) and value:
+                                # 단일 결과 객체 (배열로 변환 후 추가)
+                                potential_data_keys.append((key, [value]))
+                    
+                    # 가장 가능성 높은 데이터 선택
+                    if potential_data_keys:
+                        # 첫 번째 유효한 데이터 배열 사용
+                        target_data = potential_data_keys[0][1]
+                    else:
+                        # 검색 결과가 실제로 없는 경우 (totalCnt=0)
+                        total_cnt = search_data.get('totalCnt', 0)
+                        if str(total_cnt) == '0' or total_cnt == 0:
+                            target_data = []  # 정상적인 빈 결과
+                        else:
+                            # totalCnt > 0인데 데이터가 없으면 파싱 오류
+                            target_data = []
+                    
+                    # 여전히 없으면 빈 배열
+                    if not target_data:
+                        target_data = []
+                
+                # 문자열인 경우 처리
                 if isinstance(target_data, str):
                     if target_data.strip() == "" or "검색 결과가 없습니다" in target_data:
                         target_data = []
@@ -693,7 +779,7 @@ def _format_search_results(data: dict, target: str, search_query: str, max_resul
                         logger.warning(f"판례 타겟 {target}이 문자열로 반환됨: {target_data[:100]}...")
                         target_data = []
             else:
-                target_data = data['LawSearch'].get(target, [])
+                target_data = search_data.get(target, [])
         elif 'LawService' in data:
             # lawService.do 응답 구조
             service_data = data['LawService']
@@ -743,11 +829,40 @@ def _format_search_results(data: dict, target: str, search_query: str, max_resul
                 target_data = []
         
         if not target_data:
-            # 디버깅을 위한 상세 정보 추가
+            # 결과가 없는 경우 처리
             if 'LawSearch' in data:
-                available_keys = list(data['LawSearch'].keys())
-                total_cnt = data['LawSearch'].get('totalCnt', 0)
-                return f"'{search_query}'에 대한 검색 결과 파싱 실패.\n\n🔍 **디버깅 정보:**\n- 총 {total_cnt}건 검색됨\n- 사용 가능한 키: {available_keys}\n- 타겟: {target}\n\n**해결방법:** _format_search_results 함수의 타겟 처리 로직을 확인하세요."
+                total_cnt = search_data.get('totalCnt', 0)
+                
+                # 실제로 검색 결과가 0건인 경우
+                if str(total_cnt) == '0' or total_cnt == 0:
+                    if target == "prec":
+                        return f"**'{search_query}' 검색 결과**\n\n검색 결과가 없습니다.\n\n🔍 **다른 검색 방법:**\n- 다른 키워드로 검색해보세요\n- search=1 (판례명 검색)으로 변경해보세요\n- 더 일반적인 용어로 검색해보세요 (예: \"정보보호\" 대신 \"정보\")"
+                    elif target == "expc":
+                        return f"**'{search_query}' 검색 결과**\n\n검색 결과가 없습니다.\n\n🔍 **다른 검색 방법:**\n- 다른 키워드로 검색해보세요\n- 더 일반적인 용어로 검색해보세요\n- 관련 부처명을 포함해보세요"
+                    elif target == "decc":
+                        return f"**'{search_query}' 검색 결과**\n\n검색 결과가 없습니다.\n\n🔍 **다른 검색 방법:**\n- 다른 키워드로 검색해보세요\n- search=1 (사건명 검색)으로 변경해보세요\n- 더 일반적인 용어로 검색해보세요"
+                    else:
+                        return f"**'{search_query}' 검색 결과**\n\n검색 결과가 없습니다. 다른 키워드로 검색해보세요."
+                
+                # totalCnt > 0인데 데이터가 없는 경우 (파싱 오류)
+                else:
+                    available_keys = list(search_data.keys())
+                    key_details = {}
+                    for key, value in search_data.items():
+                        if isinstance(value, list):
+                            key_details[key] = f"list[{len(value)}]"
+                            if value and isinstance(value[0], dict):
+                                sample_keys = list(value[0].keys())[:5]
+                                key_details[key] += f" 샘플키:{sample_keys}"
+                        elif isinstance(value, dict):
+                            sample_keys = list(value.keys())[:5] 
+                            key_details[key] = f"dict 키:{sample_keys}"
+                        else:
+                            key_details[key] = f"{type(value).__name__}:{str(value)[:50]}"
+                    
+                    debug_info = "\n".join([f"  - {k}: {v}" for k, v in key_details.items()])
+                    
+                    return f"'{search_query}'에 대한 검색 결과 파싱 실패.\n\n🔍 **디버깅 정보:**\n- 총 {total_cnt}건 검색됨\n- 타겟: {target}\n- 응답 구조:\n{debug_info}\n\n**해결방법:** 실제 데이터 배열의 키명을 확인하여 파싱 로직을 수정하세요."
             else:
                 return f"'{search_query}'에 대한 검색 결과가 없습니다."
         
@@ -763,26 +878,54 @@ def _format_search_results(data: dict, target: str, search_query: str, max_resul
         for i, item in enumerate(limited_data, 1):
             result += f"**{i}. "
             
-            # 제목 추출 (실제 API 응답 키 이름들 - 언더스코어 없음)
-            title_keys = [
-                '법령명한글', '법령명', '제목', 'title', '명칭', 'name',
-                '현행법령명', '법령명국문', '국문법령명', 'lawNm', 'lawName',
-                '법령명전체', '법령제목', 'lawTitle'
-            ]
-            
-            # 영문 법령인 경우 영문명을 먼저 표시
+            # 제목 추출 (타겟별 필드 포함)
             if target == "elaw" and '법령명영문' in item and item['법령명영문']:
+                # 영문 법령인 경우 영문명을 먼저 표시
                 title = item['법령명영문']
-                # 한글명도 함께 표시
                 if '법령명한글' in item and item['법령명한글']:
                     title += f" ({item['법령명한글']})"
             else:
+                # 기본 키 세트 (법령)
+                base_title_keys = [
+                    '법령명한글', '법령명', '제목', 'title', '명칭', 'name',
+                    '현행법령명', '법령명국문', '국문법령명', 'lawNm', 'lawName',
+                    '법령명전체', '법령제목', 'lawTitle'
+                ]
+                # 판례/결정/해석/행심 타겟별 보강 키
+                if target == "prec":
+                    # 대법원 판례: API에 따라 영문/축약 키로 제공될 수 있음
+                    extra_title_keys = [
+                        '사건명', '판례명', 'LM',
+                        'EvtNm', 'evtNm', 'eventNm',
+                        'caseNm', 'caseName', 'sjNm', 'sj'
+                    ]
+                elif target == "detc":
+                    # 헌재 결정례
+                    extra_title_keys = [
+                        '사건명', '헌재결정례명', 'LM',
+                        'EvtNm', 'evtNm', 'caseNm', 'caseName', 'sjNm', 'sj'
+                    ]
+                elif target == "expc":
+                    # 법령해석례
+                    extra_title_keys = [
+                        '법령해석례명', '법령해석명', 'LM',
+                        'lawNm', 'LAW_NM', 'ttl', 'TTL', 'title'
+                    ]
+                elif target == "decc":
+                    # 행정심판례
+                    extra_title_keys = [
+                        '사건명', '재결례명', 'LM',
+                        'EvtNm', 'evtNm', 'caseNm', 'caseName', 'sjNm', 'sj'
+                    ]
+                else:
+                    extra_title_keys = []
+
                 title = None
-                for key in title_keys:
+                for key in [*extra_title_keys, *base_title_keys]:
                     if key in item and item[key] and str(item[key]).strip():
                         title = str(item[key]).strip()
                         break
-            
+
             # 디버깅: 실제 키 이름들 확인
             if not title:
                 # 응답에서 사용 가능한 모든 키 확인
@@ -797,18 +940,50 @@ def _format_search_results(data: dict, target: str, search_query: str, max_resul
                 result += f"{title}**\n"
             else:
                 result += "제목 없음**\n"
+                # 타겟별 제목 미매핑 시, 키 힌트를 결과에 간단히 표기해 진단 지원
+                if target in ("prec", "detc", "expc", "decc") and isinstance(item, dict):
+                    keys_preview = ", ".join(list(item.keys())[:10])
+                    result += f"   (키 미매핑: {keys_preview})\n"
             
-            # 상세 정보 추가 (실제 API 응답 키 이름들)
-            detail_fields = {
-                '법령ID': ['법령ID', 'ID', 'id', 'lawId', 'mstSeq'],
-                '법령일련번호': ['법령일련번호', 'MST', 'mst', 'lawMst', '법령MST'],
-                '공포일자': ['공포일자', 'date', 'announce_date', '공포일', 'promulgateDate', '공포년월일'],
-                '시행일자': ['시행일자', 'ef_date', 'effective_date', '시행일', 'enforceDate', '시행년월일'], 
-                '소관부처명': ['소관부처명', 'ministry', 'department', '소관부처', 'ministryNm', '주무부처'],
-                '법령구분명': ['법령구분명', 'type', 'law_type', '법령구분', 'lawType', '법령종류'],
-                '제개정구분명': ['제개정구분명', 'revision', '제개정구분', 'revisionType', '개정구분']
-            }
-            
+            # 상세 정보 추가 (타겟별 필드 구성)
+            if target == "prec":
+                detail_fields = {
+                    '사건번호': ['사건번호', 'caseNo', 'nb', 'NB', 'Nb'],
+                    '선고일자': ['선고일자', '판결선고일자', 'date', 'DATE', 'Date'],
+                    '법원명': ['법원명', 'courtNm', 'COURT_NM', 'CourtNm'],
+                    '사건종류명': ['사건종류명', 'caseType', 'CASE_TYPE']
+                }
+            elif target == "detc":
+                detail_fields = {
+                    '사건번호': ['사건번호', 'nb', 'NB', 'Nb'],
+                    '종국일자': ['종국일자', 'date', 'efYd', 'ED_YD', 'edYd'],
+                    '사건종류명': ['사건종류명']
+                }
+            elif target == "expc":
+                detail_fields = {
+                    '안건번호': ['안건번호', '안건', 'numb', 'NUMB', 'LM'],
+                    '해석일자': ['해석일자', 'explYd', 'EXPL_YD'],
+                    '등록일자': ['등록일자', 'regYd', 'REG_YD'],
+                    '소관부처명': ['소관부처명', '담당부서', '부처명']
+                }
+            elif target == "decc":
+                detail_fields = {
+                    '사건번호': ['사건번호', 'nb', 'NB', 'Nb'],
+                    '의결일자': ['의결일자', 'rslYd', 'RSL_YD'],
+                    '처분일자': ['처분일자', 'dpaYd', 'DPA_YD'],
+                    '심판부': ['심판부', 'panel']
+                }
+            else:
+                detail_fields = {
+                    '법령ID': ['법령ID', 'ID', 'id', 'lawId', 'mstSeq'],
+                    '법령일련번호': ['법령일련번호', 'MST', 'mst', 'lawMst', '법령MST'],
+                    '공포일자': ['공포일자', 'date', 'announce_date', '공포일', 'promulgateDate', '공포년월일'],
+                    '시행일자': ['시행일자', 'ef_date', 'effective_date', '시행일', 'enforceDate', '시행년월일'], 
+                    '소관부처명': ['소관부처명', 'ministry', 'department', '소관부처', 'ministryNm', '주무부처'],
+                    '법령구분명': ['법령구분명', 'type', 'law_type', '법령구분', 'lawType', '법령종류'],
+                    '제개정구분명': ['제개정구분명', 'revision', '제개정구분', 'revisionType', '개정구분']
+                }
+
             for display_name, field_keys in detail_fields.items():
                 value = None
                 for key in field_keys:
@@ -840,27 +1015,55 @@ def _format_search_results(data: dict, target: str, search_query: str, max_resul
                 if value:
                     result += f"   {display_name}: {value}\n"
             
-            # 법령일련번호와 법령ID 모두 있는 경우 상세조회 가이드 추가
-            mst = None
-            law_id = None
-            
-            # MST 찾기
-            for key in ['법령일련번호', 'MST', 'mst', 'lawMst']:
-                if key in item and item[key]:
-                    mst = item[key]
-                    break
-            
-            # 법령ID 찾기
-            for key in ['법령ID', 'ID', 'id', 'lawId']:
-                if key in item and item[key]:
-                    law_id = item[key]
-                    break
-            
-            # 상세조회 가이드
-            if mst:
-                result += f"   상세조회: get_law_detail_unified(mst=\"{mst}\", target=\"law\")\n"
-            elif law_id:
-                result += f"   상세조회: get_law_detail(law_id=\"{law_id}\")\n"
+            # 상세조회 가이드 (타겟별 링크)
+            if target == "prec":
+                case_id = None
+                for key in ['ID', 'id', '판례일련번호', 'prec id', '판례정보일련번호', 'precId', 'PREC_ID']:
+                    if key in item and item[key]:
+                        case_id = item[key]
+                        break
+                if case_id:
+                    result += f"   상세조회: get_precedent_detail(case_id=\"{case_id}\")\n"
+            elif target == "detc":
+                decision_id = None
+                for key in ['ID', 'id', '헌재결정례일련번호', 'detcId', 'DETC_ID']:
+                    if key in item and item[key]:
+                        decision_id = item[key]
+                        break
+                if decision_id:
+                    result += f"   상세조회: get_constitutional_court_detail(decision_id=\"{decision_id}\")\n"
+            elif target == "expc":
+                interpretation_id = None
+                for key in ['ID', 'id', '법령해석례일련번호', 'expcId', 'EXPC_ID']:
+                    if key in item and item[key]:
+                        interpretation_id = item[key]
+                        break
+                if interpretation_id:
+                    result += f"   상세조회: get_legal_interpretation_detail(interpretation_id=\"{interpretation_id}\")\n"
+            elif target == "decc":
+                trial_id = None
+                for key in ['ID', 'id', '행정심판재결례일련번호', 'decc id', 'deccId', 'DECC_ID']:
+                    if key in item and item[key]:
+                        trial_id = item[key]
+                        break
+                if trial_id:
+                    result += f"   상세조회: get_administrative_trial_detail(trial_id=\"{trial_id}\")\n"
+            else:
+                # 법령 상세조회 가이드 (기존)
+                mst = None
+                law_id = None
+                for key in ['법령일련번호', 'MST', 'mst', 'lawMst']:
+                    if key in item and item[key]:
+                        mst = item[key]
+                        break
+                for key in ['법령ID', 'ID', 'id', 'lawId']:
+                    if key in item and item[key]:
+                        law_id = item[key]
+                        break
+                if mst:
+                    result += f"   상세조회: get_law_detail_unified(mst=\"{mst}\", target=\"law\")\n"
+                elif law_id:
+                    result += f"   상세조회: get_law_detail(law_id=\"{law_id}\")\n"
             
             result += "\n"
         
@@ -1053,8 +1256,8 @@ def _safe_format_law_detail(data: dict, search_term: str, url: str) -> str:
         law_info = None
         
         # target을 포함한 구조에서 law 데이터 찾기
-        if 'LawSearch' in data and 'law' in data['LawSearch']:
-            law_data = data['LawSearch']['law']
+        if 'LawSearch' in data and 'law' in search_data:
+            law_data = search_data['law']
             if isinstance(law_data, list) and law_data:
                 law_info = law_data[0]
             elif isinstance(law_data, dict):
@@ -1299,8 +1502,8 @@ def search_law(
             
             try:
                 data = _make_legislation_request("law", params, is_detail=False)
-                if 'LawSearch' in data and 'law' in data['LawSearch']:
-                    laws = data['LawSearch']['law']
+                if 'LawSearch' in data and 'law' in search_data:
+                    laws = search_data['law']
                     if isinstance(laws, list):
                         results.extend(laws[:3])  # 각 법령당 최대 3개
             except:
@@ -1382,9 +1585,9 @@ def search_law(
                 data = _make_legislation_request("law", params, is_detail=False)
                 
                 # 결과 확인
-                if 'LawSearch' in data and 'law' in data['LawSearch']:
-                    results = data['LawSearch']['law']
-                    total_count = int(data['LawSearch'].get('totalCnt', 0))
+                if 'LawSearch' in data and 'law' in search_data:
+                    results = search_data['law']
+                    total_count = int(search_data.get('totalCnt', 0))
                     
                     # 정확한 매칭 검사
                     if isinstance(results, list) and len(results) > 0:
@@ -2028,7 +2231,7 @@ def _format_law_system_diagram_results(data: dict, search_term: str) -> str:
         
         # 1. LawSearch 구조 확인
         if 'LawSearch' in data:
-            law_search = data['LawSearch']
+            law_search = search_data
             
             # 가능한 키들 확인
             possible_keys = ['lsStmd', 'law', 'systemDiagram', 'diagram']
@@ -2262,7 +2465,7 @@ def _format_law_articles(data: dict, law_id: str, url: str = "") -> str:
         
         # 2. LawSearch 구조 확인 (조문 검색 결과)
         elif 'LawSearch' in data:
-            law_search = data['LawSearch']
+            law_search = search_data
             if 'law' in law_search:
                 laws = law_search['law']
                 if isinstance(laws, list) and laws:
@@ -5437,37 +5640,58 @@ def search_privacy_laws(
         
         # 검색 수행
         search_results = []
-        
-        if query:
-            # 특정 키워드로 검색
-            for law_name in privacy_laws:
-                if query.lower() in law_name.lower():
-                    try:
-                        law_result = _make_legislation_request("law", {"query": law_name, "display": 2})
-                        laws = law_result.get("LawSearch", {}).get("law", [])
-                        if laws:
-                            search_results.extend(laws if isinstance(laws, list) else [laws])
-                    except:
-                        continue
-        else:
-            # 전체 개인정보보호법령 검색
-            for law_name in privacy_laws[:6]:  # 상위 6개 법령
-                try:
-                    law_result = _make_legislation_request("law", {"query": law_name, "display": 2})
+
+        if query and query.strip():
+            # 본문 검색을 우선 수행하여 "수집" 같은 키워드도 탐지
+            try:
+                law_result = _make_legislation_request(
+                    "law",
+                    {"query": query.strip(), "display": min(display * 3, 50), "section": "bdyText"}
+                )
+                laws = law_result.get("LawSearch", {}).get("law", [])
+                if laws:
+                    search_results.extend(laws if isinstance(laws, list) else [laws])
+            except Exception:
+                pass
+
+            # 보강: 대표 개인정보 관련 법령명으로도 검색하여 합치기
+            try:
+                for law_name in privacy_laws:
+                    law_result = _make_legislation_request("law", {"query": law_name, "display": 2, "section": "lawNm"})
                     laws = law_result.get("LawSearch", {}).get("law", [])
                     if laws:
                         search_results.extend(laws if isinstance(laws, list) else [laws])
-                except:
+            except Exception:
+                pass
+        else:
+            # 전체 개인정보보호법령 검색 (대표 법령명 기준)
+            for law_name in privacy_laws[:6]:  # 상위 6개 법령
+                try:
+                    law_result = _make_legislation_request("law", {"query": law_name, "display": 2, "section": "lawNm"})
+                    laws = law_result.get("LawSearch", {}).get("law", [])
+                    if laws:
+                        search_results.extend(laws if isinstance(laws, list) else [laws])
+                except Exception:
                     continue
         
-        # 적용 범위별 필터링
-        if scope != "all" and scope in privacy_keywords:
-            filtered_results = []
-            keywords = privacy_keywords[scope]
-            for law in search_results:
-                law_name = law.get('법령명한글', law.get('법령명', ''))
-                if any(keyword in law_name for keyword in keywords):
-                    filtered_results.append(law)
+        # 적용 범위/프라이버시 관련성 필터링
+        privacy_name_keywords = set(
+            ["개인정보", "개인정보보호", "신용정보", "정보통신", "위치정보", "의료", "생명윤리", "공공기관", "정보공개"]
+        )
+        if scope in privacy_keywords:
+            privacy_name_keywords.update(privacy_keywords[scope])
+
+        filtered_results = []
+        for law in search_results:
+            law_name = str(law.get('법령명한글', law.get('법령명', '')))
+            if not law_name:
+                continue
+            if any(keyword in law_name for keyword in privacy_name_keywords) or any(
+                ref_name in law_name for ref_name in privacy_laws
+            ):
+                filtered_results.append(law)
+        # 필터링 결과가 전무하면 원본 유지
+        if filtered_results:
             search_results = filtered_results
         
         # 결과 제한
@@ -6235,13 +6459,13 @@ def get_english_law_summary(
         search_data = _make_legislation_request("elaw", search_params, is_detail=False)
         
         # 검색 결과에서 첫 번째 법령 선택
-        if not search_data or 'LawSearch' not in search_data or 'law' not in search_data['LawSearch']:
+        if not search_data or 'LawSearch' not in search_data or 'law' not in search_search_data:
             return TextContent(
                 type="text",
                 text=f"'{law_name}'에 해당하는 영문 법령을 찾을 수 없습니다."
             )
         
-        laws = search_data['LawSearch']['law']
+        laws = search_search_data['law']
         if not laws:
             return TextContent(
                 type="text",

@@ -8,7 +8,7 @@
 ![GitHub Stars](https://img.shields.io/github/stars/ChangooLee/mcp-kr-legislation)
 ![GitHub Issues](https://img.shields.io/github/issues/ChangooLee/mcp-kr-legislation)
 
-한국 법제처 OPEN API를 통합한 Model Context Protocol(MCP) 서버입니다. **150개 이상의 포괄적인 도구**를 통해 법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 맞춤형, 지식베이스, 특별행정심판, 중앙부처해석 등 **모든 법률 정보에 대한 접근**을 제공합니다.
+한국 법제처 OPEN API를 통합한 Model Context Protocol(MCP) 서버입니다. **130개 이상의 포괄적인 도구**를 통해 법령, 부가서비스, 행정규칙, 자치법규, 판례, 위원회결정문, 조약, 별표서식, 학칙공단, 법령용어, 맞춤형, 지식베이스, 특별행정심판, 중앙부처해석 등 **모든 법률 정보에 대한 접근**을 제공합니다.
 
 **GitHub Repository**: https://github.com/ChangooLee/mcp-kr-legislation
 
@@ -49,20 +49,18 @@ AI 어시스턴트에게 다음과 같은 요청을 할 수 있습니다:
 
 ## 🛠️ 지원 도구 전체 목록 (카테고리별)
 
-### 1. 법령 관련 도구 (8개)
-| 도구명 | 설명 | 테스트 질문 |
+### 1. 법령 관련 도구 (45개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
 | `search_law` | 현행 법령 검색 | "개인정보보호법을 검색해줘" |
-| `get_law_detail` | 특정 법령 상세 조회 | "법령ID 011357의 상세 내용을 보여줘" |
 | `search_english_law` | 영문 법령 검색 | "Personal Information Protection Act를 찾아줘" |
 | `search_effective_law` | 시행일 법령 검색 | "최근 시행 예정인 개인정보 관련 법령은?" |
 | `search_law_nickname` | 법령 약칭 검색 | "개보법이라는 약칭의 정식 법령명은?" |
 | `search_deleted_law_data` | 삭제된 법령 데이터 검색 | "폐지된 개인정보 관련 법령을 찾아줘" |
 | `search_law_articles` | 법령 조문 검색 | "개인정보보호법의 조문별 내용을 보여줘" |
-
-### 2. 부가서비스 도구 (5개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
+| `search_law_with_cache` | 캐싱 기반 법령 검색 | "은행법을 빠르게 검색해줘" |
+| `get_law_summary` | 법령 요약 정보 조회 | "개인정보보호법의 요약을 보여줘" |
+| `get_english_law_detail` | 영문 법령 상세 조회 | "영문 개인정보보호법 상세내용은?" |
 | `search_old_and_new_law` | 신구법 비교 | "개인정보보호법의 개정 전후 비교를 보여줘" |
 | `search_three_way_comparison` | 3단 비교 | "개인정보보호법의 3단계 비교를 보여줘" |
 | `search_deleted_history` | 삭제 이력 조회 | "최근 삭제된 법령 데이터는?" |
@@ -70,132 +68,115 @@ AI 어시스턴트에게 다음과 같은 요청을 할 수 있습니다:
 | `search_law_system_diagram` | 법령 체계도 | "개인정보보호법의 법령 체계도를 보여줘" |
 | `get_law_system_diagram_detail` | 체계도 상세 조회 | "법령 체계도 상세 내용을 보여줘" |
 | `get_delegated_law` | 위임법령 조회 | "개인정보보호법의 위임법령을 보여줘" |
+| `search_custom_law` | 맞춤형 법령 검색 | "분류코드별 맞춤형 법령을 보여줘" |
+| `search_custom_law_articles` | 맞춤형 법령 조문 | "맞춤형 법령의 조문별 내용을 찾아줘" |
+| `search_law_appendix` | 법령 별표서식 검색 | "개인정보보호법의 별표와 서식을 보여줘" |
 
-### 3. 행정규칙 도구 (5개)
-| 도구명 | 설명 | 테스트 질문 |
+### 2. 행정규칙/자치법규 도구 (8개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
 | `search_administrative_rule` | 행정규칙 검색 | "개인정보보호 관련 행정규칙을 찾아줘" |
 | `get_administrative_rule_detail` | 행정규칙 상세 조회 | "특정 행정규칙의 본문을 보여줘" |
 | `search_administrative_rule_comparison` | 행정규칙 신구법 비교 | "행정규칙의 개정 전후를 비교해줘" |
 | `get_administrative_rule_comparison_detail` | 비교 상세 조회 | "행정규칙 비교의 상세 내용을 보여줘" |
-
-### 4. 자치법규 도구 (4개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
 | `search_local_ordinance` | 자치법규 검색 | "서울시 개인정보보호 조례를 찾아줘" |
 | `search_ordinance_appendix` | 자치법규 별표서식 | "조례의 별표와 서식을 보여줘" |
 | `search_linked_ordinance` | 연계 자치법규 | "개인정보보호법과 연계된 조례는?" |
+| `get_local_ordinance_detail` | 자치법규 상세 조회 | "특정 자치법규의 상세 내용을 보여줘" |
 
-### 5. 판례 관련 도구 (5개)
-| 도구명 | 설명 | 테스트 질문 |
+### 3. 판례 관련 도구 (8개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
 | `search_precedent` | 대법원 판례 검색 | "개인정보보호 관련 판례를 찾아줘" |
 | `search_constitutional_court` | 헌재 결정례 검색 | "개인정보보호 관련 헌법재판소 결정례는?" |
 | `search_legal_interpretation` | 법령해석례 검색 | "개인정보수집 관련 법령해석례를 보여줘" |
 | `search_administrative_trial` | 행정심판례 검색 | "개인정보보호 관련 행정심판례는?" |
+| `get_precedent_detail` | 판례 상세 조회 | "특정 판례의 상세 내용을 보여줘" |
+| `get_constitutional_court_detail` | 헌재 결정례 상세 조회 | "특정 헌재 결정례의 상세 내용을 보여줘" |
+| `get_legal_interpretation_detail` | 법령해석례 상세 조회 | "특정 법령해석례의 상세 내용을 보여줘" |
 | `get_administrative_trial_detail` | 행정심판례 상세 조회 | "특정 행정심판례의 상세 내용을 보여줘" |
 
-### 6. 위원회 결정문 도구 (24개)
-| 도구명 | 설명 | 테스트 질문 |
+### 4. 위원회 결정문 도구 (24개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
-| `search_privacy_committee` | 개인정보보호위원회 | "개인정보보호위원회의 결혼여부 수집 관련 결정문은?" |
-| `search_financial_committee` | 금융위원회 | "금융위원회의 개인정보 관련 결정문은?" |
-| `search_monopoly_committee` | 공정거래위원회 | "공정거래위원회의 개인정보 관련 결정문은?" |
-| `search_anticorruption_committee` | 국민권익위원회 | "국민권익위원회 결정문을 찾아줘" |
-| `search_labor_committee` | 노동위원회 | "노동위원회의 개인정보 관련 결정문은?" |
-| `search_environment_committee` | 중앙환경분쟁조정위원회 | "환경위원회 결정문을 보여줘" |
-| `search_securities_committee` | 증권선물위원회 | "증권위원회의 개인정보 관련 결정문은?" |
-| `search_human_rights_committee` | 국가인권위원회 | "인권위원회의 개인정보 관련 결정문은?" |
-| `search_broadcasting_committee` | 방송통신위원회 | "방통위원회 결정문을 찾아줘" |
-| `search_industrial_accident_committee` | 산재보상보험재심사위원회 | "산재위원회 결정문을 보여줘" |
-| `search_land_tribunal` | 중앙토지수용위원회 | "토지수용위원회 결정문을 찾아줘" |
-| `search_employment_insurance_committee` | 고용보험심사위원회 | "고용보험심사위원회 결정문을 보여줘" |
-| `get_employment_insurance_committee_detail` | 고용보험심사위 상세 조회 | "특정 고용보험 결정문의 상세 내용을 보여줘" |
+| `search_privacy_committee` | 개인정보보호위원회 결정문 검색 | "개인정보보호위원회의 결혼여부 수집 관련 결정문은?" |
+| `search_financial_committee` | 금융위원회 결정문 검색 | "금융위원회의 개인정보 관련 결정문은?" |
+| `search_monopoly_committee` | 공정거래위원회 결정문 검색 | "공정거래위원회의 개인정보 관련 결정문은?" |
+| `search_anticorruption_committee` | 국민권익위원회 결정문 검색 | "국민권익위원회 결정문을 찾아줘" |
+| `search_labor_committee` | 노동위원회 결정문 검색 | "노동위원회의 개인정보 관련 결정문은?" |
+| `search_environment_committee` | 중앙환경분쟁조정위원회 결정문 검색 | "환경위원회 결정문을 보여줘" |
+| `search_securities_committee` | 증권선물위원회 결정문 검색 | "증권위원회의 개인정보 관련 결정문은?" |
+| `search_human_rights_committee` | 국가인권위원회 결정문 검색 | "인권위원회의 개인정보 관련 결정문은?" |
+| `search_broadcasting_committee` | 방송통신위원회 결정문 검색 | "방통위원회 결정문을 찾아줘" |
+| `search_industrial_accident_committee` | 산재보상보험재심사위원회 결정문 검색 | "산재위원회 결정문을 보여줘" |
+| `search_land_tribunal` | 중앙토지수용위원회 결정문 검색 | "토지수용위원회 결정문을 찾아줘" |
+| `search_employment_insurance_committee` | 고용보험심사위원회 결정문 검색 | "고용보험심사위원회 결정문을 보여줘" |
+| 상세조회 12개 도구 | 각 위원회 결정문 상세 조회 | "특정 위원회 결정문의 상세 내용을 보여줘" |
 
-### 7. 조약 도구 (2개)
-| 도구명 | 설명 | 테스트 질문 |
+### 5. 중앙부처 해석 도구 (19개)
+| 도구명 | 기능 | 테스트 질문 |
+|--------|------|------------|
+| `search_moef_interpretation` | 기획재정부 법령해석 | "기획재정부의 개인정보 관련 해석을 보여줘" |
+| `search_molit_interpretation` | 국토교통부 법령해석 | "국토교통부의 법령해석을 찾아줘" |
+| `search_moel_interpretation` | 고용노동부 법령해석 | "고용노동부의 개인정보 관련 해석은?" |
+| `search_mof_interpretation` | 해양수산부 법령해석 | "해양수산부 법령해석을 보여줘" |
+| `search_mohw_interpretation` | 보건복지부 법령해석 | "보건복지부의 개인정보 관련 해석은?" |
+| `search_moe_interpretation` | 교육부 법령해석 | "교육부 법령해석을 찾아줘" |
+| `search_korea_interpretation` | 범정부 법령해석 | "범정부 차원의 법령해석을 보여줘" |
+| `search_mssp_interpretation` | 보훈처 법령해석 | "보훈처 법령해석을 찾아줘" |
+| `search_mote_interpretation` | 산업통상자원부 법령해석 | "산업부 법령해석을 보여줘" |
+| `search_maf_interpretation` | 농림축산식품부 법령해석 | "농림부 법령해석을 찾아줘" |
+| `search_moms_interpretation` | 국방부 법령해석 | "국방부 법령해석을 보여줘" |
+| `search_sme_interpretation` | 중소벤처기업부 법령해석 | "중기부 법령해석을 찾아줘" |
+| `search_nfa_interpretation` | 산림청 법령해석 | "산림청 법령해석을 보여줘" |
+| `search_korail_interpretation` | 한국철도공사 법령해석 | "철도공사 법령해석을 찾아줘" |
+| `search_nts_interpretation` | 국세청 법령해석 | "국세청 법령해석을 찾아줘" |
+| `search_kcs_interpretation` | 관세청 법령해석 | "관세청 법령해석을 찾아줘" |
+| 상세조회 3개 도구 | 각 부처 법령해석 상세 조회 | "특정 부처 법령해석의 상세 내용을 보여줘" |
+
+### 6. 전문화된 도구 (6개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
 | `search_treaty` | 조약 검색 | "개인정보보호 관련 국제조약을 찾아줘" |
-
-### 8. 별표서식 도구 (2개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
-| `search_law_appendix` | 법령 별표서식 검색 | "개인정보보호법의 별표와 서식을 보여줘" |
-
-### 9. 학칙·공단·공공기관 도구 (6개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
 | `search_university_regulation` | 대학 학칙 검색 | "대학의 개인정보보호 관련 학칙을 찾아줘" |
-| `search_public_corporation_regulation` | 지방공사공단 규정 | "공단의 개인정보 관련 규정을 보여줘" |
-| `search_public_institution_regulation` | 공공기관 규정 | "공공기관의 개인정보 규정을 찾아줘" |
-| `get_university_regulation_detail` | 대학 학칙 상세 조회 | "특정 대학 학칙의 상세 내용을 보여줜" |
-| `get_public_corporation_regulation_detail` | 공사공단 규정 상세 | "공단 규정의 상세 내용을 보여줘" |
-| `get_public_institution_regulation_detail` | 공공기관 규정 상세 | "공공기관 규정의 상세 내용을 보여줘" |
+| `search_public_corporation_regulation` | 지방공사공단 규정 검색 | "공단의 개인정보 관련 규정을 보여줘" |
+| `search_public_institution_regulation` | 공공기관 규정 검색 | "공공기관의 개인정보 규정을 찾아줘" |
+| `search_tax_tribunal` | 조세심판원 심판례 검색 | "조세심판원의 개인정보 관련 심판례는?" |
+| `search_maritime_safety_tribunal` | 해양안전심판원 심판례 검색 | "해양안전심판원 심판례를 찾아줘" |
 
-### 10. 특별행정심판 도구 (4개)
-| 도구명 | 설명 | 테스트 질문 |
+### 7. 지식베이스/상담 도구 (6개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
-| `search_tax_tribunal` | 조세심판원 | "조세심판원의 개인정보 관련 심판례는?" |
-| `get_tax_tribunal_detail` | 조세심판원 상세 조회 | "특정 조세심판 사건의 상세 내용을 보여줘" |
-| `search_maritime_safety_tribunal` | 해양안전심판원 | "해양안전심판원 심판례를 찾아줘" |
-| `get_maritime_safety_tribunal_detail` | 해양안전심판원 상세 | "해양안전심판 사건의 상세 내용을 보여줘" |
-
-### 11. 법령용어 도구 (2개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
-| `search_legal_term` | 법령용어 검색 | "개인정보의 법령용어 정의를 보여줘" |
-
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
-
-### 12. 맞춤형 서비스 도구 (6개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
-| `search_custom_law` | 맞춤형 법령 검색 | "분류코드별 맞춤형 법령을 보여줘" |
-| `search_custom_law_articles` | 맞춤형 법령 조문 | "맞춤형 법령의 조문별 내용을 찾아줘" |
-| `search_custom_ordinance` | 맞춤형 자치법규 | "맞춤형 자치법규를 보여줘" |
-| `search_custom_ordinance_articles` | 맞춤형 자치법규 조문 | "맞춤형 자치법규 조문을 찾아줘" |
-| `search_custom_precedent` | 맞춤형 판례 | "맞춤형 판례를 보여줘" |
-
-### 14. 지식베이스 도구 (7개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
-| `search_legal_ai` | 법령 AI 지식베이스 | "AI 기반 개인정보보호 정보를 보여줘" |
 | `search_knowledge_base` | 지식베이스 검색 | "개인정보보호 지식베이스를 찾아줘" |
-| `search_faq` | 자주 묻는 질문 | "개인정보보호 관련 FAQ를 보여줘" |
-| `search_qna` | 질의응답 | "개인정보수집 관련 Q&A를 찾아줘" |
-| `search_counsel` | 상담 내용 | "개인정보보호 상담 사례를 보여줘" |
-| `search_precedent_counsel` | 판례 상담 | "판례 관련 상담 내용을 찾아줘" |
-
-### 15. 민원 도구 (1개)
-| 도구명 | 설명 | 테스트 질문 |
-|--------|------|------------|
+| `search_faq` | 자주 묻는 질문 검색 | "개인정보보호 관련 FAQ를 보여줘" |
+| `search_qna` | 질의응답 검색 | "개인정보수집 관련 Q&A를 찾아줘" |
+| `search_counsel` | 상담 내용 검색 | "개인정보보호 상담 사례를 보여줘" |
+| `search_precedent_counsel` | 판례 상담 검색 | "판례 관련 상담 내용을 찾아줘" |
 | `search_civil_petition` | 민원 검색 | "개인정보보호 관련 민원 사례를 보여줘" |
 
-### 16. 중앙부처 해석 도구 (14개)
-| 도구명 | 설명 | 테스트 질문 |
+### 8. 법령용어 도구 (6개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
-| `search_moef_interpretation` | 기획재정부 해석 | "기획재정부의 개인정보 관련 해석을 보여줘" |
-| `search_molit_interpretation` | 국토교통부 해석 | "국토교통부의 법령해석을 찾아줘" |
-| `search_moel_interpretation` | 고용노동부 해석 | "고용노동부의 개인정보 관련 해석은?" |
-| `search_mof_interpretation` | 해양수산부 해석 | "해양수산부 법령해석을 보여줘" |
-| `search_mohw_interpretation` | 보건복지부 해석 | "보건복지부의 개인정보 관련 해석은?" |
-| `search_moe_interpretation` | 교육부 해석 | "교육부 법령해석을 찾아줘" |
-| `search_korea_interpretation` | 범정부 해석 | "범정부 차원의 법령해석을 보여줘" |
-| `search_mssp_interpretation` | 보훈처 해석 | "보훈처 법령해석을 찾아줘" |
-| `search_mote_interpretation` | 산업통상자원부 해석 | "산업부 법령해석을 보여줘" |
-| `search_maf_interpretation` | 농림축산식품부 해석 | "농림부 법령해석을 찾아줘" |
-| `search_moms_interpretation` | 국방부 해석 | "국방부 법령해석을 보여줘" |
-| `search_sme_interpretation` | 중소벤처기업부 해석 | "중기부 법령해석을 찾아줘" |
-| `search_nfa_interpretation` | 산림청 해석 | "산림청 법령해석을 보여줘" |
-| `search_korail_interpretation` | 한국철도공사 해석 | "철도공사 법령해석을 찾아줘" |
+| `search_legal_term` | 법령용어 검색 | "개인정보의 법령용어 정의를 보여줘" |
+| `search_legal_term_ai` | AI 법령용어 검색 | "AI 기반 법령용어 검색을 해줘" |
+| `search_daily_term` | 일상용어 검색 | "일상용어로 법령용어를 찾아줘" |
+| `search_daily_legal_term_link` | 일상용어-법령용어 연계 | "일상용어와 법령용어 연결을 보여줘" |
+| `search_legal_daily_term_link` | 법령용어-일상용어 연계 | "법령용어와 일상용어 연결을 보여줘" |
+| `get_legal_term_detail` | 법령용어 상세 조회 | "특정 법령용어의 상세 정의를 보여줘" |
 
-### 17. 종합 검색 도구 (1개)
-| 도구명 | 설명 | 테스트 질문 |
+### 9. 맞춤형/기타 도구 (9개)
+| 도구명 | 기능 | 테스트 질문 |
 |--------|------|------------|
-| `search_all_legal_documents` | 통합 검색 | "개인정보보호 관련 모든 법률 문서를 종합 검색해줘" |
+| `search_custom_ordinance` | 맞춤형 자치법규 검색 | "맞춤형 자치법규를 보여줘" |
+| `search_custom_ordinance_articles` | 맞춤형 자치법규 조문 검색 | "맞춤형 자치법규 조문을 찾아줘" |
+| `search_custom_precedent` | 맞춤형 판례 검색 | "맞춤형 판례를 보여줘" |
+| `get_ordinance_detail` | 자치법규 상세 조회 | "특정 자치법규의 상세 내용을 보여줘" |
+| `get_treaty_detail` | 조약 상세 조회 | "특정 조약의 상세 내용을 보여줘" |
+| `get_ordinance_appendix_detail` | 자치법규 별표서식 상세 조회 | "자치법규 별표서식의 상세 내용을 보여줘" |
+| `search_legal_ai` | AI 기반 종합 법률 검색 | "AI 기반 개인정보보호 정보를 보여줘" |
+| `search_all_legal_documents` | 통합 법률 문서 검색 | "개인정보보호 관련 모든 법률 문서를 종합 검색해줘" |
 
-**총 150개 이상의 포괄적 도구로 한국의 모든 법령 정보에 접근 가능**
+**총 130개 이상의 포괄적 도구로 한국의 모든 법령 정보에 접근 가능**
 
 ---
 

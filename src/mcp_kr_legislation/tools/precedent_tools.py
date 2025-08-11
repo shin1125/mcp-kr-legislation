@@ -238,7 +238,7 @@ def get_constitutional_court_detail(decision_id: Union[str, int]) -> TextContent
     try:
         data = _make_legislation_request("detc", params)
         url = _generate_api_url("detc", params)
-        result = _format_search_results(data, "detc", f"헌법재판소결정례ID:{decision_id}")
+        result = _format_constitutional_court_detail(data, decision_id, url)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"헌법재판소 결정례 상세 조회 중 오류: {str(e)}")
@@ -259,6 +259,68 @@ def get_legal_interpretation_detail(interpretation_id: Union[str, int]) -> TextC
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 상세 조회 중 오류: {str(e)}")
+
+def _format_constitutional_court_detail(data: dict, decision_id: str, url: str) -> str:
+    """헌법재판소 결정례 상세조회 결과 포맷팅"""
+    if not data:
+        return f"헌법재판소 결정례 상세 정보를 찾을 수 없습니다.\n\nAPI URL: {url}"
+    
+    # DetcService 구조 확인
+    if 'DetcService' in data:
+        detc_info = data['DetcService']
+        
+        result = f"**헌법재판소 결정례 상세정보** (ID: {decision_id})\n"
+        result += "=" * 50 + "\n\n"
+        
+        # 기본 정보
+        basic_fields = {
+            '사건명': '사건명',
+            '사건번호': '사건번호', 
+            '종국일자': '종국일자',
+            '사건종류명': '사건종류명',
+            '재판부구분': '재판부구분코드',
+            '헌재결정례일련번호': '헌재결정례일련번호'
+        }
+        
+        for display_name, field_key in basic_fields.items():
+            if field_key in detc_info and detc_info[field_key]:
+                value = detc_info[field_key]
+                # 날짜 포맷팅
+                if '일자' in display_name and len(str(value)) == 8:
+                    value = f"{value[:4]}.{value[4:6]}.{value[6:8]}"
+                result += f"**{display_name}**: {value}\n"
+        
+        result += "\n" + "=" * 50 + "\n\n"
+        
+        # 상세 내용
+        detail_fields = {
+            '심판대상조문': '심판대상조문',
+            '참조조문': '참조조문', 
+            '참조판례': '참조판례',
+            '판시사항': '판시사항',
+            '결정요지': '결정요지'
+        }
+        
+        for display_name, field_key in detail_fields.items():
+            if field_key in detc_info and detc_info[field_key]:
+                content = detc_info[field_key].strip()
+                if content:
+                    result += f"## {display_name}\n{content}\n\n"
+        
+        # 전문 (일부만 표시)
+        if '전문' in detc_info and detc_info['전문']:
+            full_text = detc_info['전문'].strip()
+            if full_text:
+                # 전문이 너무 길면 요약
+                if len(full_text) > 2000:
+                    result += f"## 전문 (요약)\n{full_text[:2000]}...\n\n"
+                    result += f"💡 **전체 전문 보기**: 헌재결정례일련번호 {detc_info.get('헌재결정례일련번호', decision_id)}로 별도 조회\n\n"
+                else:
+                    result += f"## 전문\n{full_text}\n\n"
+        
+        return result
+    else:
+        return f"예상과 다른 응답 구조입니다: {list(data.keys())}\n\nAPI URL: {url}"
 
 def _format_html_precedent_response(html_content: str, case_id: str, url: str) -> TextContent:
     """HTML 판례 응답 포맷팅"""

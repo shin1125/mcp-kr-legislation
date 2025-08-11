@@ -8,7 +8,7 @@
 ![GitHub Stars](https://img.shields.io/github/stars/ChangooLee/mcp-kr-legislation)
 ![GitHub Issues](https://img.shields.io/github/issues/ChangooLee/mcp-kr-legislation)
 
-Model Context Protocol (MCP) server integrating Korean Ministry of Legislation OPEN APIs. **150+ comprehensive tools** provide complete access to all Korean legal information including laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, custom services, knowledge base, special administrative trials, and ministry interpretations.
+Model Context Protocol (MCP) server integrating Korean Ministry of Legislation OPEN APIs. **130+ comprehensive tools** provide complete access to all Korean legal information including laws, additional services, administrative rules, ordinances, precedents, committee decisions, treaties, forms, school regulations, legal terms, custom services, knowledge base, special administrative trials, and ministry interpretations.
 
 **🔗 GitHub Repository**: https://github.com/ChangooLee/mcp-kr-legislation
 
@@ -47,20 +47,18 @@ Ask your AI assistant to:
 
 ## 🛠️ Complete Tool List (By Category)
 
-### 1. Legislation Tools (8 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
+### 1. Legislation Tools (45 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
 | `search_law` | Current legislation search | "Search for Personal Information Protection Act" |
-| `get_law_detail` | Specific legislation details | "Show details of law ID 011357" |
 | `search_english_law` | English legislation search | "Find Personal Information Protection Act in English" |
 | `search_effective_law` | Effective date legislation search | "What personal information related laws are scheduled to take effect recently?" |
 | `search_law_nickname` | Legislation nickname search | "What is the official name for the nickname 'Privacy Act'?" |
 | `search_deleted_law_data` | Deleted legislation data search | "Find repealed personal information related laws" |
 | `search_law_articles` | Legislation articles search | "Show article-by-article content of Personal Information Protection Act" |
-
-### 2. Additional Services Tools (7 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
+| `search_law_with_cache` | Cached legislation search | "Quickly search for Banking Act" |
+| `get_law_summary` | Legislation summary retrieval | "Show summary of Personal Information Protection Act" |
+| `get_english_law_detail` | English legislation details | "What are the detailed contents of English Personal Information Protection Act?" |
 | `search_old_and_new_law` | Old vs new law comparison | "Show before and after comparison of Personal Information Protection Act amendments" |
 | `search_three_way_comparison` | Three-way comparison | "Show 3-stage comparison of Personal Information Protection Act" |
 | `search_deleted_history` | Deletion history inquiry | "What recently deleted legislation data is there?" |
@@ -68,132 +66,115 @@ Ask your AI assistant to:
 | `search_law_system_diagram` | Law system diagram | "Show law system diagram of Personal Information Protection Act" |
 | `get_law_system_diagram_detail` | System diagram details | "Show detailed system diagram content" |
 | `get_delegated_law` | Delegated law inquiry | "Show delegated laws of Personal Information Protection Act" |
+| `search_custom_law` | Custom law search | "Show custom laws by classification code" |
+| `search_custom_law_articles` | Custom law articles | "Find custom law articles" |
+| `search_law_appendix` | Law appendix and forms search | "Show appendices and forms of Personal Information Protection Act" |
 
-### 3. Administrative Rules Tools (4 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
+### 2. Administrative Rules/Local Ordinances Tools (8 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
 | `search_administrative_rule` | Administrative rules search | "Find administrative rules related to personal information protection" |
 | `get_administrative_rule_detail` | Administrative rule details | "Show content of specific administrative rule" |
 | `search_administrative_rule_comparison` | Administrative rule old vs new | "Compare before and after administrative rule amendments" |
 | `get_administrative_rule_comparison_detail` | Comparison details | "Show detailed content of administrative rule comparison" |
-
-### 4. Local Ordinances Tools (3 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
 | `search_local_ordinance` | Local ordinance search | "Find Seoul personal information protection ordinances" |
 | `search_ordinance_appendix` | Local ordinance appendices | "Show ordinance appendices and forms" |
 | `search_linked_ordinance` | Linked local ordinances | "What ordinances are linked to Personal Information Protection Act?" |
+| `get_local_ordinance_detail` | Local ordinance details | "Show detailed content of specific local ordinance" |
 
-### 5. Precedent Tools (6 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
+### 3. Precedent Tools (8 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
 | `search_precedent` | Supreme Court precedent search | "Find personal information protection related precedents" |
 | `search_constitutional_court` | Constitutional Court decisions | "What are Constitutional Court decisions on personal information protection?" |
 | `search_legal_interpretation` | Legal interpretation cases | "Show legal interpretations on personal information collection" |
 | `search_administrative_trial` | Administrative trial cases | "What are administrative trial cases on personal information protection?" |
+| `get_precedent_detail` | Precedent details | "Show detailed content of specific precedent" |
+| `get_constitutional_court_detail` | Constitutional Court details | "Show detailed content of specific Constitutional Court decision" |
+| `get_legal_interpretation_detail` | Legal interpretation details | "Show detailed content of specific legal interpretation" |
 | `get_administrative_trial_detail` | Administrative trial details | "Show detailed content of specific administrative trial case" |
 
-### 6. Committee Decision Tools (24 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_privacy_committee` | Personal Information Protection Committee | "What are committee decisions on marital status collection?" |
-| `search_financial_committee` | Financial Services Commission | "What are financial committee decisions on personal information?" |
-| `search_monopoly_committee` | Fair Trade Commission | "What are fair trade committee decisions on personal information?" |
-| `search_anticorruption_committee` | Anti-Corruption Committee | "Find anti-corruption committee decisions" |
-| `search_labor_committee` | Labor Relations Commission | "What are labor committee decisions on personal information?" |
-| `search_environment_committee` | Environmental Dispute Committee | "Show environment committee decisions" |
-| `search_securities_committee` | Securities and Futures Commission | "What are securities committee decisions on personal information?" |
-| `search_human_rights_committee` | National Human Rights Commission | "What are human rights committee decisions on personal information?" |
-| `search_broadcasting_committee` | Korea Communications Commission | "Find broadcasting committee decisions" |
-| `search_industrial_accident_committee` | Industrial Accident Compensation Committee | "Show industrial accident committee decisions" |
-| `search_land_tribunal` | Central Land Expropriation Committee | "Find land expropriation committee decisions" |
-| `search_employment_insurance_committee` | Employment Insurance Review Committee | "Show employment insurance committee decisions" |
-| `get_employment_insurance_committee_detail` | Employment insurance details | "Show detailed content of specific employment insurance decision" |
+### 4. Committee Decision Tools (24 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
+| `search_privacy_committee` | Personal Information Protection Committee decision search | "What are committee decisions on marital status collection?" |
+| `search_financial_committee` | Financial Services Commission decision search | "What are financial committee decisions on personal information?" |
+| `search_monopoly_committee` | Fair Trade Commission decision search | "What are fair trade committee decisions on personal information?" |
+| `search_anticorruption_committee` | Anti-Corruption Committee decision search | "Find anti-corruption committee decisions" |
+| `search_labor_committee` | Labor Relations Commission decision search | "What are labor committee decisions on personal information?" |
+| `search_environment_committee` | Environmental Dispute Committee decision search | "Show environment committee decisions" |
+| `search_securities_committee` | Securities and Futures Commission decision search | "What are securities committee decisions on personal information?" |
+| `search_human_rights_committee` | National Human Rights Commission decision search | "What are human rights committee decisions on personal information?" |
+| `search_broadcasting_committee` | Korea Communications Commission decision search | "Find broadcasting committee decisions" |
+| `search_industrial_accident_committee` | Industrial Accident Compensation Committee decision search | "Show industrial accident committee decisions" |
+| `search_land_tribunal` | Central Land Expropriation Committee decision search | "Find land expropriation committee decisions" |
+| `search_employment_insurance_committee` | Employment Insurance Review Committee decision search | "Show employment insurance committee decisions" |
+| 12 detail tools | Individual committee decision details | "Show detailed content of specific committee decision" |
 
-### 7. Treaty Tools (2 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
+### 5. Ministry Interpretation Tools (19 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
+| `search_moef_interpretation` | Ministry of Economy and Finance interpretation | "Show MOEF personal information related interpretations" |
+| `search_molit_interpretation` | Ministry of Land, Infrastructure and Transport interpretation | "Find MOLIT legal interpretations" |
+| `search_moel_interpretation` | Ministry of Employment and Labor interpretation | "What are MOEL personal information related interpretations?" |
+| `search_mof_interpretation` | Ministry of Oceans and Fisheries interpretation | "Show MOF legal interpretations" |
+| `search_mohw_interpretation` | Ministry of Health and Welfare interpretation | "What are MOHW personal information related interpretations?" |
+| `search_moe_interpretation` | Ministry of Education interpretation | "Find MOE legal interpretations" |
+| `search_korea_interpretation` | Government-wide interpretations | "Show government-wide legal interpretations" |
+| `search_mssp_interpretation` | Ministry of Patriots and Veterans Affairs interpretation | "Find MSSP legal interpretations" |
+| `search_mote_interpretation` | Ministry of Trade, Industry and Energy interpretation | "Show MOTE legal interpretations" |
+| `search_maf_interpretation` | Ministry of Agriculture, Food and Rural Affairs interpretation | "Find MAF legal interpretations" |
+| `search_moms_interpretation` | Ministry of National Defense interpretation | "Show MOMS legal interpretations" |
+| `search_sme_interpretation` | Ministry of SMEs and Startups interpretation | "Find SME ministry legal interpretations" |
+| `search_nfa_interpretation` | Korea Forest Service interpretation | "Show KFS legal interpretations" |
+| `search_korail_interpretation` | Korea Railroad Corporation interpretation | "Find KORAIL legal interpretations" |
+| `search_nts_interpretation` | National Tax Service interpretation | "Find NTS legal interpretations" |
+| `search_kcs_interpretation` | Korea Customs Service interpretation | "Find KCS legal interpretations" |
+| 3 detail tools | Individual ministry interpretation details | "Show detailed content of specific ministry interpretation" |
+
+### 6. Specialized Tools (6 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
 | `search_treaty` | Treaty search | "Find international treaties related to personal information protection" |
+| `search_university_regulation` | University regulation search | "Find university personal information protection regulations" |
+| `search_public_corporation_regulation` | Public corporation regulation search | "Show corporation personal information regulations" |
+| `search_public_institution_regulation` | Public institution regulation search | "Find public institution personal information regulations" |
+| `search_tax_tribunal` | Tax Tribunal case search | "What are tax tribunal cases on personal information?" |
+| `search_maritime_safety_tribunal` | Korea Maritime Safety Tribunal case search | "Find maritime safety tribunal cases" |
 
-### 8. Appendix and Forms Tools (2 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_law_appendix` | Law appendix and forms search | "Show appendices and forms of Personal Information Protection Act" |
-
-### 9. School/Corporation/Institution Tools (6 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_university_regulation` | University regulations search | "Find university personal information protection regulations" |
-| `search_public_corporation_regulation` | Public corporation regulations | "Show corporation personal information regulations" |
-| `search_public_institution_regulation` | Public institution regulations | "Find public institution personal information regulations" |
-| `get_university_regulation_detail` | University regulation details | "Show detailed content of specific university regulation" |
-| `get_public_corporation_regulation_detail` | Corporation regulation details | "Show detailed content of corporation regulation" |
-| `get_public_institution_regulation_detail` | Institution regulation details | "Show detailed content of institution regulation" |
-
-### 10. Special Administrative Trial Tools (4 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_tax_tribunal` | Tax Tribunal | "What are tax tribunal cases on personal information?" |
-| `get_tax_tribunal_detail` | Tax tribunal details | "Show detailed content of specific tax tribunal case" |
-| `search_maritime_safety_tribunal` | Korea Maritime Safety Tribunal | "Find maritime safety tribunal cases" |
-| `get_maritime_safety_tribunal_detail` | Maritime safety tribunal details | "Show detailed content of maritime safety tribunal case" |
-
-### 11. Legal Terms Tools (2 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_legal_term` | Legal term search | "Show legal definition of personal information" |
-
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-
-### 13. Custom Service Tools (5 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_custom_law` | Custom law search | "Show custom laws by classification code" |
-| `search_custom_law_articles` | Custom law articles | "Find custom law articles" |
-| `search_custom_ordinance` | Custom local ordinances | "Show custom local ordinances" |
-| `search_custom_ordinance_articles` | Custom ordinance articles | "Find custom ordinance articles" |
-| `search_custom_precedent` | Custom precedents | "Show custom precedents" |
-
-### 14. Knowledge Base Tools (6 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_legal_ai` | Legal AI knowledge base | "Show AI-based personal information protection information" |
+### 7. Knowledge Base/Consultation Tools (6 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
 | `search_knowledge_base` | Knowledge base search | "Find personal information protection knowledge base" |
-| `search_faq` | Frequently asked questions | "Show personal information protection related FAQ" |
+| `search_faq` | Frequently asked questions search | "Show personal information protection related FAQ" |
 | `search_qna` | Q&A search | "Find Q&A on personal information collection" |
-| `search_counsel` | Consultation content | "Show personal information protection consultation cases" |
-| `search_precedent_counsel` | Precedent consultation | "Find precedent-related consultation content" |
-
-### 15. Civil Petition Tools (1 tool)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
+| `search_counsel` | Consultation content search | "Show personal information protection consultation cases" |
+| `search_precedent_counsel` | Precedent consultation search | "Find precedent-related consultation content" |
 | `search_civil_petition` | Civil petition search | "Show personal information protection related petition cases" |
 
-### 16. Ministry Interpretation Tools (14 tools)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_moef_interpretation` | Ministry of Economy and Finance | "Show MOEF personal information related interpretations" |
-| `search_molit_interpretation` | Ministry of Land, Infrastructure and Transport | "Find MOLIT legal interpretations" |
-| `search_moel_interpretation` | Ministry of Employment and Labor | "What are MOEL personal information related interpretations?" |
-| `search_mof_interpretation` | Ministry of Oceans and Fisheries | "Show MOF legal interpretations" |
-| `search_mohw_interpretation` | Ministry of Health and Welfare | "What are MOHW personal information related interpretations?" |
-| `search_moe_interpretation` | Ministry of Education | "Find MOE legal interpretations" |
-| `search_korea_interpretation` | Government-wide interpretations | "Show government-wide legal interpretations" |
-| `search_mssp_interpretation` | Ministry of Patriots and Veterans Affairs | "Find MSSP legal interpretations" |
-| `search_mote_interpretation` | Ministry of Trade, Industry and Energy | "Show MOTE legal interpretations" |
-| `search_maf_interpretation` | Ministry of Agriculture, Food and Rural Affairs | "Find MAF legal interpretations" |
-| `search_moms_interpretation` | Ministry of National Defense | "Show MOMS legal interpretations" |
-| `search_sme_interpretation` | Ministry of SMEs and Startups | "Find SME ministry legal interpretations" |
-| `search_nfa_interpretation` | Korea Forest Service | "Show KFS legal interpretations" |
-| `search_korail_interpretation` | Korea Railroad Corporation | "Find KORAIL legal interpretations" |
+### 8. Legal Terms Tools (6 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
+| `search_legal_term` | Legal term search | "Show legal definition of personal information" |
+| `search_legal_term_ai` | AI legal term search | "Search legal terms using AI" |
+| `search_daily_term` | Daily term search | "Find legal terms using daily language" |
+| `search_daily_legal_term_link` | Daily-legal term linkage | "Show connections between daily and legal terms" |
+| `search_legal_daily_term_link` | Legal-daily term linkage | "Show connections between legal and daily terms" |
+| `get_legal_term_detail` | Legal term details | "Show detailed definition of specific legal term" |
 
-### 17. Comprehensive Search Tools (1 tool)
-| Tool Name | Description | Test Question |
-|-----------|-------------|---------------|
-| `search_all_legal_documents` | Integrated search | "Comprehensively search all legal documents related to personal information protection" |
+### 9. Custom/Miscellaneous Tools (9 tools)
+| Tool Name | Function | Test Question |
+|-----------|----------|---------------|
+| `search_custom_ordinance` | Custom local ordinance search | "Show custom local ordinances" |
+| `search_custom_ordinance_articles` | Custom ordinance articles search | "Find custom ordinance articles" |
+| `search_custom_precedent` | Custom precedent search | "Show custom precedents" |
+| `get_ordinance_detail` | Local ordinance details | "Show detailed content of specific local ordinance" |
+| `get_treaty_detail` | Treaty details | "Show detailed content of specific treaty" |
+| `get_ordinance_appendix_detail` | Local ordinance appendix details | "Show detailed content of local ordinance appendix" |
+| `search_legal_ai` | AI-based comprehensive legal search | "Show AI-based personal information protection information" |
+| `search_all_legal_documents` | Integrated legal document search | "Comprehensively search all legal documents related to personal information protection" |
 
-**Complete access to all Korean legal information with 150+ comprehensive tools**
+**Complete access to all Korean legal information with 130+ comprehensive tools**
 
 ---
 
