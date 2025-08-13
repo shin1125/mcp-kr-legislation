@@ -123,62 +123,66 @@ def get_treaty_detail(treaty_id: Union[str, int]) -> TextContent:
         return TextContent(type="text", text="조약ID를 입력해주세요.")
     
     try:
-        # API 요청 파라미터
-        params = {"target": "treaty", "MST": str(treaty_id)}
-        url = _generate_api_url("trtyInfoGuide", params)
+        # API 요청 파라미터 - lawService.do에서 ID 파라미터 사용
+        params = {"target": "trty", "ID": str(treaty_id)}
         
-        # API 요청
-        data = _make_legislation_request("trtyInfoGuide", params)
+        # API 요청 (is_detail=True로 lawService.do 호출)
+        data = _make_legislation_request("trty", params, is_detail=True)
         
         # 결과 포맷팅
         result = f"**조약 상세 정보** (ID: {treaty_id})\n"
         result += "=" * 50 + "\n\n"
         
-        if 'treaty' in data and data['treaty']:
-            treaty_info = data['treaty'][0] if isinstance(data['treaty'], list) else data['treaty']
+        if 'BothTrtyService' in data:
+            treaty_service = data['BothTrtyService']
             
-            # 기본 정보 출력
-            basic_fields = {
-                '조약명': ['조약명', '명칭', 'title'],
-                '조약ID': ['조약ID', 'ID', 'id'],
-                '체결일자': ['체결일자', 'conclusion_date', 'date'],
-                '발효일자': ['발효일자', 'effective_date', 'ef_date'],
-                '조약종류': ['조약종류', 'treaty_type', 'type'],
-                '상대국': ['상대국', 'counterpart', 'country']
-            }
-            
-            for field_name, field_keys in basic_fields.items():
-                value = None
-                for key in field_keys:
-                    if key in treaty_info and treaty_info[key]:
-                        value = treaty_info[key]
-                        break
+            # 조약 기본정보
+            if '조약기본정보' in treaty_service:
+                basic_info = treaty_service['조약기본정보']
+                result += "**📋 기본정보**\n"
                 
-                if value:
-                    result += f"**{field_name}**: {value}\n"
+                info_fields = {
+                    '조약명(한글)': '조약명_한글',
+                    '조약명(영문)': '조약명_영문', 
+                    '조약번호': '조약번호',
+                    '서명일자': '서명일자',
+                    '발효일자': '발효일자',
+                    '서명장소': '서명장소',
+                    '관보게재일자': '관보게재일자',
+                    '국회비준동의여부': '국회비준동의여부',
+                    '국회비준동의일자': '국회비준동의일자'
+                }
+                
+                for display_name, field_key in info_fields.items():
+                    if field_key in basic_info and basic_info[field_key]:
+                        result += f"- **{display_name}**: {basic_info[field_key]}\n"
             
-            result += "\n" + "=" * 50 + "\n\n"
+            # 추가정보
+            if '추가정보' in treaty_service:
+                add_info = treaty_service['추가정보']
+                result += "\n**🌏 체결 상대국**\n"
+                
+                if '체결대상국가한글' in add_info and add_info['체결대상국가한글']:
+                    result += f"- **상대국**: {add_info['체결대상국가한글']}\n"
+                if '양자조약분야명' in add_info and add_info['양자조약분야명']:
+                    result += f"- **분야**: {add_info['양자조약분야명']}\n"
             
-            # 조약 내용 출력
-            content_fields = ['전문', 'content', 'text', '내용', 'body']
-            content = None
+            # 조약 내용
+            if '조약내용' in treaty_service and '조약내용' in treaty_service['조약내용']:
+                content = treaty_service['조약내용']['조약내용']
+                if content:
+                    result += f"\n**📄 조약 전문**\n{content[:500]}{'...' if len(content) > 500 else ''}\n"
             
-            for field in content_fields:
-                if field in treaty_info and treaty_info[field]:
-                    content = treaty_info[field]
-                    break
-            
-            if content:
-                result += "**조약 내용:**\n\n"
-                result += str(content)
-                result += "\n\n"
-            else:
-                result += "조약 내용을 찾을 수 없습니다.\n\n"
+            # 첨부파일
+            if '첨부파일' in treaty_service:
+                file_info = treaty_service['첨부파일']
+                if file_info.get('첨부파일명'):
+                    result += f"\n**📎 첨부파일**: {file_info['첨부파일명']}\n"
+                    
         else:
             result += "조약 정보를 찾을 수 없습니다.\n\n"
         
-        result += "=" * 50 + "\n"
-        result += f"**API URL**: {url}\n"
+        result += "\n" + "=" * 50 + "\n"
         
         return TextContent(type="text", text=result)
         

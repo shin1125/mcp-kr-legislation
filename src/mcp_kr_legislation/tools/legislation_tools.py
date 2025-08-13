@@ -1150,8 +1150,12 @@ def search_all_legal_documents(
                 # 결과 유효성 검사
                 if law_data and isinstance(law_data, dict) and law_data.get('LawSearch'):
                     law_count = law_data['LawSearch'].get('totalCnt', 0)
+                    try:
+                        law_count = int(law_count)
+                    except (ValueError, TypeError):
+                        law_count = 0
                     if law_count > 0:
-                        law_result = _format_search_results(law_data, "law", search_query, law_url)
+                        law_result = _format_search_results(law_data, "law", search_query, 20)
                         results.append("**법령 검색 결과:**\n")
                         results.append(law_result + "\n")
                         total_results += law_count
@@ -1171,8 +1175,12 @@ def search_all_legal_documents(
                 
                 if prec_data and isinstance(prec_data, dict) and prec_data.get('PrecSearch'):
                     prec_count = prec_data['PrecSearch'].get('totalCnt', 0)
+                    try:
+                        prec_count = int(prec_count)
+                    except (ValueError, TypeError):
+                        prec_count = 0
                     if prec_count > 0:
-                        prec_result = _format_search_results(prec_data, "prec", search_query, prec_url)
+                        prec_result = _format_search_results(prec_data, "prec", search_query, 20)
                         results.append("**판례 검색 결과:**\n")
                         results.append(prec_result + "\n")
                         total_results += prec_count
@@ -1190,10 +1198,14 @@ def search_all_legal_documents(
                 interp_data = _make_legislation_request("expc", interp_params)
                 interp_url = _generate_api_url("expc", interp_params)
                 
-                if interp_data and isinstance(interp_data, dict) and interp_data.get('ExpcSearch'):
-                    interp_count = interp_data['ExpcSearch'].get('totalCnt', 0)
+                if interp_data and isinstance(interp_data, dict) and interp_data.get('Expc'):
+                    interp_count = interp_data['Expc'].get('totalCnt', 0)
+                    try:
+                        interp_count = int(interp_count)
+                    except (ValueError, TypeError):
+                        interp_count = 0
                     if interp_count > 0:
-                        interp_result = _format_search_results(interp_data, "expc", search_query, interp_url)
+                        interp_result = _format_search_results(interp_data, "expc", search_query, 20)
                         results.append("**해석례 검색 결과:**\n")
                         results.append(interp_result + "\n")
                         total_results += interp_count
@@ -1225,14 +1237,21 @@ def search_all_legal_documents(
                     
                     # 결과 유효성 검사 강화
                     if committee_data and isinstance(committee_data, dict) and not committee_data.get("error"):
-                        # 각 위원회별 응답 구조 확인
-                        search_key = f"{target.title()}Search"  # PpcSearch, FscSearch 등
-                        if search_key in committee_data and committee_data[search_key].get('totalCnt', 0) > 0:
-                            committee_result = _format_search_results(committee_data, target, search_query, committee_url)
-                            if "결과가 없습니다" not in committee_result and "검색된" not in committee_result:
-                                results.append(f"**{name}:**\n")
-                                results.append(committee_result + "\n")
-                                committee_results += committee_data[search_key].get('totalCnt', 0)
+                        # 각 위원회별 응답 구조 확인 (실제 키는 Ppc, Fsc, Ftc, Acr, Nhrck 등)
+                        search_key = target.title()  # Ppc, Fsc, Ftc 등
+                        if search_key in committee_data:
+                            total_cnt = committee_data[search_key].get('totalCnt', 0)
+                            try:
+                                total_cnt = int(total_cnt)
+                            except (ValueError, TypeError):
+                                total_cnt = 0
+                            
+                            if total_cnt > 0:
+                                committee_result = _format_search_results(committee_data, target, search_query, 20)
+                                if "결과가 없습니다" not in committee_result and "검색된" not in committee_result:
+                                    results.append(f"**{name}:**\n")
+                                    results.append(committee_result + "\n")
+                                    committee_results += total_cnt
                         else:
                             results.append(f"**{name}:** 관련 결정문이 없습니다.\n")
                     else:

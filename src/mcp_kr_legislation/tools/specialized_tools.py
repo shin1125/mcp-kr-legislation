@@ -86,9 +86,9 @@ def search_treaty(
         params["gana"] = alphabetical
         
     try:
-        data = _make_legislation_request("trt", params)
-        url = _generate_api_url("trt", params)
-        result = _format_search_results(data, "trt", search_query, url)
+        data = _make_legislation_request("trty", params)
+        url = _generate_api_url("trty", params)
+        result = _format_search_results(data, "trty", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"조약 검색 중 오류: {str(e)}")
@@ -110,7 +110,7 @@ def search_university_regulation(query: Optional[str] = None, display: int = 20,
     try:
         data = _make_legislation_request("schreg", params)
         url = _generate_api_url("schreg", params)
-        result = _format_search_results(data, "schreg", search_query, url)
+        result = _format_search_results(data, "schreg", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"대학 학칙 검색 중 오류: {str(e)}")
@@ -133,7 +133,7 @@ def search_public_corporation_regulation(query: Optional[str] = None, display: i
     try:
         data = _make_legislation_request("locgongreg", params)
         url = _generate_api_url("locgongreg", params)
-        result = _format_search_results(data, "locgongreg", search_query, url)
+        result = _format_search_results(data, "locgongreg", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"지방공사공단 규정 검색 중 오류: {str(e)}")
@@ -156,7 +156,7 @@ def search_public_institution_regulation(query: Optional[str] = None, display: i
     try:
         data = _make_legislation_request("pubitreg", params)
         url = _generate_api_url("pubitreg", params)
-        result = _format_search_results(data, "pubitreg", search_query, url)
+        result = _format_search_results(data, "pubitreg", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"공공기관 규정 검색 중 오류: {str(e)}")
@@ -179,7 +179,7 @@ def search_tax_tribunal(query: Optional[str] = None, display: int = 20, page: in
     try:
         data = _make_legislation_request("taxTibunal", params)
         url = _generate_api_url("taxTibunal", params)
-        result = _format_search_results(data, "taxTibunal", search_query, url)
+        result = _format_search_results(data, "taxTibunal", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"조세심판원 검색 중 오류: {str(e)}")
@@ -202,7 +202,7 @@ def search_maritime_safety_tribunal(query: Optional[str] = None, display: int = 
     try:
         data = _make_legislation_request("marSafeTibunal", params)
         url = _generate_api_url("marSafeTibunal", params)
-        result = _format_search_results(data, "marSafeTibunal", search_query, url)
+        result = _format_search_results(data, "marSafeTibunal", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"해양안전심판원 검색 중 오류: {str(e)}") 

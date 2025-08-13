@@ -110,7 +110,7 @@ def get_legal_term_detail(term_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("legalTerm", params, is_detail=True)
         url = _generate_api_url("legalTerm", params, is_detail=True)
-        result = _format_search_results(data, "legalTerm", str(term_id), url)
+        result = _format_search_results(data, "legalTerm", str(term_id), 50)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"법령용어 상세조회 중 오류: {str(e)}") 

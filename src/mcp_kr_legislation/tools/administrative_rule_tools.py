@@ -39,7 +39,7 @@ def search_administrative_rule(query: Optional[str] = None, search: int = 2, dis
     try:
         data = _make_legislation_request("admrul", params)
         url = _generate_api_url("admrul", params)
-        result = _format_search_results(data, "admrul", search_query, url)
+        result = _format_search_results(data, "admrul", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정규칙 검색 중 오류: {str(e)}")
@@ -51,14 +51,14 @@ def get_administrative_rule_detail(rule_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("admrul", params)
         url = _generate_api_url("admrul", params)
-        result = _format_search_results(data, "admrul", f"행정규칙ID:{rule_id}", url)
+        result = _format_search_results(data, "admrul", f"행정규칙ID:{rule_id}", 50)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정규칙 상세 조회 중 오류: {str(e)}")
 
 @mcp.tool(name="search_administrative_rule_comparison", description="행정규칙 신구법 비교를 검색합니다. 행정규칙의 개정 전후 비교 정보를 제공합니다.")
 def search_administrative_rule_comparison(query: Optional[str] = None, display: int = 20, page: int = 1) -> TextContent:
-    """행정규칙 신구법 비교 목록 조회"""
+    """행정규칙 신구법 비교 목록 조회 (업데이트됨)"""
     if not query or not query.strip():
         return TextContent(type="text", text="검색어를 입력해주세요.")
     
@@ -67,7 +67,7 @@ def search_administrative_rule_comparison(query: Optional[str] = None, display: 
     try:
         data = _make_legislation_request("admrulOldAndNew", params)
         url = _generate_api_url("admrulOldAndNew", params)
-        result = _format_search_results(data, "admrulOldAndNew", search_query, url)
+        result = _format_search_results(data, "admrulOldAndNew", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정규칙 신구법 비교 검색 중 오류: {str(e)}")
@@ -79,7 +79,7 @@ def get_administrative_rule_comparison_detail(comparison_id: Union[str, int]) ->
     try:
         data = _make_legislation_request("admrulOldAndNew", params)
         url = _generate_api_url("admrulOldAndNew", params)
-        result = _format_search_results(data, "admrulOldAndNew", f"비교ID:{comparison_id}", url)
+        result = _format_search_results(data, "admrulOldAndNew", f"비교ID:{comparison_id}", 50)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정규칙 신구법 비교 상세 조회 중 오류: {str(e)}")
@@ -95,11 +95,11 @@ def search_local_ordinance(query: Optional[str] = None, search: int = 2, display
         return TextContent(type="text", text="검색어를 입력해주세요.")
     
     search_query = query.strip()
-    params = {"target": "ordinance", "query": search_query, "search": search, "display": min(display, 100), "page": page}
+    params = {"target": "ordinfd", "query": search_query, "search": search, "display": min(display, 100), "page": page}
     try:
-        data = _make_legislation_request("ordinance", params)
-        url = _generate_api_url("ordinance", params)
-        result = _format_search_results(data, "ordinance", search_query, url)
+        data = _make_legislation_request("ordinfd", params)
+        url = _generate_api_url("ordinfd", params)
+        result = _format_search_results(data, "ordinfd", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"자치법규 검색 중 오류: {str(e)}")
@@ -115,7 +115,7 @@ def search_ordinance_appendix(query: Optional[str] = None, display: int = 20, pa
     try:
         data = _make_legislation_request("ordinanceApp", params)
         url = _generate_api_url("ordinanceApp", params)
-        result = _format_search_results(data, "ordinanceApp", search_query, url)
+        result = _format_search_results(data, "ordinanceApp", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"자치법규 별표서식 검색 중 오류: {str(e)}")
@@ -129,20 +129,19 @@ def search_linked_ordinance(
     page: int = 1
 ) -> TextContent:
     """연계 자치법규 검색"""
-    params = {"target": "ordinanceLink", "display": min(display, 100), "page": page}
+    params = {"target": "lnkLsOrd", "display": min(display, 100), "page": page}
     
     if query and query.strip():
         params["query"] = query.strip()
     if law_id:
-        params["LID"] = law_id
+        params["knd"] = law_id  # 법령ID는 knd 파라미터 사용
     if ordinance_id:
         params["OID"] = ordinance_id
     
     try:
-        data = _make_legislation_request("ordinanceLink", params)
-        url = _generate_api_url("ordinanceLink", params)
+        data = _make_legislation_request("lnkLsOrd", params)
         search_term = query or f"법령ID:{law_id}" if law_id else f"자치법규ID:{ordinance_id}" if ordinance_id else "연계 자치법규"
-        result = _format_search_results(data, "ordinanceLink", search_term, url)
+        result = _format_search_results(data, "lnkLsOrd", search_term, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"연계 자치법규 검색 중 오류: {str(e)}")

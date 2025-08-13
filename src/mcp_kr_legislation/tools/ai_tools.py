@@ -90,59 +90,82 @@ def search_legal_ai(
         params["sort"] = sort
         
     try:
-        # AI 검색 API 호출
-        data = _make_legislation_request("legalAi", params)
-        url = _generate_api_url("legalAi", params)
-        
-        # 결과 포맷팅
-        if not data:
-            return TextContent(type="text", text=f"'{search_query}'에 대한 AI 검색 결과가 없습니다.")
-        
-        # AI 검색 결과는 특별한 포맷팅이 필요할 수 있음
-        result = f"AI 기반 종합 법률 검색 결과: '{search_query}'\n"
-        result += f"API URL: {url}\n\n"
-        
-        # 다양한 응답 형식 처리
-        if isinstance(data, dict):
-            # 법령 결과
-            if 'laws' in data and data['laws']:
-                result += "**관련 법령:**\n"
-                for i, law in enumerate(data['laws'][:5], 1):
-                    result += f"{i}. {law.get('title', '제목없음')}\n"
-                result += "\n"
+        # AI 검색 구현: target에 따라 적절한 API 호출
+        if target == "all":
+            # 전체 검색인 경우 주요 카테고리별로 검색 수행
+            result = f"AI 기반 종합 법률 검색 결과: '{search_query}'\n"
+            result += "=" * 50 + "\n\n"
             
-            # 판례 결과  
-            if 'precedents' in data and data['precedents']:
-                result += "**관련 판례:**\n"
-                for i, prec in enumerate(data['precedents'][:5], 1):
-                    result += f"{i}. {prec.get('title', '제목없음')}\n"
-                result += "\n"
+            # 1. 법령 검색
+            try:
+                law_params = {**params, "target": "law"}
+                law_data = _make_legislation_request("law", law_params)
+                law_url = _generate_api_url("law", law_params)
+                if law_data and isinstance(law_data, dict) and law_data.get('LawSearch'):
+                    law_total = law_data['LawSearch'].get('totalCnt', 0)
+                    try:
+                        law_total = int(law_total)
+                    except:
+                        law_total = 0
+                    if law_total > 0:
+                        result += f"**법령 검색 결과**: {law_total}건\n"
+                        law_result = _format_search_results(law_data, "law", search_query, 5)
+                        result += law_result + "\n\n"
+            except Exception as e:
+                result += f"**법령 검색 오류**: {str(e)}\n\n"
             
-            # 해석례 결과
-            if 'interpretations' in data and data['interpretations']:
-                result += "**관련 해석례:**\n"
-                for i, interp in enumerate(data['interpretations'][:5], 1):
-                    result += f"{i}. {interp.get('title', '제목없음')}\n"
-                result += "\n"
+            # 2. 판례 검색
+            try:
+                prec_params = {**params, "target": "prec", "search": 2}
+                prec_data = _make_legislation_request("prec", prec_params)
+                prec_url = _generate_api_url("prec", prec_params)
+                if prec_data and isinstance(prec_data, dict) and prec_data.get('PrecSearch'):
+                    prec_total = prec_data['PrecSearch'].get('totalCnt', 0)
+                    try:
+                        prec_total = int(prec_total)
+                    except:
+                        prec_total = 0
+                    if prec_total > 0:
+                        result += f"**판례 검색 결과**: {prec_total}건\n"
+                        prec_result = _format_search_results(prec_data, "prec", search_query, 5)
+                        result += prec_result + "\n\n"
+            except Exception as e:
+                result += f"**판례 검색 오류**: {str(e)}\n\n"
             
-            # 위원회 결정문 결과
-            if 'committees' in data and data['committees']:
-                result += "**관련 위원회 결정문:**\n"
-                for i, comm in enumerate(data['committees'][:5], 1):
-                    result += f"{i}. {comm.get('title', '제목없음')}\n"
-                result += "\n"
-                
+            # 3. 해석례 검색
+            try:
+                expc_params = {**params, "target": "expc"}
+                expc_data = _make_legislation_request("expc", expc_params)
+                expc_url = _generate_api_url("expc", expc_params)
+                if expc_data and isinstance(expc_data, dict) and expc_data.get('Expc'):
+                    expc_total = expc_data['Expc'].get('totalCnt', 0)
+                    try:
+                        expc_total = int(expc_total)
+                    except:
+                        expc_total = 0
+                    if expc_total > 0:
+                        result += f"**해석례 검색 결과**: {expc_total}건\n"
+                        expc_result = _format_search_results(expc_data, "expc", search_query, 5)
+                        result += expc_result + "\n\n"
+            except Exception as e:
+                result += f"**해석례 검색 오류**: {str(e)}\n\n"
         else:
-            # 일반 검색 결과 포맷 사용
-            result = _format_search_results(data, "legalAi", search_query, url)
-        
-        result += f"\n더 자세한 검색을 원하시면 각 분야별 전문 검색 도구를 이용하세요.\n"
-        result += f"   - 법령: search_law\n"
-        result += f"   - 판례: search_precedent\n" 
-        result += f"   - 해석례: search_legal_interpretation\n"
-        result += f"   - 위원회: search_*_committee 도구들\n"
+            # 특정 타겟 검색인 경우
+            data = _make_legislation_request(target, params)
+            url = _generate_api_url(target, params)
+            
+            if data and isinstance(data, dict):
+                result = _format_search_results(data, target, search_query, 10)
+                result += f"\n\nAPI URL: {url}"
+            else:
+                result = f"'{search_query}'에 대한 {target} 검색 결과가 없습니다.\nAPI URL: {url}"
         
         return TextContent(type="text", text=result)
-        
+    
     except Exception as e:
-        return TextContent(type="text", text=f"AI 기반 법률 검색 중 오류: {str(e)}") 
+        error_msg = f"AI 검색 중 오류가 발생했습니다: {str(e)}"
+        return TextContent(type="text", text=error_msg)
+
+logger.info("AI 도구가 로드되었습니다!")
+
+ 

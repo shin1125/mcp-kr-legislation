@@ -8,7 +8,7 @@
 import logging
 import json
 import os
-import requests
+import requests  # type: ignore
 from urllib.parse import urlencode
 from typing import Optional, Union
 from mcp.types import TextContent
@@ -21,9 +21,191 @@ logger = logging.getLogger(__name__)
 # 유틸리티 함수들 import
 from .law_tools import (
     _make_legislation_request,
-    _generate_api_url,
-    _format_search_results
+    _generate_api_url
 )
+
+def _format_precedent_search_results(data: dict, target: str, search_query: str, max_results: int = 50) -> str:
+    """판례/해석례/행정심판례 전용 검색 결과 포맷팅 함수"""
+    try:
+        # 타겟별 루트 키 매핑 (실제 API 응답 구조 기준)
+        target_root_map = {
+            "prec": "PrecSearch",
+            "expc": "Expc", 
+            "decc": "Decc"
+        }
+        
+        # 올바른 루트 키에서 데이터 추출
+        root_key = target_root_map.get(target)
+        if not root_key or root_key not in data:
+            return f"'{search_query}'에 대한 검색 결과가 없습니다."
+        
+        search_data = data[root_key]
+        target_data = search_data.get(target, [])
+        
+        if isinstance(target_data, str):
+            if target_data.strip() == "" or "검색 결과가 없습니다" in target_data:
+                target_data = []
+        elif isinstance(target_data, dict) and target_data:
+            # 단일 딕셔너리인 경우 리스트로 변환
+            target_data = [target_data]
+        
+        if not target_data:
+            return f"'{search_query}'에 대한 검색 결과가 없습니다."
+        
+        # 제한된 결과만 처리
+        if isinstance(target_data, list):
+            target_data = target_data[:max_results]
+        
+        # 타겟별 제목 키 설정
+        if target == "prec":
+            title_keys = ['사건명', '재판사건명', '사건제목']
+            detail_fields = {
+                '사건번호': ['사건번호', 'CaseNo', 'caseNo'],
+                '선고일자': ['선고일자', 'judgment_date', 'judgeDate'], 
+                '법원명': ['법원명', 'court', 'courtName']
+            }
+        elif target == "expc":
+            title_keys = ['해석례명', '해석제목', '질의제목']
+            detail_fields = {
+                '해석례번호': ['해석례번호', 'expc_no', 'ExpcNo'],
+                '작성일자': ['작성일자', 'create_date', 'createDate'],
+                '소관부처': ['소관부처', 'dept', 'department']
+            }
+        elif target == "decc":
+            title_keys = ['재결례명', '사건명', '재결제목']
+            detail_fields = {
+                '사건번호': ['사건번호', 'case_no', 'caseNo'],
+                '재결일자': ['재결일자', 'decision_date', 'decisionDate'],
+                '심판부': ['심판부', 'panel', 'tribunal']
+            }
+        else:
+            title_keys = ['title', 'name', '제목']
+            detail_fields = {}
+        
+        results = []
+        
+        for idx, item in enumerate(target_data, 1):
+            if not isinstance(item, dict):
+                continue
+                
+            # 제목 찾기
+            title = "제목 없음"
+            for key in title_keys:
+                if key in item and item[key] and str(item[key]).strip():
+                    title = str(item[key]).strip()
+                    break
+            
+            result_lines = [f"**{idx}. {title}**"]
+            
+            # 상세 정보 추가
+            for field_name, possible_keys in detail_fields.items():
+                for key in possible_keys:
+                    if key in item and item[key] and str(item[key]).strip():
+                        result_lines.append(f"   {field_name}: {item[key]}")
+                        break
+            
+            # ID 정보 추가 (상세조회용) - 타겟별 올바른 ID 키 사용
+            if target == "prec":
+                # 판례는 판례일련번호를 사용해야 함 (검색의 id는 순번일 뿐)
+                for id_key in ['판례일련번호', '판례정보일련번호', 'mstSeq']:
+                    if id_key in item and item[id_key]:
+                        result_lines.append(f"   상세조회: get_precedent_detail(case_id=\"{item[id_key]}\")")
+                        break
+            elif target == "expc":
+                # 해석례는 해석례일련번호 사용
+                for id_key in ['해석례일련번호', '법령해석일련번호', 'mstSeq']:
+                    if id_key in item and item[id_key]:
+                        result_lines.append(f"   상세조회: get_legal_interpretation_detail(interpretation_id=\"{item[id_key]}\")")
+                        break
+            elif target == "decc":
+                # 행정심판례는 행정심판례일련번호 사용
+                for id_key in ['행정심판례일련번호', '심판례일련번호', 'mstSeq']:
+                    if id_key in item and item[id_key]:
+                        result_lines.append(f"   상세조회: get_administrative_trial_detail(trial_id=\"{item[id_key]}\")")
+                        break
+            else:
+                # 기타 타겟은 기존 방식 사용
+                for id_key in ['ID', 'id', 'mstSeq', '일련번호']:
+                    if id_key in item and item[id_key]:
+                        result_lines.append(f"   상세조회: get_{target}_detail(id=\"{item[id_key]}\")")
+                        break
+                    
+            results.append("\\n".join(result_lines))
+        
+        total_count = search_data.get('totalCnt', len(target_data))
+        
+        return f"**'{search_query}' 검색 결과** (총 {total_count}건)\\n\\n" + "\\n\\n".join(results)
+        
+    except Exception as e:
+        logger.error(f"판례 검색 결과 포맷팅 오류: {e}")
+        return f"검색 결과 처리 중 오류가 발생했습니다: {str(e)}"
+
+def _format_constitutional_search_results(data: dict, target: str, search_query: str, max_results: int = 50) -> str:
+    """헌법재판소 검색 전용 결과 포맷팅 함수"""
+    try:
+        # 헌법재판소는 DetcSearch > Detc 구조 사용
+        if 'DetcSearch' not in data or 'Detc' not in data['DetcSearch']:
+            return f"'{search_query}'에 대한 검색 결과가 없습니다."
+        
+        detc_item = data['DetcSearch']['Detc']
+        
+        # Detc는 배열 형태로 반환됨
+        if isinstance(detc_item, list):
+            target_data = detc_item
+        elif isinstance(detc_item, dict) and detc_item:
+            target_data = [detc_item]
+        else:
+            return f"'{search_query}'에 대한 검색 결과가 없습니다."
+        
+        # 제한된 결과만 처리
+        target_data = target_data[:max_results]
+        
+        # 헌법재판소 제목 및 상세 정보 필드
+        title_keys = ['사건명', '결정명', '헌법재판소결정명']
+        detail_fields = {
+            '사건번호': ['사건번호', 'caseNo', 'CaseNo'],
+            '종국일자': ['종국일자', 'finalDate', 'judgment_date'],
+            '재판관': ['재판관', 'judge', 'justices']
+        }
+        
+        results = []
+        
+        for idx, item in enumerate(target_data, 1):
+            if not isinstance(item, dict):
+                continue
+                
+            # 제목 찾기
+            title = "제목 없음"
+            for key in title_keys:
+                if key in item and item[key] and str(item[key]).strip():
+                    title = str(item[key]).strip()
+                    break
+            
+            result_lines = [f"**{idx}. {title}**"]
+            
+            # 상세 정보 추가
+            for field_name, possible_keys in detail_fields.items():
+                for key in possible_keys:
+                    if key in item and item[key] and str(item[key]).strip():
+                        result_lines.append(f"   {field_name}: {item[key]}")
+                        break
+            
+            # ID 정보 추가 (상세조회용)
+            for id_key in ['헌재결정례일련번호', 'ID', 'id']:
+                if id_key in item and item[id_key]:
+                    result_lines.append(f"   상세조회: get_constitutional_court_detail(decision_id=\"{item[id_key]}\")")
+                    break
+                    
+            results.append("\\n".join(result_lines))
+        
+        search_data = data['DetcSearch']
+        total_count = search_data.get('totalCnt', len(target_data))
+        
+        return f"**'{search_query}' 검색 결과** (총 {total_count}건)\\n\\n" + "\\n\\n".join(results)
+        
+    except Exception as e:
+        logger.error(f"헌법재판소 검색 결과 포맷팅 오류: {e}")
+        return f"검색 결과 처리 중 오류가 발생했습니다: {str(e)}"
 
 # ===========================================
 # 판례 관련 도구들 (8개)
@@ -106,7 +288,7 @@ def search_precedent(
     try:
         data = _make_legislation_request("prec", params)
         url = _generate_api_url("prec", params)
-        result = _format_search_results(data, "prec", search_query)
+        result = _format_precedent_search_results(data, "prec", search_query, display)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"판례 검색 중 오류: {str(e)}")
@@ -122,7 +304,7 @@ def search_constitutional_court(query: Optional[str] = None, display: int = 20, 
     try:
         data = _make_legislation_request("detc", params)
         url = _generate_api_url("detc", params)
-        result = _format_search_results(data, "detc", search_query)
+        result = _format_constitutional_search_results(data, "detc", search_query, display)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"헌법재판소 결정례 검색 중 오류: {str(e)}")
@@ -138,7 +320,7 @@ def search_legal_interpretation(query: Optional[str] = None, display: int = 20, 
     try:
         data = _make_legislation_request("expc", params)
         url = _generate_api_url("expc", params)
-        result = _format_search_results(data, "expc", search_query)
+        result = _format_precedent_search_results(data, "expc", search_query, display)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 검색 중 오류: {str(e)}")
@@ -154,7 +336,7 @@ def search_administrative_trial(query: Optional[str] = None, search: int = 1, di
     try:
         data = _make_legislation_request("decc", params)
         url = _generate_api_url("decc", params)
-        result = _format_search_results(data, "decc", search_query)
+        result = _format_precedent_search_results(data, "decc", search_query, display)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정심판례 검색 중 오류: {str(e)}")
@@ -171,7 +353,7 @@ def get_administrative_trial_detail(trial_id: Union[str, int]) -> TextContent:
     try:
         data = _make_legislation_request("decc", params)
         url = _generate_api_url("decc", params)
-        result = _format_search_results(data, "decc", f"행정심판례ID:{trial_id}")
+        result = _format_precedent_search_results(data, "decc", f"행정심판례ID:{trial_id}", 1)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"행정심판례 상세 조회 중 오류: {str(e)}")
@@ -194,7 +376,7 @@ def get_precedent_detail(case_id: Union[str, int]) -> TextContent:
         
         # JSON 응답 확인
         if isinstance(data, dict) and data:
-            result = _format_search_results(data, "prec", f"판례ID:{case_id}")
+            result = _format_precedent_search_results(data, "prec", f"판례ID:{case_id}", 1)
             return TextContent(type="text", text=result)
         else:
             # HTML 폴백 (국세청 판례 등)
@@ -236,9 +418,10 @@ def get_constitutional_court_detail(decision_id: Union[str, int]) -> TextContent
     """헌법재판소 결정례 본문 조회"""
     params = {"target": "detc", "ID": str(decision_id)}
     try:
-        data = _make_legislation_request("detc", params)
-        url = _generate_api_url("detc", params)
-        result = _format_constitutional_court_detail(data, decision_id, url)
+        # 상세조회이므로 is_detail=True로 lawService.do 사용
+        data = _make_legislation_request("detc", params, is_detail=True)
+        url = _generate_api_url("detc", params, is_detail=True)
+        result = _format_constitutional_court_detail(data, str(decision_id), url)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"헌법재판소 결정례 상세 조회 중 오류: {str(e)}")
@@ -255,7 +438,7 @@ def get_legal_interpretation_detail(interpretation_id: Union[str, int]) -> TextC
     try:
         data = _make_legislation_request("expc", params)
         url = _generate_api_url("expc", params)
-        result = _format_search_results(data, "expc", f"법령해석례ID:{interpretation_id}")
+        result = _format_precedent_search_results(data, "expc", f"법령해석례ID:{interpretation_id}", 1)
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"법령해석례 상세 조회 중 오류: {str(e)}")
