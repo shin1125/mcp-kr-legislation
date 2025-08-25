@@ -65,11 +65,11 @@ def _format_precedent_search_results(data: dict, target: str, search_query: str,
                 '법원명': ['법원명', 'court', 'courtName']
             }
         elif target == "expc":
-            title_keys = ['해석례명', '해석제목', '질의제목']
+            title_keys = ['안건명', '해석례명', '해석제목', '질의제목']
             detail_fields = {
-                '해석례번호': ['해석례번호', 'expc_no', 'ExpcNo'],
-                '작성일자': ['작성일자', 'create_date', 'createDate'],
-                '소관부처': ['소관부처', 'dept', 'department']
+                '안건번호': ['안건번호', '해석례번호', 'expc_no', 'ExpcNo'],
+                '회신일자': ['회신일자', '작성일자', 'create_date', 'createDate'],
+                '질의기관': ['질의기관명', '소관부처', 'dept', 'department']
             }
         elif target == "decc":
             title_keys = ['재결례명', '사건명', '재결제목']

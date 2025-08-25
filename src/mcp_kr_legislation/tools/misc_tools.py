@@ -44,57 +44,69 @@ def get_ordinance_detail(ordinance_id: Union[str, int]) -> TextContent:
         return TextContent(type="text", text="자치법규ID를 입력해주세요.")
     
     try:
-        # API 요청 파라미터
-        params = {"target": "ordinance", "MST": str(ordinance_id)}
-        url = _generate_api_url("ordinInfoGuide", params)
+        # API 요청 파라미터 - 올바른 target과 엔드포인트 사용
+        params = {"target": "ordin", "ID": str(ordinance_id)}
         
-        # API 요청
-        data = _make_legislation_request("ordinInfoGuide", params)
+        # 올바른 API 엔드포인트 사용 (lawService.do)
+        oc = os.getenv("LEGISLATION_API_KEY", "lchangoo")
+        url = f"http://www.law.go.kr/DRF/lawService.do?OC={oc}&target=ordin&ID={ordinance_id}&type=JSON"
         
-        # 결과 포맷팅 (법령과 동일한 형태로)
+        # API 요청 - 직접 requests 사용
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        # 결과 포맷팅
         result = f"**자치법규 상세 정보** (ID: {ordinance_id})\n"
         result += "=" * 50 + "\n\n"
         
-        if 'ordinance' in data and data['ordinance']:
-            ordinance_info = data['ordinance'][0] if isinstance(data['ordinance'], list) else data['ordinance']
+        if 'LawService' in data and data['LawService']:
+            law_service = data['LawService']
             
-            # 기본 정보 출력
-            basic_fields = {
-                '자치법규명': ['자치법규명', '명칭', 'title'],
-                '자치법규ID': ['자치법규ID', 'ID', 'id'],
-                '공포일자': ['공포일자', 'announce_date', 'date'],
-                '시행일자': ['시행일자', 'effective_date', 'ef_date'],
-                '자치단체': ['자치단체명', 'local_gov', 'organization'],
-                '법규구분': ['법규구분명', 'ordinance_type', 'type']
-            }
-            
-            for field_name, field_keys in basic_fields.items():
-                value = None
-                for key in field_keys:
-                    if key in ordinance_info and ordinance_info[key]:
-                        value = ordinance_info[key]
-                        break
+            # 자치법규 기본정보 확인
+            if '자치법규기본정보' in law_service:
+                basic_info = law_service['자치법규기본정보']
                 
-                if value:
-                    result += f"**{field_name}**: {value}\n"
-            
-            result += "\n" + "=" * 50 + "\n\n"
-            
-            # 조문 내용 출력
-            content_fields = ['조문', 'content', 'text', '내용', 'body']
-            content = None
-            
-            for field in content_fields:
-                if field in ordinance_info and ordinance_info[field]:
-                    content = ordinance_info[field]
-                    break
-            
-            if content:
-                result += "**조문 내용:**\n\n"
-                result += str(content)
-                result += "\n\n"
+                # 기본 정보 출력
+                basic_fields = {
+                    '자치법규명': '자치법규명',
+                    '자치법규ID': '자치법규ID',
+                    '공포일자': '공포일자',
+                    '시행일자': '시행일자',
+                    '자치단체': '지자체기관명',
+                    '공포번호': '공포번호',
+                    '담당부서': '담당부서명'
+                }
+                
+                for field_name, field_key in basic_fields.items():
+                    if field_key in basic_info and basic_info[field_key]:
+                        result += f"**{field_name}**: {basic_info[field_key]}\n"
+                
+                result += "\n" + "=" * 50 + "\n\n"
+                
+                # 조문 내용 출력
+                if '조문' in law_service and law_service['조문']:
+                    조문_data = law_service['조문']
+                    if '조' in 조문_data and 조문_data['조']:
+                        result += "**조문 내용:**\n\n"
+                        for 조 in 조문_data['조']:
+                            if '조제목' in 조 and '조내용' in 조:
+                                result += f"**{조['조제목']}**\n"
+                                result += f"{조['조내용']}\n\n"
+                    else:
+                        result += "조문 내용을 찾을 수 없습니다.\n\n"
+                else:
+                    result += "조문 내용을 찾을 수 없습니다.\n\n"
+                
+                # 부칙 정보 출력
+                if '부칙' in law_service and law_service['부칙']:
+                    부칙_data = law_service['부칙']
+                    if '부칙내용' in 부칙_data and 부칙_data['부칙내용']:
+                        result += "**부칙:**\n"
+                        result += f"{부칙_data['부칙내용']}\n\n"
             else:
-                result += "조문 내용을 찾을 수 없습니다.\n\n"
+                result += "자치법규 기본정보를 찾을 수 없습니다.\n\n"
         else:
             result += "자치법규 정보를 찾을 수 없습니다.\n\n"
         

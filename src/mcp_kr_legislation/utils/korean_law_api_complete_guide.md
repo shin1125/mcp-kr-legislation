@@ -24,6 +24,7 @@
 |--------|--------|---------------|--------|---------------|--------|------------|---------------|
 | **법령** | **본문** | 현행법령 목록 조회 | `law` | 현행법령 본문 조회 | `law` | `search_law` | `get_law_detail` (통합) |
 | | | 시행일 법령 목록 조회 | `eflaw` | 시행일 법령 본문 조회 | `eflaw` | `search_effective_law` | `get_effective_law_detail` |
+| | **통합검색** | 범용 법령 통합 검색 | `다중` | - | - | `search_law_unified` | - |
 | | **조항호목** | - | - | 현행법령 본문 조항호목 조회 | `lawjosub` | - | `get_current_law_articles`, `search_law_articles` |
 | | | - | - | 시행일 법령 본문 조항호목 조회 | `eflawjosub` | - | `get_effective_law_articles` |
 | | **영문법령** | 영문 법령 목록 조회 | `elaw` | 영문 법령 본문 조회 | `elaw` | `search_english_law` | `get_english_law_detail` |
@@ -602,6 +603,44 @@ def search_legislation(target, query, **params):
 [TABLE_0]
 ####  상세 내용
 
+
+##### 범용 법령 통합 검색 도구 (search_law_unified)
+
+**도구 개요**: 모든 법령 검색의 시작점 - 범용 통합 검색 도구
+
+**주요 용도**:
+- 일반적인 키워드로 관련 법령 탐색 (예: "부동산", "교통", "개인정보")
+- 법령명을 정확히 모를 때 검색
+- 다양한 종류의 법령을 한 번에 검색
+- 법령의 역사, 영문판, 시행일 등 다양한 관점에서 검색
+
+**매개변수**:
+- `query`: 검색어 (필수) - 법령명, 키워드, 주제 등 자유롭게 입력
+- `target`: 검색 대상 (기본값: "law")
+  - `law`: 현행법령
+  - `eflaw`: 시행일법령  
+  - `lsHistory`: 법령연혁
+  - `elaw`: 영문법령
+  - 기타 20여개 타겟 지원
+- `display`: 결과 개수 (최대 100)
+- `page`: 페이지 번호
+- `search`: 검색범위 (1=법령명, 2=본문검색)
+
+**반환정보**: 법령명, 법령ID, 법령일련번호(MST), 공포일자, 시행일자, 소관부처
+
+**권장 사용 순서**:
+1. `search_law_unified("금융")` → 관련 법령 목록 파악
+2. 구체적인 법령명 확인 후 → `search_law("은행법")`로 정밀 검색
+
+**사용 예시**:
+- `search_law_unified("금융")` # 금융 관련 모든 법령 검색
+- `search_law_unified("세무", search=2)` # 본문에 세무 포함된 법령
+- `search_law_unified("개인정보", target="law")` # 개인정보 관련 법령 검색
+- `search_law_unified("Income Tax Act", target="elaw")` # 영문 소득세법 검색
+
+**API 구현**: 내부적으로 `lawSearch.do` API를 사용하며, `target` 파라미터에 따라 다양한 법령 데이터베이스를 검색
+
+---
 
 ##### 법령 본문 조회 API
 

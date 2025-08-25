@@ -95,11 +95,11 @@ def search_local_ordinance(query: Optional[str] = None, search: int = 2, display
         return TextContent(type="text", text="검색어를 입력해주세요.")
     
     search_query = query.strip()
-    params = {"target": "ordinfd", "query": search_query, "search": search, "display": min(display, 100), "page": page}
+    params = {"target": "ordin", "query": search_query, "search": search, "display": min(display, 100), "page": page}
     try:
-        data = _make_legislation_request("ordinfd", params)
-        url = _generate_api_url("ordinfd", params)
-        result = _format_search_results(data, "ordinfd", search_query, min(display, 100))
+        data = _make_legislation_request("ordin", params)
+        url = _generate_api_url("ordin", params)
+        result = _format_search_results(data, "ordin", search_query, min(display, 100))
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"자치법규 검색 중 오류: {str(e)}")
@@ -149,11 +149,71 @@ def search_linked_ordinance(
 @mcp.tool(name="get_local_ordinance_detail", description="자치법규 상세내용을 조회합니다. 특정 자치법규의 본문을 제공합니다.")
 def get_local_ordinance_detail(ordinance_id: Union[str, int]) -> TextContent:
     """자치법규 본문 조회"""
-    params = {"target": "ordinance", "ID": str(ordinance_id)}
     try:
-        data = _make_legislation_request("ordinance", params)
-        url = _generate_api_url("ordinance", params)
-        result = _format_search_results(data, "ordinance", f"자치법규ID:{ordinance_id}")
+        # 올바른 API 엔드포인트 사용 (lawService.do)
+        oc = os.getenv("LEGISLATION_API_KEY", "lchangoo")
+        url = f"http://www.law.go.kr/DRF/lawService.do?OC={oc}&target=ordin&ID={ordinance_id}&type=JSON"
+        
+        # API 요청 - 직접 requests 사용
+        response = requests.get(url, timeout=15)
+        response.raise_for_status()
+        
+        data = response.json()
+        
+        # 결과 포맷팅 - 상세 조례 내용 제공
+        result = f"**자치법규 상세 정보** (ID: {ordinance_id})\n"
+        result += "=" * 60 + "\n\n"
+        
+        if 'LawService' in data and data['LawService']:
+            law_service = data['LawService']
+            
+            if '자치법규기본정보' in law_service:
+                basic_info = law_service['자치법규기본정보']
+                
+                # 기본 정보 출력
+                result += "**📋 기본 정보**\n"
+                if '자치법규명' in basic_info and basic_info['자치법규명']:
+                    result += f"**자치법규명**: {basic_info['자치법규명']}\n"
+                if '지자체기관명' in basic_info and basic_info['지자체기관명']:
+                    result += f"**지자체**: {basic_info['지자체기관명']}\n"
+                if '공포일자' in basic_info and basic_info['공포일자']:
+                    result += f"**공포일자**: {basic_info['공포일자']}\n"
+                if '시행일자' in basic_info and basic_info['시행일자']:
+                    result += f"**시행일자**: {basic_info['시행일자']}\n"
+                if '공포번호' in basic_info and basic_info['공포번호']:
+                    result += f"**공포번호**: {basic_info['공포번호']}\n"
+                if '담당부서명' in basic_info and basic_info['담당부서명']:
+                    result += f"**담당부서**: {basic_info['담당부서명']}\n"
+                
+                result += "\n" + "=" * 60 + "\n\n"
+                
+                # 조문 내용 출력 (상세)
+                if '조문' in law_service and law_service['조문']:
+                    조문_data = law_service['조문']
+                    if '조' in 조문_data and 조문_data['조']:
+                        result += "**📜 조문 내용**\n\n"
+                        for 조 in 조문_data['조']:
+                            if '조제목' in 조 and '조내용' in 조:
+                                result += f"**{조['조제목']}**\n"
+                                result += f"{조['조내용']}\n\n"
+                    else:
+                        result += "**📜 조문 내용**\n\n"
+                        result += "조문 내용을 찾을 수 없습니다.\n\n"
+                else:
+                    result += "**📜 조문 내용**\n\n"
+                    result += "조문 내용을 찾을 수 없습니다.\n\n"
+                
+                # 부칙 정보 출력
+                if '부칙' in law_service and law_service['부칙']:
+                    부칙_data = law_service['부칙']
+                    if '부칙내용' in 부칙_data and 부칙_data['부칙내용']:
+                        result += "**📋 부칙**\n"
+                        result += f"{부칙_data['부칙내용']}\n\n"
+            else:
+                result += "자치법규 기본정보를 찾을 수 없습니다.\n\n"
+        else:
+            result += "자치법규 정보를 찾을 수 없습니다.\n\n"
+        
         return TextContent(type="text", text=result)
     except Exception as e:
         return TextContent(type="text", text=f"자치법규 상세 조회 중 오류: {str(e)}") 
